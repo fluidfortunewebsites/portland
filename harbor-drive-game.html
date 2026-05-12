@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harbor Drive: A Portland Story</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e8e8e8;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            border-bottom: 3px solid #E74C3C;
+            padding-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #E74C3C;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -1px;
+        }
+
+        .header .subtitle {
+            font-size: 18px;
+            color: #a8a8a8;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .header .tagline {
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .scene {
+            display: none;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .scene.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scene-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 25px;
+            border-left: 6px solid #E74C3C;
+            padding-left: 20px;
+        }
+
+        .scene-text {
+            font-size: 16px;
+            line-height: 1.9;
+            margin-bottom: 30px;
+            color: #d0d0d0;
+        }
+
+        .scene-text p {
+            margin-bottom: 15px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid #E74C3C;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #E74C3C;
+        }
+
+        .stat-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: #E74C3C;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .faction-alert {
+            background: rgba(139, 0, 0, 0.2);
+            border: 2px solid #8B0000;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #ff9999;
+        }
+
+        .faction-alert.dantes {
+            border-color: #2c1810;
+            background: rgba(44, 24, 16, 0.3);
+            color: #d4a574;
+        }
+
+        .faction-alert.dantes::before {
+            content: "🎭 DANTE'S UNDERGROUND COUNCIL: ";
+            font-weight: 700;
+        }
+
+        .faction-alert.powell::before {
+            content: "📚 POWELL'S BOOKS DIRECTIVE: ";
+            font-weight: 700;
+            color: #8b7355;
+        }
+
+        .faction-alert.screendoor::before {
+            content: "🍳 SCREEN DOOR COLLECTIVE: ";
+            font-weight: 700;
+            color: #d4a574;
+        }
+
+        .faction-alert.voodoo::before {
+            content: "🍩 VOODOO DONUTS SYNDICATE: ";
+            font-weight: 700;
+            color: #ff69b4;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #E74C3C 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .choice-btn:hover {
+            transform: translateX(10px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .choice-btn:active {
+            transform: translateX(8px);
+        }
+
+        .choice-btn .label {
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .choice-btn .description {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ending {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(231, 76, 60, 0.1);
+            border: 2px solid #E74C3C;
+            border-radius: 8px;
+        }
+
+        .ending-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 20px;
+        }
+
+        .ending-type {
+            font-size: 18px;
+            color: #a8a8a8;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .ending-text {
+            font-size: 16px;
+            line-height: 2;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .special-alert {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 15px;
+            color: #FFD700;
+            font-weight: 700;
+        }
+
+        .bikelane-alert {
+            background: rgba(0, 150, 136, 0.2);
+            border: 2px solid #009688;
+            color: #4DB8AC;
+        }
+
+        .bankruptcy-alert {
+            background: rgba(200, 0, 0, 0.3);
+            border: 2px solid #FF0000;
+            color: #FF6B6B;
+        }
+
+        .sponsor-box {
+            background: rgba(100, 100, 100, 0.2);
+            border-left: 4px solid #E74C3C;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #b8b8b8;
+            font-style: italic;
+        }
+
+        .sponsor-box strong {
+            color: #d4a574;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>HARBOR DRIVE</h1>
+        <div class="subtitle">A Portland Saga</div>
+        <div class="tagline">Where Freeways Fear to Tread</div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Political Capital</div>
+            <div class="stat-value" id="politicalScore">100</div>
+            <div class="stat-bar"><div class="stat-fill" id="politicalFill" style="width: 100%"></div></div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Budget Health</div>
+            <div class="stat-value" id="budgetScore">100</div>
+            <div class="stat-bar"><div class="stat-fill" id="budgetFill" style="width: 100%"></div></div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Weirdness</div>
+            <div class="stat-value" id="weirdScore">50</div>
+            <div class="stat-bar"><div class="stat-fill" id="weirdFill" style="width: 50%"></div></div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Dante's Favor</div>
+            <div class="stat-value" id="dantesScore">50</div>
+            <div class="stat-bar"><div class="stat-fill" id="dantesFill" style="width: 50%"></div></div>
+        </div>
+    </div>
+
+    <!-- INTRO -->
+    <div id="scene-intro" class="scene active">
+        <div class="scene-title">The Year Is 1974</div>
+        <div class="scene-text">
+            <p>You are the newly appointed Portland City Commissioner. Your desk is still sticky from whatever the last guy spilled on it. You have one major decision before you:</p>
+            <p>Harbor Drive. US Route 99 West. A six-lane freeway carved through Portland's waterfront like a scar. The city council is locked in eternal debate: tear it down and build a waterfront park, or let the concrete hemorrhage slowly into the river forever.</p>
+            <p>But this decision is bigger than you realize. There are forces at work. Factions. The kind of organizations that don't appear in official minutes.</p>
+            <p>Your phone rings. It's 3 AM. A voice you don't recognize whispers: "Some people don't want this park, Commissioner. Some people benefit from the cars. Remember that when you vote."</p>
+            <p>The voice hangs up.</p>
+            <p>You look out your window at the freeway. Tail lights disappear into fog. You make your choice.</p>
+        </div>
+
+        <div class="sponsor-box">
+            <strong>🍩 This scenario is brought to you by Voodoo Donuts™</strong> - "Fueling Portland's poor decisions since 2003"
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-harborpark')">
+                <span class="label">✓ YES - Remove Harbor Drive, Build Tom McCall Waterfront Park</span>
+                <span class="description">The righteous path. Parks are good. Freeway bad. Simple.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-keep-freeway')">
+                <span class="label">✗ NO - Keep Harbor Drive as Is</span>
+                <span class="description">Sometimes the devil you know is better. The freeway stays.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-lazy-river')">
+                <span class="label">🌊 WILD CARD - Replace Harbor Drive With a Lazy River</span>
+                <span class="description">Why not? Portland's weird. Let's get genuinely weird.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCENE: YES TO PARK -->
+    <div id="scene-harborpark" class="scene">
+        <div class="scene-title">Tom McCall Waterfront Park</div>
+        <div class="scene-text">
+            <p>You vote YES. The city erupts. Environmental groups celebrate. Urban planners weep with joy. A park rises where the freeway once stood—grass, trees, the river visible for the first time in decades.</p>
+            <p>But the Dante's Underground Council is not pleased.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            We expected more from you, Commissioner. That freeway brought people to our doors. Now what? Joggers? Cyclists? The horror. We're watching.
+        </div>
+
+        <div class="scene-text">
+            <p>However, Powell's Books is thrilled. The park brings foot traffic. People walk to the river, then to books. It's perfect.</p>
+        </div>
+
+        <div class="faction-alert powell">
+            Excellent work, Commissioner. The waterfront pedestrian traffic has increased our Q3 sales by 23%. We'd like to sponsor the park's grand opening with complimentary bookmarks and a 47-page poem about urban renewal.
+        </div>
+
+        <div class="scene-text">
+            <p>You now face your next critical decision: What should replace the freeway's east-west transportation function?</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-bike-lanes')">
+                <span class="label">🚴 Build Protected Bike Lanes Everywhere</span>
+                <span class="description">Portland's true calling. Every commute is now a lifestyle statement.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-mount-hood-freeway')">
+                <span class="label">🛣️ Construct the Mount Hood Freeway (Division/Powell Eastbound)</span>
+                <span class="description">A new freeway heading east toward Gresham via Division and Powell. Different direction, same problem. (Dante's strongly approves.)</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-streetcar')">
+                <span class="label">🚊 Build a Modern Streetcar Network</span>
+                <span class="description">European charm. Zero cars. The dream.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCENE: KEEP FREEWAY -->
+    <div id="scene-keep-freeway" class="scene">
+        <div class="scene-title">The Freeway Persists</div>
+        <div class="scene-text">
+            <p>You vote NO. Harbor Drive stays. Concrete remains. Dante's Underground Council sends a fruit basket to your office (suspicious).</p>
+            <p>But Portland's environmental movement is furious. Powell's Books, sensing a business downturn in the waterfront area, sends a strongly worded letter accusing you of "betraying the city's intellectual future."</p>
+        </div>
+
+        <div class="faction-alert powell">
+            We are DEEPLY disappointed in this choice, Commissioner. The waterfront is where Portland's intellectual class wants to be. Not in front of a freeway ramp. We're reconsidering our $50,000 donation to the Portland Parks Committee.
+        </div>
+
+        <div class="scene-text">
+            <p>The Screen Door restaurant, sensing that without a park the waterfront remains a wasteland, decides to take matters into their own hands.</p>
+        </div>
+
+        <div class="faction-alert screendoor">
+            Fine. We'll do it ourselves. We're opening a second location ON the freeway overpass. The ultimate brunch experience: fried chicken overlooking gridlock. You've forced our hand, Commissioner.
+        </div>
+
+        <div class="scene-text">
+            <p>Years pass. The freeway thrives. Traffic flows. But Portland's soul slowly dies. No waterfront parks. No revival. Just tired commuters.</p>
+            <p>And then one day, you receive a letter. Hand-delivered. From Dante's Underground Council.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            You have served us well. But your usefulness is ending. We're installing a new commissioner. Don't worry—you'll never see it coming. We control this city now. The freeway was just the beginning.
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE QUIET ENDING</div>
+            <div class="ending-type">Ending: Dante's Takes Over</div>
+            <div class="ending-text">
+                You are quietly removed from office on charges of "fiscal mismanagement" you didn't commit. The freeway remains. Dante's Underground Council controls Portland's infrastructure decisions for the next 20 years. The city never fully recovers its waterfront. But the nightclub does great business. Powell's Books relocates to the suburbs in protest. The city's weirdness score plummets. Voodoo Donuts becomes the defacto government. You spend your final years writing a memoir nobody reads.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- MOUNT HOOD FREEWAY (FROM PARK CHOICE) -->
+    <div id="scene-mount-hood-freeway" class="scene">
+        <div class="scene-title">The Mount Hood Freeway</div>
+        <div class="scene-text">
+            <p>Smart choice. Harbor Drive becomes Tom McCall Waterfront Park. The Mount Hood Freeway is constructed eastbound via Division and Powell, routing long-distance traffic toward Gresham and Hood River. The Banfield stays functional.</p>
+            <p>Portland achieves balance: a thriving waterfront park AND functional transportation.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Good. The freeway brings visitors. The park brings atmosphere. We can work with this.
+        </div>
+
+        <div class="faction-alert powell">
+            The waterfront park increases our book sales by 34%. We're opening a flagship location right on the park. Excellent vision.
+        </div>
+
+        <div class="scene-text">
+            <p>But then a federal bureaucrat arrives with bad news: the government is demanding a decision on I-205. A second interstate loop around Portland's east side has been deferred for decades. No more waiting.</p>
+        </div>
+
+        <div class="special-alert">
+            ⚠️ FEDERAL MANDATE: Interstate 205 corridor must be selected within 60 days. Three competing options. Your choice will define Portland's growth pattern for 50 years.
+        </div>
+
+        <div class="scene-text">
+            <p>Your engineering team presents three proposals:</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd')">
+                <span class="label">🛣️ I-205 via 52nd Street NE/SE Corridor</span>
+                <span class="description">Closer to downtown. Cuts through Parkrose, Montavilla, South Tabor, Gateway. High impact neighborhoods. Faster commute.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd')">
+                <span class="label">🛣️ I-205 via 92nd Street NE/SE Corridor</span>
+                <span class="description">Further out. Less dense. Accelerates sprawl toward Gresham and Troutdale. Protects core neighborhoods.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-parkway')">
+                <span class="label">🌲 No Interstate: 82nd Street Parkway to PDX Grand Entrance</span>
+                <span class="description">Reject federal freeway. Convert 82nd to a beautiful parkway leading to Portland International Airport instead.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-lazy-river-loop')">
+                <span class="label">🌊 Build a Lazy River to PDX via 82nd — The First Lazy River</span>
+                <span class="description">No Harbor Drive river, no Banfield river. Just 82nd Street as Portland's first and only lazy river, flowing to the airport. Something wonderful happens next.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-second-lazy-river-from-park')">
+                <span class="label">🌊🌊 Build a Lazy River to PDX — Then Keep Building</span>
+                <span class="description">82nd becomes a lazy river. But that's just the beginning. More water. More rivers. More Portland.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-concrete-apocalypse')">
+                <span class="label">🏗️ MADNESS: Build ALL the Unbuilt Freeways At Once</span>
+                <span class="description">Rose City Freeway, Northwest Industrial, State Route 217 tunnel under Forest Park... concrete paradise.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCENE: LAZY RIVER -->
+    <div id="scene-lazy-river" class="scene">
+        <div class="scene-title">The Lazy River Decision</div>
+        <div class="scene-text">
+            <p>You stand up at the city council meeting and make an announcement that will echo through Portland history:</p>
+            <p>"We're replacing Harbor Drive with a lazy river. Not metaphorically. A literal, continuous lazy river. Tubing. Inner tubes. Water rides directly through downtown Portland along the waterfront."</p>
+            <p>The room goes silent. Then chaos. Some people cry. Some cheer. The Dante's Underground Council is literally confused—they can't decide if this is genius or insanity.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Okay... we respect the commitment to weirdness. But how does this help our business? People don't go to nightclubs soaking wet. Or do they? Are we out of touch?
+        </div>
+
+        <div class="scene-text">
+            <p>But Voodoo Donuts sees the ultimate opportunity.</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            We're opening waterfront donut kiosks along the lazy river. Waterproof boxes. Divers will deliver them. Glazed donuts wrapped in waterproof polymer. It's happening whether you like it or not.
+        </div>
+
+        <div class="scene-text">
+            <p>Harbor Drive Lazy River #1 is now a fait accompli. The city is buzzing. But transportation planners are panicking—you've removed a major arterial. What do you do about the Banfield Expressway, and how do you replace the lost traffic capacity?</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-lazy-river-mount-hood')">
+                <span class="label">🛣️ Build the Mount Hood Freeway, Keep the Banfield as-is</span>
+                <span class="description">Eastbound freeway via Division/Powell to Gresham replaces lost capacity. Banfield stays exactly as it is.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-banfield-lazy-river-with-mhf')">
+                <span class="label">🌊🛣️ Mount Hood Freeway + Replace the Banfield with Lazy River #2</span>
+                <span class="description">Build the eastbound freeway AND convert the Banfield into a second lazy river. Two rivers, one freeway.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-banfield-boulevard')">
+                <span class="label">🌳 Mount Hood Freeway + Replace the Banfield with a Surface Boulevard</span>
+                <span class="description">Build the eastbound freeway. Convert I-84 into a beautiful tree-lined surface boulevard. The European option.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-banfield-bike-path')">
+                <span class="label">🚴 Mount Hood Freeway + Convert the Banfield to America's Widest Bike Path</span>
+                <span class="description">Build the eastbound freeway. Repurpose all 6+ lanes of the Banfield as a bike expressway. Pure chaos.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-lazy-river-banfield')">
+                <span class="label">🌊🌊 Replace the Banfield with Lazy River #2 (No Mount Hood Freeway)</span>
+                <span class="description">Two lazy rivers, zero new freeways. Portland's infrastructure is now entirely aquatic. What could go wrong.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-lazy-river-both')">
+                <span class="label">🤯 DO EVERYTHING: Two Lazy Rivers + Mount Hood Freeway + Keep Banfield Open</span>
+                <span class="description">Harbor Drive becomes a river. The Banfield ALSO becomes a river. AND the Mount Hood Freeway. Everything at once.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER + BANFIELD -->
+    <div id="scene-lazy-river-banfield" class="scene">
+        <div class="scene-title">The Banfield River Decision</div>
+        <div class="scene-text">
+            <p>You announce it: "The Banfield Expressway? Lazy river now too. Two lazy rivers. Portland's infrastructure is now 70% aquatic."</p>
+            <p>Portland's traffic network becomes half waterway, half asphalt. Commuters are confused. Engineers resign in protest. Voodoo Donuts stock rises 400%.</p>
+            <p>But there's a catastrophic problem.</p>
+        </div>
+
+        <div class="special-alert bankruptcy-alert">
+            ⚠️ BUDGET CRISIS: Portland's infrastructure budget cannot support TWO lazy rivers, two freeway systems, and basic municipal services. The city's finance director is crying in the mayor's office. Tax revenue is insufficient. The city is hemorrhaging money at $2 million per day.
+        </div>
+
+        <div class="scene-text">
+            <p>Powell's Books, seeing the economic collapse coming, abandons the waterfront and relocates to Eugene. Screen Door becomes a food cart. Even Dante's goes dark temporarily—the Underground Council convenes for an emergency meeting that lasts 8 hours.</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            We're pulling our underwater donut operation. This is financial suicide. Even we have limits. Good luck explaining to citizens why their tax bills tripled.
+        </div>
+
+        <div class="scene-text">
+            <p>By 2008, Portland has no choice. The city declares partial bankruptcy. The Tualatin Valley—that suburban nothingness nobody thought about—becomes a refuge.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE BANKRUPTCY ENDING</div>
+            <div class="ending-type">Ending: The Tualatin Valley Exodus</div>
+            <div class="ending-text">
+                Portland's budget collapses completely. The city cannot maintain the freeway, the lazy rivers, or basic services. A mass exodus occurs across the Morrison Bridge: 250,000 citizens relocate to the Tualatin Valley—Beaverton, Tigard, Sherwood. They build new lives in suburbs nobody wanted to acknowledge. New communities. New identities. New brunch spots that are somehow even better than Portland's.<br><br>You are branded the Commissioner who destroyed Portland by turning it into Splash Mountain. Your statue is erected in the Tualatin Valley as a warning to others. Powell's Books opens a mega-location in Beaverton. Voodoo Donuts becomes a Valley institution. Portland slowly sinks into the Columbia River, metaphorically speaking. Dante's nightclub becomes an underwater ruin.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER + MOUNT HOOD FREEWAY -->
+    <div id="scene-lazy-river-mount-hood" class="scene">
+        <div class="scene-title">The Mount Hood Freeway</div>
+        <div class="scene-text">
+            <p>Smart move. Harbor Drive becomes a lazy river. The Mount Hood Freeway is constructed eastbound via Division and Powell, routing long-distance traffic toward Gresham. The Banfield stays functional.</p>
+            <p>Portland achieves an impossible balance: maximum weirdness AND functional transportation.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            This is actually... perfect. The freeway brings visitors. The lazy river brings atmosphere. We're proud of this city again.
+        </div>
+
+        <div class="faction-alert powell">
+            The waterfront is thriving. Our new location is up 47%. We're sponsoring a lazy river boat rental kiosk. This is poetry in real estate.
+        </div>
+
+        <div class="scene-text">
+            <p>Before the ink is dry, a cycling collective has blockaded Burnside Street. They've painted it green. They're demanding a permanent protected bike lane. They look determined and caffeinated.</p>
+        </div>
+
+        <div class="special-alert bikelane-alert">
+            🚲 BURNSIDE BLOCKADE: Cyclists have occupied Burnside Street. They will not leave. Your response will define your relationship with Portland's cycling community for decades.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-burnside-bikes')">
+                <span class="label">🚴 Approve Burnside Bike Lane Permanently</span>
+                <span class="description">Let them have it. A lazy river AND a bike superhighway. Portland is becoming unstoppable.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-ignore-cyclists')">
+                <span class="label">🚗 Reject the Bike Lane, Keep Burnside for Cars</span>
+                <span class="description">You've done enough weird things today. Burnside stays mixed traffic.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER PATH: BURNSIDE APPROVED -> I-205 DECISION -->
+    <div id="scene-burnside-bikes" class="scene">
+        <div class="scene-title">Burnside Goes Green</div>
+        <div class="scene-text">
+            <p>You approve it. Burnside is painted green from the river to 82nd. Cyclists cheer. The lazy river flows. The Mount Hood Freeway hums eastward. Everything is working.</p>
+            <p>Then the federal government arrives with one more demand.</p>
+        </div>
+
+        <div class="faction-alert powell">
+            Burnside bike traffic has increased foot traffic to our store by 31%. We're sponsoring the bike lane's grand opening with a complimentary reading list. You are doing the Lord's work, Commissioner.
+        </div>
+
+        <div class="special-alert">
+            ⚠️ FEDERAL MANDATE: I-205 corridor must be chosen within 60 days. Your lazy river, Mount Hood Freeway, and bike lane are all in place. Now decide Portland's eastern growth pattern.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd')">
+                <span class="label">🛣️ I-205 via 52nd Street NE/SE</span>
+                <span class="description">Closer in. Displaces established neighborhoods. Faster commute.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd')">
+                <span class="label">🛣️ I-205 via 92nd Street NE/SE</span>
+                <span class="description">Further out. Spreads sprawl toward Gresham.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-parkway')">
+                <span class="label">🌲 No I-205: 82nd Street Parkway to PDX</span>
+                <span class="description">Reject the freeway entirely. Go parkway.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-lazy-river-2')">
+                <span class="label">🌊 Second Lazy River to PDX via 82nd</span>
+                <span class="description">Harbor Drive is already Lazy River #1. Make 82nd Lazy River #2. The Great Loop becomes possible.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-concrete-apocalypse')">
+                <span class="label">🏗️ Build ALL the Unbuilt Freeways</span>
+                <span class="description">Rose City Freeway, NW Industrial, SR-217 tunnel... the full concrete vision.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER PATH: BURNSIDE REJECTED -> I-205 DECISION -->
+    <div id="scene-ignore-cyclists" class="scene">
+        <div class="scene-title">Burnside Stands</div>
+        <div class="scene-text">
+            <p>You reject the bike lane. Burnside stays mixed traffic. The cyclists disperse, furious, muttering about long memories and longer organizational timelines.</p>
+            <p>Dante's approves. The federal government, oblivious to all of this, arrives immediately with another demand.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Wise. Cyclists don't drink. Keep the car traffic flowing to our doors. We owe you one.
+        </div>
+
+        <div class="special-alert">
+            ⚠️ FEDERAL MANDATE: I-205 corridor must be chosen within 60 days. The lazy river flows, the Mount Hood Freeway is built, and Burnside stays cars. Now define Portland's eastern growth.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd')">
+                <span class="label">🛣️ I-205 via 52nd Street NE/SE</span>
+                <span class="description">Closer in. Displaces established neighborhoods. Faster commute.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd')">
+                <span class="label">🛣️ I-205 via 92nd Street NE/SE</span>
+                <span class="description">Further out. Spreads sprawl toward Gresham.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-parkway')">
+                <span class="label">🌲 No I-205: 82nd Street Parkway to PDX</span>
+                <span class="description">Reject the freeway entirely. Let Portland grow up, not out.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-lazy-river-2')">
+                <span class="label">🌊 Second Lazy River to PDX via 82nd</span>
+                <span class="description">Harbor Drive is already Lazy River #1. Make 82nd Lazy River #2. Cyclists can tube to the airport whether you approved their bike lane or not.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-concrete-apocalypse')">
+                <span class="label">🏗️ Build ALL the Unbuilt Freeways</span>
+                <span class="description">Rose City Freeway, NW Industrial, SR-217 tunnel... maximum concrete.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER + MOUNT HOOD + BANFIELD (BOTH FREEWAYS) -->
+    <div id="scene-lazy-river-both" class="scene">
+        <div class="scene-title">The Total Chaos Option</div>
+        <div class="scene-text">
+            <p>You announce it all at once in a rambling 45-minute speech:</p>
+            <p>"Harbor Drive becomes a lazy river. The Banfield ALSO becomes a lazy river. The Mount Hood Freeway is built. EVERYTHING exists simultaneously."</p>
+            <p>The city council has a collective aneurysm. Three members retire immediately. Two start cults (separate cults). One just stares at the infrastructure map without blinking for 6 hours.</p>
+            <p>But something genuinely miraculous happens: it works.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            This is... this is the most Portland thing ever. We're impressed. Also confused. Also concerned about accounting. But ultimately impressed.
+        </div>
+
+        <div class="scene-text">
+            <p>Three simultaneous modes of transportation operate at once: freeway traffic heading east via Division and Powell, two lazy rivers for the whimsical, and somehow—defying physics and economics—it all functions.</p>
+            <p>Powell's Books opens a 400,000-square-foot waterfront mega-location with a Powell's-branded lazy river boat. Screen Door's underwater brunch concept actually launches with a Michelin star. Voodoo Donuts achieves market dominance through lazy river delivery service.</p>
+            <p>But then—</p>
+        </div>
+
+        <div class="special-alert bikelane-alert">
+            🚲 CRITICAL OVERRIDE: While you were focused on water, a group of fixie riders has taken over Division Street entirely. They've removed all cars. They claim it. It's a bike lane now. There's no negotiation possible. They look angry and committed.
+        </div>
+
+        <div class="scene-text">
+            <p>A street has been claimed. Not by the city government. By cyclists. Through direct action. And they will not relinquish it.</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-division-bikes')">
+                <span class="label">🚴 Accept Division Street as Permanent Bike Territory</span>
+                <span class="description">They've earned it. Let them have it. Direct action democracy.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-division-crackdown')">
+                <span class="label">🚨 Crack Down: Send Police to Clear Division Street</span>
+                <span class="description">Restore traffic. Show that cyclists don't make the rules. (This will not end well.)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MOUNT HOOD FREEWAY + BANFIELD AS LAZY RIVER #2 -->
+    <div id="scene-banfield-lazy-river-with-mhf" class="scene">
+        <div class="scene-title">Two Rivers and a Freeway</div>
+        <div class="scene-text">
+            <p>You announce the plan: the Mount Hood Freeway will run eastbound via Division and Powell to Gresham, replacing Harbor Drive's lost traffic capacity. And the Banfield Expressway — I-84, the backbone of Portland's east-west traffic — will become Lazy River #2.</p>
+            <p>Transportation engineers stare at the ceiling for a long time. Several tender their resignations. One just starts laughing and doesn't stop.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Commissioner. Two lazy rivers. One freeway. I don't know whether to be furious or delighted. We're going with delighted. Our new waterfront location is already tubing distance from Dante's. This is perfect.
+        </div>
+
+        <div class="faction-alert voodoo">
+            TWO lazy rivers means TWO underwater donut delivery networks. The Banfield River alone could support seventeen kiosks. We've already ordered the waterproof polymer stock.
+        </div>
+
+        <div class="scene-text">
+            <p>The Mount Hood Freeway opens eastbound. Traffic flows to Gresham. Meanwhile the Banfield — the old I-84 corridor through the lower Gorge approach — fills with water. Inner tubes appear. Bemused Gresham commuters find themselves tubing home.</p>
+            <p>Then the federal government arrives, unimpressed, demanding a decision on I-205.</p>
+        </div>
+
+        <div class="special-alert">
+            ⚠️ FEDERAL MANDATE: I-205 corridor decision required. Two lazy rivers are already in place. The feds are concerned.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd')">
+                <span class="label">🛣️ I-205 via 52nd Street NE/SE</span>
+                <span class="description">Closer in. Displaces neighborhoods. Faster commute. At this point the feds are just relieved you're building something normal.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd')">
+                <span class="label">🛣️ I-205 via 92nd Street NE/SE</span>
+                <span class="description">Further out. Spreads sprawl. Protects core. A reasonable choice amid the aquatic madness.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-airport-parkway')">
+                <span class="label">🌲 No I-205: 82nd Street Parkway to PDX</span>
+                <span class="description">Reject the freeway. Parkway to the airport. Portland chooses beauty over throughput.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-volcanic-apocalypse')">
+                <span class="label">🌊 Lazy River #3 to the Airport via 82nd</span>
+                <span class="description">You have two lazy rivers. Why not a third? (Geology has concerns.)</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-concrete-apocalypse')">
+                <span class="label">🏗️ Build ALL the Unbuilt Freeways</span>
+                <span class="description">Two lazy rivers weren't enough. Now go maximum concrete everywhere else.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MOUNT HOOD FREEWAY + BANFIELD AS SURFACE BOULEVARD -->
+    <div id="scene-banfield-boulevard" class="scene">
+        <div class="scene-title">The Boulevard Option</div>
+        <div class="scene-text">
+            <p>You announce it: the Mount Hood Freeway goes in eastbound via Division and Powell. And the Banfield Expressway — I-84 — is decommissioned as a freeway and rebuilt as a surface-level boulevard. Trees. Sidewalks. Bike lanes. Street crossings. The full European urban treatment applied to a former interstate.</p>
+            <p>Paris did this with the Pompidou Expressway. Seoul did it with the Cheonggyecheon. Portland will do it with the Banfield.</p>
+        </div>
+
+        <div class="faction-alert powell">
+            This is extraordinary. A boulevard where I-84 once roared? Think of the new neighborhoods. Think of the pedestrian traffic. Think of the Powell's outposts we could open along its entire length from the Rose Quarter to Troutdale.
+        </div>
+
+        <div class="faction-alert dantes">
+            We are... cautiously optimistic. Surface streets mean slower traffic, which means people stop. People who stop go to nightclubs. This could work.
+        </div>
+
+        <div class="faction-alert screendoor">
+            A tree-lined boulevard through inner Northeast Portland? We're opening three locations. This is exactly the kind of neighborhood energy we need. Prepare for a two-hour brunch wait on every corner.
+        </div>
+
+        <div class="scene-text">
+            <p>The Banfield Boulevard project is hailed internationally. Urban planners from Copenhagen visit. A documentary is made. Portland is, briefly, not weird in a bad way—weird in a visionary way.</p>
+            <p>Then the Burnside cyclists arrive.</p>
+        </div>
+
+        <div class="special-alert bikelane-alert">
+            🚲 BURNSIDE BLOCKADE: Emboldened by the boulevard decision, cyclists have occupied Burnside Street demanding a protected bike lane. They see momentum. They want in.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-burnside-bikes')">
+                <span class="label">🚴 Approve Burnside Bike Lane</span>
+                <span class="description">Yes. The boulevard, the freeway, the lazy river, and now a bike lane. Portland is complete.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-ignore-cyclists')">
+                <span class="label">🚗 Reject the Bike Lane, Keep Burnside Mixed</span>
+                <span class="description">You've done enough. Burnside stays for everyone.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MOUNT HOOD FREEWAY + BANFIELD AS AMERICA'S WIDEST BIKE PATH -->
+    <div id="scene-banfield-bike-path" class="scene">
+        <div class="scene-title">America's Widest Bike Path</div>
+        <div class="scene-text">
+            <p>You announce it: the Mount Hood Freeway goes in eastbound via Division and Powell. And the Banfield Expressway — the full width of I-84, all six-plus lanes, the shoulders, the median, everything — is converted into a protected bike path.</p>
+            <p>Not a bike lane. A bike expressway. The widest dedicated cycling infrastructure in the United States. Possibly the world. A velodrome that goes from the Rose Quarter to Troutdale.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            I... what? The entire Banfield? For bikes? All of it? You realize that's twelve lanes of asphalt given to people who don't even own cars? We are having an emergency council meeting right now.
+        </div>
+
+        <div class="scene-text">
+            <p>The cycling community loses its collective mind. Portland becomes international news. The New York Times runs a headline: "Portland Converts Interstate to Bike Path, Remains Unclear If This Is Genius or Collapse."</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            We're opening Voodoo Donuts bike-through windows every half mile along the entire corridor. Cyclists will never need to leave the Banfield Bike Expressway. This is our destiny.
+        </div>
+
+        <div class="scene-text">
+            <p>The Banfield Bike Expressway becomes the most-used cycling infrastructure in North America. Commuters from Gresham bike in on a twelve-lane velodrome. The Mount Hood Freeway handles car traffic. Voodoo Donuts serves the riders. Powell's Books opens a cycling-accessible location at every former on-ramp.</p>
+            <p>Dante's Underground Council — furious at first — eventually opens a series of nightclubs along the bike path. Turns out, cyclists party harder than anyone expected.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE GLORIOUS ABSURDITY ENDING</div>
+            <div class="ending-type">Ending: America's Bike Capital</div>
+            <div class="ending-text">
+                Portland becomes the undisputed cycling capital of North America. The Banfield Bike Expressway is wider than most freeways. Gresham commuters arrive downtown by bike in 25 minutes on a dedicated twelve-lane velodrome. Car traffic flows on the Mount Hood Freeway. Harbor Drive is a lazy river. Everything works in a way that violates every assumption of 20th-century transportation planning.<br><br>Powell's Books sponsors the Banfield Bike Expressway mile markers. Voodoo Donuts achieves total market saturation with bike-through windows every half mile. Screen Door opens an elaborate cycling rest stop at the midpoint near 39th Avenue. Dante's nightclubs along the path become legendary—open until 4 AM, requiring a bike to enter.<br><br>The Keep Portland Weird sign at Dante's has never been more accurate. You are remembered as the Commissioner who gave twelve lanes of interstate to cyclists and somehow made it work. Your statue is installed at the Banfield Bike Expressway's western terminus, wearing a helmet.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- I-205 VIA 52ND CORRIDOR -->
+    <div id="scene-i205-52nd" class="scene">
+        <div class="scene-title">I-205 via 52nd Street</div>
+        <div class="scene-text">
+            <p>You choose the 52nd Street corridor. Closer to downtown. More efficient. But it cuts through established neighborhoods—Parkrose, Montavilla, South Tabor, Gateway. Thousands of homes displaced.</p>
+            <p>It's the practical choice. It's also brutal.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Smart. Very smart. Gateway becomes prime freeway-adjacent real estate. We're already planning nightclubs along the ramps.
+        </div>
+
+        <div class="scene-text">
+            <p>Now there's one final decision: the cyclists have blockaded Burnside again. Will you accommodate them?</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd-bikes')">
+                <span class="label">🚴 Approve Burnside Bike Lane</span>
+                <span class="description">Accept the bike lane despite the freeway construction.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-52nd-no-bikes')">
+                <span class="label">🚗 Reject Bike Lane, Prioritize I-205</span>
+                <span class="description">Freeways come first. Bikes can wait.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- I-205 VIA 92ND CORRIDOR -->
+    <div id="scene-i205-92nd" class="scene">
+        <div class="scene-title">I-205 via 92nd Street</div>
+        <div class="scene-text">
+            <p>You choose the 92nd Street corridor. Further out. Less dense. But it spreads sprawl eastward—new developments follow the freeway like moths to flame. Gresham explodes outward. Troutdale becomes a boomtown.</p>
+            <p>It's the suburban choice. It's also Portland's future.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Smart choice. Keeps the city core intact. The nightclubs stay downtown. We approve.
+        </div>
+
+        <div class="faction-alert powell">
+            This protects our waterfront investment. Powell's remains the heart of Portland. Excellent decision.
+        </div>
+
+        <div class="scene-text">
+            <p>Once again, the cyclists have blockaded Burnside. Your final choice.</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd-bikes')">
+                <span class="label">🚴 Approve Burnside Bike Lane</span>
+                <span class="description">Let the cyclists have their victory.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-i205-92nd-no-bikes')">
+                <span class="label">🚗 Reject Bike Lane, Keep Burnside for Cars</span>
+                <span class="description">You've done enough freeway building. No more changes.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AIRPORT PARKWAY NO-BUILD OPTION -->
+    <div id="scene-airport-parkway" class="scene">
+        <div class="scene-title">The Grand Parkway Vision</div>
+        <div class="scene-text">
+            <p>You reject both freeway corridors. Instead, you propose something radical: convert 82nd Street into a beautiful parkway. Trees. Grass. A grand ceremonial entrance to Portland International Airport. No more highway expansion.</p>
+            <p>The federal government is stunned. Portland is choosing NOT to build a freeway?</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            We... actually respect this. You've broken the cycle. No more freeways. We can work with this.
+        </div>
+
+        <div class="faction-alert powell">
+            This is beautiful. Portland commits to density and transit instead of sprawl. We're opening a Powell's at PDX with the new grand entrance. Inspired.
+        </div>
+
+        <div class="scene-text">
+            <p>The cyclists, seeing your commitment to non-freeway thinking, don't even blockade Burnside. They respect your decision.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE VISIONARY ENDING</div>
+            <div class="ending-type">Ending: Portland Chooses Different</div>
+            <div class="ending-text">
+                By rejecting I-205 entirely and replacing 82nd with a parkway and grand airport entrance, you've fundamentally altered Portland's trajectory. The city grows UP instead of OUT. Density increases. Transit-oriented development flourishes. The airport entrance becomes a symbol of Portland's commitment to beauty over speed. Sprawl decreases. Gresham remains a separate city. Powell's Books thrives on the waterfront. Dante's celebrates in their nightclub. Voodoo Donuts becomes an airport icon. Screen Door opens at PDX. You're remembered as the Commissioner who broke the freeway cycle. Your statue stands in the 82nd Street Parkway, surrounded by trees.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- PARK PATH: 82ND = LAZY RIVER #1, NOW KEEP BUILDING -> LAZY RIVER #2 -->
+    <div id="scene-second-lazy-river-from-park" class="scene">
+        <div class="scene-title">The Second Lazy River</div>
+        <div class="scene-text">
+            <p>The 82nd Street Lazy River to PDX is open and beloved. Portlanders tube to the airport. Voodoo Donuts operates a departure lounge kiosk. Everything is fine.</p>
+            <p>You are not satisfied. You want more water.</p>
+            <p>The Banfield Expressway sits there, wide and asphalt and boring. You stare at it. It stares back. You know what it could become.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Commissioner. We know that look. Don't do it. We're begging you. We have a nightclub to run. We need cars. We need— you're already signing the paperwork aren't you.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-airport-lazy-river-loop')">
+                <span class="label">🌊 Stop at Two — Keep the Banfield as a Freeway</span>
+                <span class="description">82nd is Lazy River #1. That's enough. The Great Loop can still happen using natural rivers. Keep the Banfield for cars.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-volcanic-apocalypse')">
+                <span class="label">🌊🌊🌊 Convert the Banfield to Lazy River #2 — Three Rivers Total</span>
+                <span class="description">82nd is #1. Banfield is #2. And you'll find a third somewhere. Geology has been quiet for too long.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAZY RIVER PATH: HARBOR = #1, 82ND = #2, GREAT LOOP OR PUSH TO #3 -->
+    <div id="scene-airport-lazy-river-2" class="scene">
+        <div class="scene-title">Lazy River #2: The Airport Connection</div>
+        <div class="scene-text">
+            <p>Harbor Drive became Lazy River #1. Now 82nd Street becomes Lazy River #2, running north to Portland International Airport.</p>
+            <p>Two lazy rivers. The Mount Hood Freeway running east. The Banfield still intact. Portland has achieved a bizarre equilibrium.</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            Two lazy rivers. TWO. The 82nd corridor alone supports eleven new kiosk locations. We are operating at maximum donut capacity. This is the best city on Earth.
+        </div>
+
+        <div class="faction-alert powell">
+            The 82nd Lazy River passes three blocks from our flagship location. Foot traffic — or tube traffic — has increased 58%. We're sponsoring the river's grand opening with a complimentary waterproof book sleeve for every tuber.
+        </div>
+
+        <div class="scene-text">
+            <p>With two lazy rivers in place, a city engineer notices something extraordinary on a map. Harbor Drive (Lazy River #1) runs along the waterfront. 82nd Street (Lazy River #2) runs north to PDX. A bypass canal around the airport's north boundary connects to the Columbia River. The Columbia flows west back toward the city. The Willamette runs south. A Milwaukie Extension east connects back to 82nd.</p>
+            <p>It's the Great Loop. Two artificial rivers, two natural ones, one complete circuit.</p>
+            <p>Do you fund the Milwaukie Extension and airport bypass canal to complete it? Or do you keep building more lazy rivers until something geological objects?</p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-airport-lazy-river-loop')">
+                <span class="label">🌊 Complete the Great Loop — Milwaukie Extension + Airport Bypass Canal</span>
+                <span class="description">Fund the two remaining connections. Two lazy rivers plus two natural rivers form a complete inner-tube circuit of Portland.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-volcanic-apocalypse')">
+                <span class="label">🌊🌊🌊 Build Lazy River #3 — Convert the Banfield Too</span>
+                <span class="description">You have two lazy rivers. The Banfield could be a third. Mount Hood has been dormant for 400 years. What are the odds?</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- AIRPORT LAZY RIVER LOOP - FIRST LAZY RIVER, NO ERUPTION -->
+    <div id="scene-airport-lazy-river-loop" class="scene">
+        <div class="scene-title">The 82nd Street Lazy River</div>
+        <div class="scene-text">
+            <p>You announce it calmly, as if this is perfectly reasonable: "We're not building I-205. Instead, 82nd Street becomes a lazy river running from the inner city out to Portland International Airport."</p>
+            <p>The federal government is baffled. The engineering team is silent for four minutes. Then someone says "actually that's technically feasible" and everything accelerates.</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            A lazy river to the airport. People tubing to their flights. We're opening a Voodoo Donuts departure lounge kiosk at the terminus. Waterproof boxes. Pre-flight glazed. This is the future.
+        </div>
+
+        <div class="faction-alert powell">
+            We are opening a Powell's Books at PDX that is accessible only by inner tube. The exclusivity alone will drive sales. Inspired decision, Commissioner.
+        </div>
+
+        <div class="scene-text">
+            <p>The 82nd Street Lazy River opens. Portlanders tube to the airport. It works. It actually works. Flight check-in now includes a "drying station."</p>
+            <p>But then something unexpected happens. Northeast and Southeast Portland, watching the 82nd corridor become a beloved aquatic artery, start building their own neighborhood lazy rivers and canals without asking permission. By the time City Hall notices, inner Sellwood has a canal. Woodstock has a canal. The Buckman neighborhood has converted three streets to waterways. Alberta Arts District has a lazy river running its entire length.</p>
+            <p>Someone at the Portland Bureau of Transportation writes a memo titled "We Have Lost Control Of The Water Situation." It is never formally addressed.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            The Alberta lazy river passes directly in front of our secondary location. Tube traffic has increased our Thursday night attendance by 340%. We are no longer opposed to water-based infrastructure. We are its greatest champion.
+        </div>
+
+        <div class="faction-alert screendoor">
+            We now offer lazy river brunch service. You tube up, you order, you receive fried chicken in a waterproof container, you continue tubing. The wait list is six weeks. We have no regrets.
+        </div>
+
+        <div class="scene-text">
+            <p>A city engineer, staring at a map covered in blue marker lines representing spontaneous citizen canals, has a revelation. The 82nd Street Lazy River runs north to Portland International Airport. From there, a bypass canal can be cut around the airport's north boundary to connect with the Columbia River. The Columbia flows west back toward the city. The Willamette runs south through Portland. A Milwaukie extension of the lazy river connects back to the Willamette's east bank.</p>
+            <p>It's a complete loop.</p>
+        </div>
+
+        <div class="special-alert">
+            🚣 THE GREAT LOOP: 82nd Street Lazy River north to PDX → bypass canal east around the airport to the Columbia River → Columbia River west back toward the city → Willamette River south through Portland → Milwaukie Extension east back to 82nd. A complete inner-tube circuit of greater Portland using natural and artificial waterways.
+        </div>
+
+        <div class="scene-text">
+            <p>The city council votes to fund the Milwaukie Extension and the airport bypass canal. The Columbia and Willamette do the rest for free, as rivers do.</p>
+            <p>The Mount Hood Freeway handles car traffic. The Great Loop handles everything else.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            The Great Loop passes Dante's on the Willamette segment. We have installed a floating dock. Tubers stop. They drink. They reboard. This is the most Portland thing that has ever happened and we want it on our sign alongside "Keep Portland Weird."
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE GREAT LOOP ENDING</div>
+            <div class="ending-type">Ending: Portland Becomes a Water City</div>
+            <div class="ending-text">
+                Portland completes the Great Loop: the 82nd Street Lazy River north to PDX, a bypass canal east around the airport to the Columbia River, the Columbia flowing west back toward the city, the Willamette running south through downtown, and the Milwaukie Extension connecting east back to 82nd Street. A complete inner-tube circuit of greater Portland using three artificial waterways and two of the Pacific Northwest's great natural rivers.<br><br>
+                Northeast and Southeast Portland's spontaneous neighborhood canals — built without permission, ratified by popular acclaim — connect the residential grid to the Great Loop at dozens of points. The Buckman Canal. The Alberta Lazy River. The Sellwood Cut. The Woodstock Channel. None of them were planned. All of them work.<br><br>
+                The Mount Hood Freeway carries car traffic eastbound to Gresham and the Gorge. The Great Loop carries everything else. Powell's Books opens a floating bookstore on the Willamette segment with a Powell's-branded inner tube available for purchase. Voodoo Donuts operates the departure lounge at the PDX terminus, the Willamette floating kiosk, and the Milwaukie Extension rest stop. Screen Door's lazy river brunch service has a six-week wait. Dante's floating dock on the Willamette becomes one of Portland's most beloved institutions, accessible only by inner tube, open until 2 AM.<br><br>
+                You are remembered as the Commissioner who gave Portland a lazy river to the airport and accidentally caused the entire city to build itself into a water city. No other city on Earth has done this. Hydrologists study it. Urban planners visit and weep with confused joy. The Keep Portland Weird sign at Dante's floats on a raft now.<br><br>
+                Your statue stands at the confluence of the Milwaukie Extension and the Willamette, knee-deep in water, holding an inner tube.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- VOLCANIC APOCALYPSE -->
+    <div id="scene-volcanic-apocalypse" class="scene">
+        <div class="scene-title">The Lazy River to the Airport</div>
+        <div class="scene-text">
+            <p>You announce it with absolute certainty: "We're building a lazy river from downtown Portland all the way to Portland International Airport via 82nd Street. An aquatic highway to the skies."</p>
+            <p>The city council looks at you like you're insane. They may be right.</p>
+        </div>
+
+        <div class="faction-alert voodoo">
+            Three lazy rivers? FOUR airport donut delivery underwater drones? This is the greatest day in Voodoo Donuts history.
+        </div>
+
+        <div class="scene-text">
+            <p>Construction begins immediately. The lazy river tunnel toward the airport is dug. Water is pumped eastward at massive volume.</p>
+            <p>Then, on Day 47 of construction, the ground shakes.</p>
+        </div>
+
+        <div class="special-alert bankruptcy-alert">
+            🌋 UNPRECEDENTED EVENT: Mount Hood volcanic tremors detected. Seismic readings are off the charts. The massive amount of water pumped into the ground has destabilized the volcanic system. Geologists are panicking.
+        </div>
+
+        <div class="scene-text">
+            <p>You watch from the commissioner's office as the news breaks. Mount Hood hasn't erupted in 400 years. But the pressure is building. The water. The pumping. The disruption of the volcanic system.</p>
+            <p>Three days later, it happens.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE VOLCANIC ENDING</div>
+            <div class="ending-type">Ending: Mount Hood Erupts - The Cascadian Catastrophe</div>
+            <div class="ending-text">
+                Mount Hood erupts with unprecedented force. The lazy river tunnel fills with superheated steam and volcanic debris. The explosion is visible from Seattle. lahars flow down the Hood River canyon, wiping out every community from Government Camp to the Columbia River. Portland is buried under 3 feet of volcanic ash. The Columbia River is choked with debris.<br><br>The city is uninhabitable. 2 million people are forced to evacuate. Dante's nightclub is entombed in ash. Powell's Books is destroyed. Voodoo Donuts is vaporized. The Screen Door is... well, permanently closed.<br><br>Survivors relocate to the Tualatin Valley, the Willamette Valley, and as far as Eugene and Salem. You are blamed entirely. You become a historical figure—"The Commissioner Who Destroyed Portland By Messing With Volcanoes." Your statue is buried under volcanic ash in Pioneer Courthouse Square, serving as a dark monument to hubris. The Cascadia Subduction Zone next door watches nervously. They're waiting. Always waiting.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- CONCRETE APOCALYPSE -->
+    <div id="scene-concrete-apocalypse" class="scene">
+        <div class="scene-title">The Freeway Renaissance</div>
+        <div class="scene-text">
+            <p>You stand before the city council and announce something that will reshape Portland's destiny:</p>
+            <p>"We're not going to choose between I-205 corridors. We're building them ALL. And while we're at it, we're finishing the work that was started but abandoned decades ago."</p>
+            <p>You pull out a map covered in red ink. Every freeway Portland ever planned but rejected. Every corridor that was studied, debated, and killed.</p>
+        </div>
+
+        <div class="scene-text">
+            <p><strong>The Rose City Freeway</strong> — Running east from the current termination of the Fremont Bridge, just east of I-5, cutting through Northeast Portland toward Troutdale along the U.S. 30 corridor.</p>
+            <p><strong>The Northwest Industrial Freeway</strong> — A massive 6-lane upgrade to U.S. 30, transforming it from a surface street into a high-speed arterial running west and northwest through the industrial district, past St. Helens, toward Astoria at the mouth of the Columbia River on the coast.</p>
+            <p><strong>The State Route 217 Extension</strong> — Connecting Beaverton with the Industrial Northwest near the St. Johns Bridge. The route requires a prohibitively expensive tunnel bore UNDER Forest Park. Several miles of boring. Millions per foot.</p>
+            <p><strong>Plus I-205</strong> in BOTH corridors—52nd AND 92nd. Dual I-205 loops for ultimate redundancy.</p>
+        </div>
+
+        <div class="faction-alert dantes">
+            Oh my God. You're building a freeway utopia. We're... we're in awe. The nightclub location options are infinite.
+        </div>
+
+        <div class="scene-text">
+            <p>Construction begins. Bulldozers appear everywhere. Concrete is poured. Asphalt spreads like a plague. The Rose City Freeway cuts through Northeast Portland toward Troutdale along the U.S. 30 corridor. U.S. 30 itself becomes a thunderous six-lane speedway running west through the industrial district, past St. Helens, all the way to Astoria on the coast. The 217 tunnel boring begins—drilling under Forest Park, under trees that have stood for 500 years.</p>
+            <p>Years pass. Freeway after freeway opens. Traffic flows beautifully. Commute times drop. It's perfect.</p>
+            <p>For exactly six months.</p>
+        </div>
+
+        <div class="special-alert bankruptcy-alert">
+            ⚠️ CRITICAL: Portland's air quality index is now permanently unhealthy. Particulate matter from continuous traffic has blanketed the city. Trees in Forest Park are dying from vehicle emissions seeping up from the 217 tunnel. The Willamette River's air quality classification has been downgraded. Asthma rates triple. Children cannot play outside.
+        </div>
+
+        <div class="scene-text">
+            <p>But the traffic keeps flowing. The freeways are efficient. Commute times are excellent. The trade-off is Portland's livability.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE CONCRETE ENDING</div>
+            <div class="ending-type">Ending: The City Choked By Its Own Arteries</div>
+            <div class="ending-text">
+                Portland becomes a freeway city. Not a walkable city. Not a transit city. A car city. The Rose City Freeway, Northwest Industrial Freeway, State Route 217 tunnel, and dual I-205 loops create a complete freeway network. Traffic moves efficiently. Commutes are quick. But the air is poison. Cyclists are gone—breathing is too hard. Powell's Books closes its waterfront location; nobody walks anymore. The waterfront—whether it was a park or a lazy river—becomes a dead zone. Who would linger there with freeway noise and diesel fumes on all sides?<br><br>Dante's Underground Council thrives. Nightclubs multiply along freeway ramps. Voodoo Donuts opens drive-thru locations at every exit. Screen Door becomes a highway rest stop.<br><br>Portland transforms from "Keep Portland Weird" to "Keep Portland Paved." Nature retreats. Forest Park dies slowly from emissions creeping through the 217 tunnel. The city becomes a monument to 1950s planning ideology—freeways solve everything. Except they don't. They just create more traffic. More cars. More emissions. More concrete.<br><br>By 2030, Portland is unrecognizable. A ghost of its weird self. Children develop asthma before age 5. Nobody can see Mount Hood anymore—the air is permanently gray. The Columbia River smells like diesel. The Willamette is choked with runoff from constant repaving.<br><br>Then something extraordinary happens: mass exodus. But not to the suburbs. Not to the Tualatin Valley. Hundreds of thousands of Portlanders begin relocating to... Los Angeles.<br><br>Why? Because they've done the math. Los Angeles, despite its reputation as a car-crazy hellscape, actually REJECTED dozens of proposed freeways. The Whitnall Freeway? Killed. The Reseda-to-the-Sea Freeway? Never built. The original Santa Monica Freeway (which would have bisected Beverly Hills)? Rejected—they built I-10 (the Olympic Parkway) instead on a different route. The Harbor Freeway/Downtown Split? The Hill Street parallel never materialized. The Industrial Freeway running along Alameda? Stopped. The Rosemead Freeway? Abandoned. The Huntington Beach Freeway? Dead. The Marina/Slauson Freeway? Only a stub. Long Beach Freeway Extension to Pasadena? Never completed. Pacific Coast Freeway (would have been a freeway from Ventura to San Juan Capistrano)? Almost entirely rejected.<br><br>Environmental groups, neighborhood activists, and citizens in LA fought back. They said NO. Not in Beverly Hills. Not in Malibu. Not along the Pacific Coast. Not through the hills. LA sprawled horizontally, but it didn't pave over itself completely.<br><br>A Portlander breathing Los Angeles smog realizes the horrifying truth: "Wait. Despite being car-centric, LA is actually LESS paved than Portland. They rejected the Laurel Canyon Freeway (mostly). They blocked the Whitnall. They killed the original Santa Monica routing. They refused to tunnel under Forest Park equivalents. They let some canyons survive. And somehow... I can still see the San Gabriel Mountains. In Portland, I can't even see Mount Hood."<br><br>They move to LA. They open Powell's Books locations there (thriving immediately). Voodoo Donuts franchises explode across Southern California. Screen Door opens in Venice Beach. Dante's establishes a nightclub in Downtown LA's Arts District.<br><br>Portland becomes a cautionary tale in urban planning textbooks. "The City That Out-Freewayed Los Angeles" they call it. Your statue stands in a highway median, slowly being poisoned by diesel fumes, while the city you shaped becomes infamous for choosing more concrete than the car capital of the world.<br><br>The ultimate irony: You tried to make Portland function like a car city. You succeeded so completely that you made it worse than Los Angeles—the actual car city that at least had the sense to reject some of its freeway madness. Portlanders now flee to LA seeking fresher air, while Angelenos visit Portland as a cautionary tourist destination: "See what happens when you actually BUILD all the freeways?"
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- I-205 52ND + BIKES -->
+    <div id="scene-i205-52nd-bikes" class="scene">
+        <div class="scene-title">Burnside Bikes Victory</div>
+        <div class="scene-text">
+            <p>You approve the Burnside bike lane. Despite building I-205 through 52nd, you make room for cyclists. Balance, of sorts.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE COMPLICATED ENDING</div>
+            <div class="ending-type">Ending: Progress and Displacement</div>
+            <div class="ending-text">
+                I-205 via 52nd Street splits the Parkrose and South Tabor neighborhoods forever. Thousands are displaced. But Burnside becomes a legendary bike corridor. The Mount Hood Freeway moves traffic east. Powell's Books, Dante's, Voodoo Donuts, and Screen Door all flourish in the remaining city core. You're remembered as the Commissioner who chose connectivity over preservation. Your legacy is complicated—progress at human cost.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- I-205 52ND + NO BIKES -->
+    <div id="scene-i205-52nd-no-bikes" class="scene">
+        <div class="scene-title">Freeway Priority</div>
+        <div class="scene-text">
+            <p>You reject the bike lane. Freeway construction takes priority. Burnside remains mixed traffic.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE PRACTICAL ENDING</div>
+            <div class="ending-type">Ending: Freeways Win</div>
+            <div class="ending-text">
+                I-205 is built via 52nd Street. Thousands are displaced. Burnside remains congested. Cyclists are furious. But Portland has two freeway corridors now—the Mount Hood Freeway eastbound, and I-205 carrying regional north-south traffic. The city remains functional but less weird. Dante's thrives on freeway-adjacent land. Powell's adapts. You're remembered as practical but uninspired. Your statue is erected in a traffic median.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- I-205 92ND + BIKES -->
+    <div id="scene-i205-92nd-bikes" class="scene">
+        <div class="scene-title">Outward Expansion</div>
+        <div class="scene-text">
+            <p>You approve Burnside as a bike lane. I-205 sprawls eastward via 92nd. Portland grows outward, but the core remains livable.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE SUBURBAN FUTURE ENDING</div>
+            <div class="ending-type">Ending: The Great Eastward Expansion</div>
+            <div class="ending-text">
+                I-205 via 92nd Street becomes the defining freeway of Portland's sprawl era. Gresham, Troutdale, and areas beyond explode with development. Burnside becomes a celebrated bike corridor. The lazy river and Mount Hood Freeway serve the core. Powell's Books remains strong in downtown. Voodoo Donuts spreads to every suburb along I-205. You're remembered as the Commissioner who enabled Portland's eastward expansion—whether that's good or bad depends on when you ask.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- I-205 92ND + NO BIKES -->
+    <div id="scene-i205-92nd-no-bikes" class="scene">
+        <div class="scene-title">Sprawl Without Sentiment</div>
+        <div class="scene-text">
+            <p>You reject the bike lane. I-205 spreads eastward. Portland grows outward. Burnside remains a car corridor.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE SUBURBAN PRACTICAL ENDING</div>
+            <div class="ending-type">Ending: Maximum Sprawl</div>
+            <div class="ending-text">
+                I-205 via 92nd Street is built. Sprawl accelerates. Gresham becomes Portland's unwilling twin. Troutdale booms. But the core city remains intact. Powell's Books, Dante's, Voodoo Donuts, and Screen Door all thrive in downtown Portland. Burnside remains congested with cars. Cyclists curse your name forever. You're remembered as the Commissioner who chose suburban expansion over urban cycling. Your statue is erected in a Gresham parking lot.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <div id="scene-burnside-bikes" class="scene">
+        <div class="scene-title">Burnside Rises</div>
+        <div class="scene-text">
+            <p>You approve the Burnside bike lane. You sign the decree. You unveil it in a ceremony. Cyclists cheer. The street is painted green. Burnside becomes a symbol of Portland's commitment to two-wheeled transportation.</p>
+            <p>The lazy river flows. The Mount Hood Freeway hums with traffic. Bikes dominate Burnside. All three systems work in harmony.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE PERFECT ENDING</div>
+            <div class="ending-type">Ending: Portland Achieves Impossible Balance</div>
+            <div class="ending-text">
+                Harbor Drive becomes Tom McCall Waterfront Park. The Mount Hood Freeway routes long-distance traffic east toward Gresham efficiently. Burnside becomes a legendary bike corridor. Powell's Books sponsors everything. Voodoo Donuts opens on the waterfront (naturally). Screen Door's outdoor dining becomes a world-famous concept. Dante's Underground Council declares you "acceptable" which in their language means you're basically a deity.<br><br>Portland becomes the only city on Earth with a functioning lazy river, competitive freeway system, waterfront park, and thriving bike culture. Tourists come for the weirdness. They stay for the brunch. Urban planners study it in disbelief. You are remembered as the Commissioner who actually did something. Your statue in Tom McCall Park gets donations from passing cyclists.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- IGNORE CYCLISTS ENDING -->
+    <div id="scene-ignore-cyclists" class="scene">
+        <div class="scene-title">The Cyclists' Revenge</div>
+        <div class="scene-text">
+            <p>You reject the Burnside bike lane. You send an official letter. Burnside remains for mixed traffic. Cars, buses, trucks, pedestrians, cyclists all competing for space.</p>
+            <p>The cyclists do not forgive. They remember. They plan.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE QUIET REVENGE</div>
+            <div class="ending-type">Ending: The 40-Year Cyclist Takeover</div>
+            <div class="ending-text">
+                For the next 40 years, cyclists slowly infiltrate Portland's government from within. They take positions as city planners, traffic engineers, parks commissioners, city council members. By 2015, Burnside is a bike lane anyway, but you never live to see it. More importantly: Dante's Underground Council is completely overthrown by the Portland Cycling Coalition. The lazy river remains. The Mount Hood Freeway becomes a hybrid freeway/bike expressway system. Powell's Books is converted to a bicycle repair cooperative (they serve coffee). Screen Door becomes a cyclists-only restaurant. You are utterly forgotten. The cyclists win everything. Absolutely everything. The Cycling Coalition eventually installs a statue of you being crushed by a fixed-gear bike.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- DIVISION BIKES ENDING -->
+    <div id="scene-division-bikes" class="scene">
+        <div class="scene-title">Division Falls</div>
+        <div class="scene-text">
+            <p>You accept it. You sign the decree. Division Street is now a bike lane. Not through official channels. Through sheer cyclist will and direct action.</p>
+            <p>The cyclists, stunned by your acceptance, actually respect you.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE ANARCHIST ENDING</div>
+            <div class="ending-type">Ending: Power to the Pedals</div>
+            <div class="ending-text">
+                By accepting Division, you've legitimized a new form of Portland governance: direct action cycles democracy. Cyclists claim three more streets within a month. By year three, bikes outnumber cars in central Portland. Five years later, bikes outnumber humans. Dante's, Powell's, Voodoo, and Screen Door all adapt to a bike-first economy. The Mount Hood Freeway is abandoned—who drives anymore? The lazy rivers become the city's main transportation corridor AND tourist attraction. You go down in history as the Commissioner who accidentally created anarchist Portland. No government. Just rivers, bicycles, and donuts. It's weird. It's perfect. It's Portland. Your statue gets repainted by fixie riders monthly.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- CRACKDOWN ENDING -->
+    <div id="scene-division-crackdown" class="scene">
+        <div class="scene-title">The Police Response</div>
+        <div class="scene-text">
+            <p>You order the police to clear Division Street. The cyclists refuse. What happens next is the largest bike-based civil disobedience event in North American history.</p>
+            <p>Thousands of cyclists. Thousands of fixed-gear bikes. Division Street becomes a war zone—but a peaceful, pedal-powered war zone.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE CHAOS ENDING</div>
+            <div class="ending-type">Ending: The Bike Wars of 2010</div>
+            <div class="ending-text">
+                National Guard is called in. National media descends. There are no weapons—just bikes, inner tubes, and determination. International news covers "The Bike Wars of Portland" for weeks. Somehow, not a single person dies. Everyone is vegan. Portland's reputation as America's weirdest city becomes permanently cemented. You are removed from office for "creating a public safety crisis" despite the fact that the only casualties are several damaged city traffic signs. Dante's Underground Council takes control, installs a bike-based martial law, and Portland becomes a cautionary tale studied by sociology departments worldwide. Powell's Books becomes a historical archive documenting The Wars.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- STREETCAR ENDING -->
+    <div id="scene-streetcar" class="scene">
+        <div class="scene-title">The Streetcar Vision</div>
+        <div class="scene-text">
+            <p>No bikes. No new freeway. Just beautiful, European-style streetcars. Simple. Elegant. Portland-ish.</p>
+            <p>Powell's Books approves immediately—pedestrians everywhere mean book sales. Dante's is neutral (streetcars don't bring nightclub traffic). Voodoo Donuts opens a streetcar-specific donut concept anyway.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE CIVILIZED ENDING</div>
+            <div class="ending-type">Ending: Portland Goes Cosmopolitan</div>
+            <div class="ending-text">
+                The streetcar network becomes genuinely successful. People use it. The city becomes less weird—more European. More civilized. More functional. Powell's thrives. Screen Door opens a streetcar-accessible mega-location on the waterfront. Even Dante's adjusts to late-night streetcar crowds. But something is lost. Portland is no longer maximally weird. It's just... nice. Pretty. Functional. Boring. Years later, hipsters from Brooklyn move here because it's become affordable again. The city becomes normal. This is actually the worst ending in disguise. You've accidentally made Portland boring. Your statue is never erected.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- BIKE LANES ENDING -->
+    <div id="scene-bike-lanes" class="scene">
+        <div class="scene-title">The Bike Lane Era</div>
+        <div class="scene-text">
+            <p>You choose bike lanes. Protected, painted, beautiful bike lanes everywhere. The freeway space is converted to an 8-lane bike superhighway.</p>
+            <p>The city transforms. Cars become secondary. Bikes become primary. Even buses seem like dinosaurs.</p>
+        </div>
+
+        <div class="special-alert bikelane-alert">
+            🚲 MID-SCENARIO: Out of nowhere, a local cyclist collective demands you also install a bike lane on the Banfield Expressway itself. Literal bikes on the freeway. They're serious. They're also not leaving until you agree.
+        </div>
+
+        <div class="choices">
+            <button class="choice-btn" onclick="goToScene('scene-banfield-bikes')">
+                <span class="label">🚴 Add Bikes to the Banfield (Absolute Madness)</span>
+                <span class="description">A freeway AND a bike lane? Why not. You've come this far.</span>
+            </button>
+            <button class="choice-btn" onclick="goToScene('scene-reject-banfield-bikes')">
+                <span class="label">✗ No Bikes on the Banfield. That's a Hard Line.</span>
+                <span class="description">Some infrastructure should remain sacred for car traffic.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- BANFIELD BIKES -->
+    <div id="scene-banfield-bikes" class="scene">
+        <div class="scene-title">The Bike Freeway Paradox</div>
+        <div class="scene-text">
+            <p>You do it. You actually build a protected bike lane on the Banfield Expressway itself. Cars on one side. Bikes on the other. Moving at different speeds. In opposite directions (mostly).</p>
+            <p>It shouldn't work. Traffic engineers say it's impossible. But it works.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE ABSURD HARMONY ENDING</div>
+            <div class="ending-type">Ending: The Banfield Miracle</div>
+            <div class="ending-text">
+                Portland becomes the world's first city with a functioning hybrid freeway/bike expressway. Civil engineers worldwide study it in disbelief. Somehow it works perfectly. Voodoo Donuts sponsors both the car lanes and the bike lanes (somehow). Powell's Books publishes a 4-volume academic series about the decision. Screen Door opens a rest stop on the Banfield itself (health code violations be damned). Dante's uses the Banfield as a metaphor for balance in their underground philosophy seminars. You are remembered as either genius or insane—history cannot decide, so they go with both.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+    <!-- REJECT BANFIELD BIKES -->
+    <div id="scene-reject-banfield-bikes" class="scene">
+        <div class="scene-title">The Freeway Holds</div>
+        <div class="scene-text">
+            <p>You say no. The Banfield stays as a pure freeway. Some infrastructure is sacred. Some systems need to move cars quickly.</p>
+            <p>The cyclists accept this. Grudgingly. A truce is established.</p>
+        </div>
+
+        <div class="ending">
+            <div class="ending-title">THE REASONABLE ENDING</div>
+            <div class="ending-type">Ending: Balance Through Compromise</div>
+            <div class="ending-text">
+                Tom McCall Waterfront Park thrives. Bike lanes flourish on city streets. The Banfield remains functional for long-distance car traffic. Powell's Books becomes the waterfront anchor. Voodoo Donuts expands to 50 locations. Dante's Underground Council respects your willingness to compromise. Screen Door becomes a destination restaurant. Portland becomes weirdly functional—a city that balanced competing interests and somehow succeeded. You retire with a moderately positive legacy. Not legendary, but not disastrous either. In Portland terms, this is an honest success. Your statue is erected in a location that satisfies absolutely nobody, which is perfect.
+            </div>
+            <button class="restart-btn" onclick="location.reload()">Start Over</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let gameState = {
+    political: 100,
+    budget: 100,
+    weird: 50,
+    dantes: 50
+};
+
+function updateStats() {
+    document.getElementById('politicalScore').textContent = Math.round(gameState.political);
+    document.getElementById('budgetScore').textContent = Math.round(gameState.budget);
+    document.getElementById('weirdScore').textContent = Math.round(gameState.weird);
+    document.getElementById('dantesScore').textContent = Math.round(gameState.dantes);
+
+    document.getElementById('politicalFill').style.width = Math.max(0, Math.min(100, gameState.political)) + '%';
+    document.getElementById('budgetFill').style.width = Math.max(0, Math.min(100, gameState.budget)) + '%';
+    document.getElementById('weirdFill').style.width = Math.max(0, Math.min(100, gameState.weird)) + '%';
+    document.getElementById('dantesFill').style.width = Math.max(0, Math.min(100, gameState.dantes)) + '%';
+}
+
+function modifyStats(political = 0, budget = 0, weird = 0, dantes = 0) {
+    gameState.political += political;
+    gameState.budget += budget;
+    gameState.weird += weird;
+    gameState.dantes += dantes;
+    updateStats();
+}
+
+function goToScene(sceneId) {
+    // Apply stat changes based on scene
+    switch(sceneId) {
+        case 'scene-harborpark':
+            modifyStats(-10, -5, 5, -15);
+            break;
+        case 'scene-keep-freeway':
+            modifyStats(15, 10, -10, 20);
+            break;
+        case 'scene-banfield-lazy-river-with-mhf':
+            modifyStats(-15, -25, 45, 20);
+            break;
+        case 'scene-banfield-boulevard':
+            modifyStats(20, 5, 30, -10);
+            break;
+        case 'scene-banfield-bike-path':
+            modifyStats(-20, -15, 60, -30);
+            break;
+        case 'scene-second-lazy-river-from-park':
+            modifyStats(-10, -20, 35, 10);
+            break;
+        case 'scene-airport-lazy-river-2':
+            modifyStats(5, -15, 45, 15);
+            break;
+        case 'scene-lazy-river':
+            modifyStats(-20, -30, 40, 5);
+            break;
+        case 'scene-mount-hood-freeway':
+            modifyStats(20, 15, -5, 10);
+            break;
+        case 'scene-bike-lanes':
+            modifyStats(-5, -10, 20, -25);
+            break;
+        case 'scene-streetcar':
+            modifyStats(10, 5, 5, 0);
+            break;
+        case 'scene-i205-52nd':
+            modifyStats(-25, -40, -5, 15);
+            break;
+        case 'scene-i205-92nd':
+            modifyStats(5, -20, -15, 10);
+            break;
+        case 'scene-airport-parkway':
+            modifyStats(30, 20, 25, -5);
+            break;
+        case 'scene-volcanic-apocalypse':
+            modifyStats(-50, -80, 50, 0);
+            break;
+        case 'scene-concrete-apocalypse':
+            modifyStats(-40, -60, -50, 25);
+            break;
+        case 'scene-lazy-river-mount-hood':
+            modifyStats(10, 0, 30, 15);
+            break;
+        case 'scene-lazy-river-banfield':
+            modifyStats(-60, -70, 50, 5);
+            break;
+        case 'scene-lazy-river-both':
+            modifyStats(-10, -20, 60, 20);
+            break;
+        case 'scene-burnside-bikes':
+            modifyStats(25, 10, 35, 5);
+            break;
+        case 'scene-ignore-cyclists':
+            modifyStats(5, 15, -20, 10);
+            break;
+        case 'scene-division-bikes':
+            modifyStats(-30, -10, 40, -10);
+            break;
+        case 'scene-division-crackdown':
+            modifyStats(-20, 5, -30, -20);
+            break;
+        case 'scene-banfield-bikes':
+            modifyStats(-15, -25, 30, -5);
+            break;
+        case 'scene-reject-banfield-bikes':
+            modifyStats(10, 5, -15, 15);
+            break;
+        case 'scene-i205-52nd-bikes':
+            modifyStats(5, -5, 20, 5);
+            break;
+        case 'scene-i205-52nd-no-bikes':
+            modifyStats(15, 5, -10, 10);
+            break;
+        case 'scene-i205-92nd-bikes':
+            modifyStats(15, 5, 15, 8);
+            break;
+        case 'scene-i205-92nd-no-bikes':
+            modifyStats(20, 10, -10, 12);
+            break;
+    }
+    
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.getElementById(sceneId).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// Initial stat update
+updateStats();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portland Simulator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e8e8e8;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c1810 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid #E74C3C;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #E74C3C;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #a8a8a8;
+            font-style: italic;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid #E74C3C;
+            overflow-x: auto;
+            padding: 0 1rem;
+        }
+
+        .tab-btn {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            padding: 14px 18px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-family: 'Georgia', serif;
+        }
+
+        .tab-btn:hover { color: #e8e8e8; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { color: #E74C3C; border-bottom-color: #E74C3C; }
+
+        .tab-content { display: none; padding: 2rem; max-width: 1000px; margin: 0 auto; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 22px; color: #E74C3C; margin-bottom: 1.5rem; border-left: 5px solid #E74C3C; padding-left: 14px; }
+        h3 { font-size: 16px; font-weight: 600; margin-bottom: 1rem; color: #d4a574; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 4px;
+        }
+
+        .metric-sub { font-size: 10px; color: #666; }
+
+        .card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            border-left: 4px solid #E74C3C;
+        }
+
+        .card p { font-size: 13px; color: #c0c0c0; line-height: 1.7; }
+
+        .slider-row {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .slider-row label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 10px; color: #d0d0d0; }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 8px;
+            accent-color: #E74C3C;
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            font-size: 13px;
+            color: #e8e8e8;
+            margin-bottom: 12px;
+            font-family: 'Georgia', serif;
+        }
+
+        select option { background: #2d2d2d; }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #E74C3C 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Georgia', serif;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(231,76,60,0.4); }
+        .btn:active { transform: translateY(0); }
+
+        .output-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1.2rem;
+            font-size: 13px;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+            min-height: 60px;
+            color: #a8d8a8;
+            white-space: pre-line;
+        }
+
+        .neighborhood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .neighborhood-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .neighborhood-card:hover { border-color: #E74C3C; }
+        .neighborhood-card.selected { background: rgba(231,76,60,0.15); border-color: #E74C3C; }
+        .neighborhood-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+        .neighborhood-card p { font-size: 11px; color: #888; line-height: 1.5; }
+
+        .news-item {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid #E74C3C;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 13px;
+            color: #c0c0c0;
+            line-height: 1.6;
+            animation: fadeIn 0.3s;
+        }
+
+        .sponsor-box {
+            background: rgba(212,165,116,0.1);
+            border-left: 3px solid #d4a574;
+            padding: 10px 14px;
+            margin-bottom: 1.5rem;
+            font-size: 12px;
+            color: #d4a574;
+            font-style: italic;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .score-display {
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(231,76,60,0.3);
+        }
+
+        .score-number {
+            font-size: 56px;
+            font-weight: 700;
+            color: #E74C3C;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .score-label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+        .band-history-item {
+            background: rgba(0,0,0,0.2);
+            border-left: 3px solid #9B59B6;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border-radius: 0 6px 6px 0;
+            font-size: 13px;
+            color: #c0c0c0;
+            animation: fadeIn 0.3s;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin: 4px 0 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>PORTLAND SIMULATOR™</h1>
+    <p>A collection of applications proving Portland was a beautiful mistake</p>
+</div>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('dashboard', this)">Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('rain', this)">Rain Meter</button>
+    <button class="tab-btn" onclick="switchTab('coffee', this)">Coffee Map</button>
+    <button class="tab-btn" onclick="switchTab('foodcarts', this)">Food Carts</button>
+    <button class="tab-btn" onclick="switchTab('bikes', this)">Bike Index</button>
+    <button class="tab-btn" onclick="switchTab('flannel', this)">Flannel Calc</button>
+    <button class="tab-btn" onclick="switchTab('news', this)">Weird News</button>
+    <button class="tab-btn" onclick="switchTab('powell', this)">Powell's Pages</button>
+    <button class="tab-btn" onclick="switchTab('bands', this)">Band Names</button>
+    <button class="tab-btn" onclick="switchTab('weird', this)">Weirdness Score</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="tab-content active">
+    <h2>Portland Real-Time Status</h2>
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Rain Saturation</div>
+            <div class="metric-value">94%</div>
+            <div class="metric-sub">constantly</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Coffee Density</div>
+            <div class="metric-value">847</div>
+            <div class="metric-sub">per block</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Active Food Carts</div>
+            <div class="metric-value">423</div>
+            <div class="metric-sub">mysteries inside</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Fixed-Gear Bikes</div>
+            <div class="metric-value">2,891</div>
+            <div class="metric-sub">brakeless</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Flannel Status</div>
+            <div class="metric-value">SEASON</div>
+            <div class="metric-sub">always optimal</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Weirdness Level</div>
+            <div class="metric-value">11</div>
+            <div class="metric-sub">out of 10</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Current Portland Status</h3>
+        <p>It is currently raining. Someone is opening a third artisanal pickle shop in Southeast. A band with no bassist is rehearsing in a warehouse you have never heard of. The city has exactly 47 new food cart concepts, most involving sriracha in unexpected ways. This is normal. This is Portland.</p>
+    </div>
+
+    <div class="card">
+        <h3>Today's Vibe Check</h3>
+        <p>The clouds are contemplative. The rain is existential. Your hipster credentials are 73% secure. A Powell's employee just helped someone find a book that may not exist. Nobody is smiling but everyone seems satisfied with this arrangement.</p>
+    </div>
+
+    <div class="sponsor-box">
+        🍩 Portland Simulator™ is sponsored by Voodoo Donuts — "Fueling Portland's poor decisions since 2003"
+    </div>
+</div>
+
+<!-- RAIN METER -->
+<div id="rain" class="tab-content">
+    <h2>Rain Saturation Meter</h2>
+    <div class="card" style="border-left-color: #3498DB;">
+        <p>⚠️ This meter is always at maximum. Adjust your expectations accordingly.</p>
+    </div>
+    <div class="slider-row">
+        <label>Current Rain Level</label>
+        <input type="range" id="rainSlider" min="0" max="100" value="94" oninput="updateRain()">
+        <div class="slider-value" id="rainDisplay">94%</div>
+    </div>
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Umbrella Necessity</div>
+            <div class="metric-value" id="umbrellaRating">EXTREME</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Hair Frizz Index</div>
+            <div class="metric-value" id="frizz">MAXIMUM</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Mood Impact</div>
+            <div class="metric-value" id="moodImpact">PENSIVE</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Waterlogged</div>
+            <div class="metric-value" id="waterlog">87%</div>
+        </div>
+    </div>
+    <div class="card">
+        <p>Portland receives 36 inches of rain annually, mostly as a light drizzle that makes you question your life choices. The rain is not aggressive — it's passive-aggressive. It will slowly soak you while you convince yourself you don't need an umbrella.</p>
+    </div>
+</div>
+
+<!-- COFFEE MAP -->
+<div id="coffee" class="tab-content">
+    <h2>Coffee Shop Density Map</h2>
+    <div class="neighborhood-grid">
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'Pearl District',412,'Highest concentration of single-origin, pour-over only establishments. You cannot enter without a tote bag.')">
+            <h4>Pearl District</h4>
+            <p>412 shops / sq block</p>
+        </div>
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'Hawthorne',287,'Bohemian vibes, grunge coffee, espresso machines older than your car.')">
+            <h4>Hawthorne</h4>
+            <p>287 shops / sq block</p>
+        </div>
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'Southeast',324,'Third-wave roasters competing for the same 6 discerning customers.')">
+            <h4>Southeast</h4>
+            <p>324 shops / sq block</p>
+        </div>
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'NW Portland',289,'Experimental blends, natural processing, and a vague sense of judgment.')">
+            <h4>NW Portland</h4>
+            <p>289 shops / sq block</p>
+        </div>
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'East Side',156,'Where normal people live and drink normal coffee without discussing the terroir.')">
+            <h4>East Side</h4>
+            <p>156 shops / sq block</p>
+        </div>
+        <div class="neighborhood-card" onclick="selectNeighborhood(this,'Southwest',43,'What is coffee even doing here. Nobody knows.')">
+            <h4>Southwest</h4>
+            <p>43 shops / sq block</p>
+        </div>
+    </div>
+    <div class="card" id="neighborhoodCard">
+        <h3 id="selectedNeighborhood">Select a Neighborhood</h3>
+        <p id="selectedDescription">Portland has approximately 98 coffee shops per capita. Everyone is an expert. Nobody agrees. The perfect cup costs $8.75 and is described using words borrowed from wine criticism.</p>
+    </div>
+    <div class="slider-row">
+        <label>Monthly coffee spend ($)</label>
+        <input type="number" id="coffeeSpend" value="150" oninput="calculateCoffee()">
+        <div class="output-box" id="coffeeOutput">Enter your monthly spend above</div>
+    </div>
+</div>
+
+<!-- FOOD CARTS -->
+<div id="foodcarts" class="tab-content">
+    <h2>Food Cart Tracker</h2>
+    <div class="slider-row">
+        <label>Active Carts Right Now</label>
+        <input type="range" id="cartSlider" min="100" max="600" value="423" oninput="document.getElementById('cartDisplay').textContent=this.value">
+        <div class="slider-value" id="cartDisplay">423</div>
+    </div>
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Taco Carts</div>
+            <div class="metric-value">127</div>
+            <div class="metric-sub">origin: unknown</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Korean BBQ</div>
+            <div class="metric-value">84</div>
+            <div class="metric-sub">consistently excellent</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Experimental</div>
+            <div class="metric-value">156</div>
+            <div class="metric-sub">what even is this</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Sriracha-Based</div>
+            <div class="metric-value">89</div>
+            <div class="metric-sub">all of them, really</div>
+        </div>
+    </div>
+    <button class="btn" onclick="generateCartConcept()">Generate New Food Cart Concept</button>
+    <div class="output-box" id="cartOutput">Click above to generate a cart concept</div>
+</div>
+
+<!-- BIKE INDEX -->
+<div id="bikes" class="tab-content">
+    <h2>Fixed-Gear Bike Aggression Index</h2>
+    <div class="card" style="border-left-color: #27AE60;">
+        <p>⚠️ This data updates in real-time as you make eye contact with someone on a single-speed.</p>
+    </div>
+    <div class="slider-row">
+        <label>Sightings Per Hour</label>
+        <input type="range" id="bikeSlider" min="10" max="250" value="127" oninput="updateBikes()">
+        <div class="slider-value" id="bikeDisplay">127/hr</div>
+    </div>
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Brakeless Riders</div>
+            <div class="metric-value">89%</div>
+            <div class="metric-sub">confidence unclear</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Unique Paint Jobs</div>
+            <div class="metric-value">44</div>
+            <div class="metric-sub">colors this hour</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Rider's Name</div>
+            <div class="metric-value">Chad</div>
+            <div class="metric-sub">always Chad</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Red Light Runs</div>
+            <div class="metric-value" id="redLightRuns">94%</div>
+            <div class="metric-sub">this hour</div>
+        </div>
+    </div>
+    <div class="card">
+        <p>Portland has more bikes per capita than people with stable housing. Critical Mass happens the last Friday of every month and absolutely nobody gets anywhere. This is considered a success.</p>
+    </div>
+</div>
+
+<!-- FLANNEL CALC -->
+<div id="flannel" class="tab-content">
+    <h2>Flannel Temperature Calculator</h2>
+    <div class="slider-row">
+        <label>Current Temperature (°F)</label>
+        <input type="range" id="tempSlider" min="30" max="95" value="52" oninput="calculateFlannel()">
+        <div class="slider-value" id="tempDisplay">52°F</div>
+    </div>
+    <div class="slider-row">
+        <label>Is it raining?</label>
+        <select id="rainSelect" onchange="calculateFlannel()">
+            <option value="yes">Yes (always)</option>
+            <option value="maybe">Maybe (probably)</option>
+            <option value="no">No (impossible)</option>
+        </select>
+    </div>
+    <div class="output-box" id="flannelOutput">Adjust temperature above</div>
+    <div style="margin-top:1.5rem;">
+        <div class="card" style="border-left-color:#3498DB;"><p><strong>Light Flannel (60–75°F):</strong> One layer. Optional. You're basically a tourist.</p></div>
+        <div class="card" style="border-left-color:#E67E22;"><p><strong>Standard Flannel (45–60°F):</strong> Daily wear. This is your identity now. Accept it.</p></div>
+        <div class="card" style="border-left-color:#E74C3C;"><p><strong>Maximum Flannel (below 45°F):</strong> Flannel over flannel. You are a walking lumber yard. Perfect.</p></div>
+    </div>
+</div>
+
+<!-- WEIRD NEWS -->
+<div id="news" class="tab-content">
+    <h2>Weird Portland News Generator</h2>
+    <div class="sponsor-box">
+        📚 Today's news is brought to you by Powell's Books — "We have a book about this, somewhere"
+    </div>
+    <button class="btn" onclick="generateNews()">Generate Today's Headlines</button>
+    <div id="newsContainer">
+        <div class="news-item">Click the button to generate Portland headlines.</div>
+    </div>
+</div>
+
+<!-- POWELL'S PAGES -->
+<div id="powell" class="tab-content">
+    <h2>Powell's Books Page Counter</h2>
+    <div class="slider-row">
+        <label>Pages You've Read (of Powell's total inventory)</label>
+        <input type="range" id="pagesSlider" min="0" max="1000" value="247" oninput="calculatePowell()">
+        <div class="slider-value" id="pagesDisplay">247</div>
+    </div>
+    <div class="output-box" id="powellOutput">Adjust slider above</div>
+    <div class="card" style="margin-top:1.5rem;">
+        <p>Powell's occupies an entire city block and contains approximately 1,000,000 books. You will never read them all. You will buy 12 you never read. Time works differently inside Powell's — you enter for 20 minutes and emerge 4 hours later, $180 poorer, deeply satisfied, surrounded by strangers who all look like they live there.</p>
+    </div>
+    <div class="sponsor-box">📚 This calculator is a Powell's Books production. The answer is always "buy more books."</div>
+</div>
+
+<!-- BAND NAMES -->
+<div id="bands" class="tab-content">
+    <h2>Portland Indie Band Name Generator</h2>
+    <div class="sponsor-box">
+        🍳 Brought to you by Screen Door — "We have a 3-hour wait and we're worth it"
+    </div>
+    <button class="btn" onclick="generateBandName()">Generate Band Name</button>
+    <div class="output-box" id="bandOutput" style="font-size:18px; text-align:center; padding:1.5rem;">Your band name will appear here</div>
+    <div style="margin-top:1.5rem;" id="bandHistory"></div>
+</div>
+
+<!-- WEIRDNESS SCORE -->
+<div id="weird" class="tab-content">
+    <h2>Keep Portland Weird™ Compliance Score</h2>
+    <div class="score-display">
+        <div class="score-number" id="weirdScore">0</div>
+        <div class="score-label">Weirdness Score (anything below 50 is concerning)</div>
+    </div>
+    <div class="slider-row">
+        <label>Tattoos (be honest)</label>
+        <input type="number" id="tattoos" value="0" min="0" max="30" oninput="calculateWeird()">
+    </div>
+    <div class="slider-row">
+        <label>Books bought but not read</label>
+        <input type="number" id="unreadBooks" value="0" min="0" max="200" oninput="calculateWeird()">
+    </div>
+    <div class="slider-row">
+        <label>Times you've said "that's kind of fascist" this year</label>
+        <input type="number" id="fascistComments" value="0" min="0" max="500" oninput="calculateWeird()">
+    </div>
+    <div class="slider-row">
+        <label>Vinyl records owned</label>
+        <input type="number" id="vinylRecords" value="0" min="0" max="500" oninput="calculateWeird()">
+    </div>
+    <div class="slider-row">
+        <label>Poetry reading history</label>
+        <select id="poetryReading" onchange="calculateWeird()">
+            <option value="0">Never attended one</option>
+            <option value="15">Attended once, didn't get it</option>
+            <option value="40">Attend occasionally</option>
+            <option value="75">Regular attendee</option>
+            <option value="100">I perform (maximum weirdness achieved)</option>
+        </select>
+    </div>
+    <div class="output-box" id="weirdOutput">Fill in fields above to calculate your Portland compliance score</div>
+    <div class="sponsor-box" style="margin-top:1rem;">🎭 Weirdness certification provided by Dante's Nightclub — "Keep Portland Weird since 1996"</div>
+</div>
+
+<script>
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    btn.classList.add('active');
+}
+
+function updateRain() {
+    const v = parseInt(document.getElementById('rainSlider').value);
+    document.getElementById('rainDisplay').textContent = v + '%';
+    document.getElementById('umbrellaRating').textContent = v > 80 ? 'EXTREME' : v > 50 ? 'MODERATE' : 'OPTIONAL';
+    document.getElementById('frizz').textContent = v > 80 ? 'MAXIMUM' : v > 50 ? 'SIGNIFICANT' : 'MANAGEABLE';
+    document.getElementById('moodImpact').textContent = v > 80 ? 'PENSIVE' : v > 50 ? 'MELANCHOLIC' : 'SUSPICIOUS';
+    document.getElementById('waterlog').textContent = Math.min(100, Math.round(v * 0.92)) + '%';
+}
+
+function selectNeighborhood(el, name, density, desc) {
+    document.querySelectorAll('.neighborhood-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('selectedNeighborhood').textContent = name + ' — ' + density + ' shops/sq block';
+    document.getElementById('selectedDescription').textContent = desc;
+}
+
+function calculateCoffee() {
+    const spend = parseInt(document.getElementById('coffeeSpend').value) || 0;
+    const cups = Math.round(spend / 7.5);
+    document.getElementById('coffeeOutput').textContent =
+        'Monthly spend: $' + spend +
+        '\nEstimated cups: ' + cups +
+        '\nPer day: ' + (cups / 30).toFixed(1) +
+        '\nAnnual spend: $' + (spend * 12).toLocaleString() +
+        '\nYears of rent this represents: ' + (spend * 12 / 18000).toFixed(2) +
+        '\nRegret level: ' + (spend > 200 ? 'PROFOUND' : spend > 100 ? 'MODERATE' : 'NONEXISTENT');
+}
+
+const cartConcepts = [
+    'Sriracha-infused ice cream sandwich cart',
+    'Vegan tempeh bacon wrapped in kale (just kale)',
+    'Artisanal toast with hyperlocal butter (sourced 6 blocks away)',
+    'Korean BBQ fusion pizza on a stick',
+    'Deconstructed breakfast burrito "experience"',
+    'Mushroom-based everything (no further explanation provided)',
+    'Single-origin chocolate tacos',
+    'Experimental beet and coconut milk beverage cart',
+    'Elevated PB&J — $14, no substitutions',
+    'Raw vegetable arrangements with cryptic Jungian names',
+    'Turmeric-activated charcoal smoothie bowls',
+    'Gourmet hot dog with 7-ingredient house aioli',
+    'Handmade pasta served in non-pasta geometric formats',
+    'Sustainable seafood curry in rice paper cones',
+    'Fermented oat porridge with locally foraged garnish',
+    'Avocado applied to things that did not previously contain avocado'
+];
+
+function generateCartConcept() {
+    document.getElementById('cartOutput').textContent = cartConcepts[Math.floor(Math.random() * cartConcepts.length)];
+}
+
+function updateBikes() {
+    const v = document.getElementById('bikeSlider').value;
+    document.getElementById('bikeDisplay').textContent = v + '/hr';
+    document.getElementById('redLightRuns').textContent = Math.min(100, Math.round(v * 0.74)) + '%';
+}
+
+function calculateFlannel() {
+    const temp = parseInt(document.getElementById('tempSlider').value);
+    const rain = document.getElementById('rainSelect').value;
+    document.getElementById('tempDisplay').textContent = temp + '°F';
+    let rec = temp > 70 ? 'Light flannel optional. You\'re basically cheating.' :
+              temp > 55 ? 'Standard flannel. This is your uniform now. Embrace it.' :
+              temp > 40 ? 'Maximum flannel. Double layer. You are the flannel.' :
+                          'FLANNEL EMERGENCY. Flannel under flannel under more flannel. You are one with the Pacific Northwest.';
+    if (rain !== 'no') rec += ' (And it\'s raining, so flannel is mandatory regardless of temperature.)';
+    document.getElementById('flannelOutput').textContent = rec;
+}
+
+const weirdNews = [
+    'Local man discovers third coffee shop on his block, cries gently into single-origin brew',
+    'Powell\'s Books reports customer has been inside for 6 hours and now considers it home',
+    'Food cart generates 47 new concepts overnight — 46 involve sriracha',
+    'Cyclist speeds through red light, makes prolonged eye contact, regrets nothing',
+    'Woman buys 4 books at Powell\'s, completes 0.5 pages of one',
+    'Artist opens pop-up gallery in abandoned warehouse, closes after 3 days citing "overexposure"',
+    'New coffee spot opened yesterday already has four direct imitators',
+    'City council debates whether Portland is still weird enough',
+    'Band breaks up because name got too mainstream (it had 12 followers)',
+    'Rainy day confirmed — city shocked, refuses to carry umbrella anyway',
+    'Taco cart moves 2 blocks, attracts entirely new confused clientele',
+    'Neighbor\'s band practices same three chords for second consecutive month (still not tight)',
+    'Fixie rider stops at green light, causes philosophical crisis for three drivers',
+    'Artisanal pickle shop opens in former artisanal pickle shop space',
+    'Man explains coffee sourcing to disinterested date for 40 minutes straight',
+    'Screen Door wait list reaches 4 hours — diners describe it as "worth it, obviously"',
+    'Voodoo Donuts unveils donut that cannot be legally described in this news feed',
+    'Dante\'s Underground Council issues cryptic statement about the nature of weird'
+];
+
+function generateNews() {
+    const count = Math.floor(Math.random() * 3) + 2;
+    const shuffled = [...weirdNews].sort(() => Math.random() - 0.5).slice(0, count);
+    document.getElementById('newsContainer').innerHTML = shuffled
+        .map(s => `<div class="news-item"><strong>📰 BREAKING:</strong> ${s}</div>`)
+        .join('');
+}
+
+function calculatePowell() {
+    const pages = parseInt(document.getElementById('pagesSlider').value);
+    document.getElementById('pagesDisplay').textContent = pages;
+    const pct = (pages / 1000000 * 100).toFixed(6);
+    const years = Math.round((1000000 - pages) / (50 * 365));
+    const status = pages < 100 ? 'You have barely located the front door.' :
+                   pages < 500 ? 'You are committed but statistically irrelevant.' :
+                   pages < 1000 ? 'Impressive. Still nowhere.' : 'You have a condition.';
+    document.getElementById('powellOutput').textContent =
+        'Pages read: ' + pages +
+        '\nOf Powell\'s total: ' + pct + '%' +
+        '\nStatus: ' + status +
+        '\nCompletion estimate: ' + years + ' years (at 50 pages/day, which you won\'t maintain)' +
+        '\nBooks you\'ve bought but not read: probably more than this';
+}
+
+const bandPrefixes = ['The','Electric','Lazy','Sad','Lost','Broken','Cosmic','Existential','Post-Portland','Ironic','Vaguely','Rainwater','Unnamed','Former'];
+const bandMiddles = ['Portland','Rain','Coffee','Flannel','Basement','Vinyl','Fixie','Artisanal','Obscure','Cedar','Alberta','Burnside','Hawthorne','Division'];
+const bandSuffixes = ['Collective','Experience','Movement','Society','Institute','Congregation','Assembly','Experiment','Archives','Studies','Hypothesis','Concern'];
+const bandHistory = [];
+
+function generateBandName() {
+    const name = bandPrefixes[Math.floor(Math.random()*bandPrefixes.length)] + ' ' +
+                 bandMiddles[Math.floor(Math.random()*bandMiddles.length)] + ' ' +
+                 bandSuffixes[Math.floor(Math.random()*bandSuffixes.length)];
+    document.getElementById('bandOutput').textContent = name;
+    bandHistory.unshift(name);
+    document.getElementById('bandHistory').innerHTML = bandHistory.slice(0,8)
+        .map(n => `<div class="band-history-item">${n}</div>`).join('');
+}
+
+function calculateWeird() {
+    const tattoos = parseInt(document.getElementById('tattoos').value) || 0;
+    const books = parseInt(document.getElementById('unreadBooks').value) || 0;
+    const fascist = parseInt(document.getElementById('fascistComments').value) || 0;
+    const vinyl = parseInt(document.getElementById('vinylRecords').value) || 0;
+    const poetry = parseInt(document.getElementById('poetryReading').value) || 0;
+
+    let score = Math.min(30, tattoos * 2) + Math.min(20, books / 2) +
+                Math.min(15, fascist / 20) + Math.min(20, vinyl / 10) + poetry;
+    score = Math.min(100, Math.round(score));
+
+    document.getElementById('weirdScore').textContent = score;
+    const verdict = score < 20 ? 'You are suspiciously normal. Have you considered relocating to Beaverton?' :
+                    score < 40 ? 'You are trying. Add more coffee discourse and political tangents.' :
+                    score < 60 ? 'You are acceptable. Welcome to Portland. Here is your tote bag.' :
+                    score < 80 ? 'You are genuinely weird. This is a compliment.' :
+                                 'Maximum Portland status achieved. Congratulations on your identity crisis.';
+    document.getElementById('weirdOutput').textContent = verdict;
+}
+
+// Init
+calculateFlannel();
+calculatePowell();
+calculateCoffee();
+</script>
+
+</body>
+</html>

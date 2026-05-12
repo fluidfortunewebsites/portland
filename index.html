@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portland Web Applications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e8e8e8;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            border-bottom: 3px solid #E74C3C;
+            padding-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #E74C3C;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: -1px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            color: #a8a8a8;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .header .tagline {
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(44, 24, 16, 0.1) 100%);
+            border: 2px solid #E74C3C;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(231, 76, 60, 0.3);
+            border-color: #ff6b5b;
+        }
+
+        .app-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 15px;
+        }
+
+        .app-description {
+            font-size: 15px;
+            color: #d0d0d0;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .app-features {
+            font-size: 13px;
+            color: #a8a8a8;
+            text-align: left;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            line-height: 2;
+        }
+
+        .app-features strong {
+            color: #d4a574;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .app-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #E74C3C 0%, #c0392b 100%);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+
+        .app-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            border-top: 1px solid #444;
+            padding-top: 40px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        .footer strong {
+            color: #d4a574;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 42px;
+            }
+
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-card {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>PORTLAND APPLICATIONS</h1>
+        <div class="subtitle">A collection of pointless applications that solve problems nobody was asking about</div>
+        <div class="tagline">Powered by Voodoo Donuts™, Powell's Books™, Screen Door™, and Dante's Underground Council™</div>
+    </div>
+
+    <div class="apps-grid">
+        <!-- SIMULATOR CARD -->
+        <div class="app-card">
+            <div class="app-icon">🌧️</div>
+            <div class="app-title">Portland Simulator</div>
+            <div class="app-description">
+                Real-time metrics tracking Portland's coffee density, rain saturation, bike aggression, flannel temperatures, and weirdness levels.
+            </div>
+            <div class="app-features">
+                <strong>Features:</strong>
+                🌧️ Rain Saturation Meter (always 94%)<br>
+                ☕ Coffee Shop Density Map<br>
+                🍔 Food Cart Tracker & Generator<br>
+                🚴 Fixed-Gear Bike Index<br>
+                👔 Flannel Temperature Calculator<br>
+                📰 Weird Portland News Generator<br>
+                📚 Powell's Books Page Counter<br>
+                🎵 Indie Band Name Generator<br>
+                😈 Keep Portland Weird™ Score
+            </div>
+            <a href="portland-simulator.html" class="app-link">Open Simulator</a>
+        </div>
+
+        <!-- GAME CARD -->
+        <div class="app-card">
+            <div class="app-icon">🛣️</div>
+            <div class="app-title">Harbor Drive</div>
+            <div class="app-description">
+                An epic narrative game where you decide Portland's fate: tear down Harbor Drive for a waterfront park, or destroy the city with lazy rivers and budget collapse?
+            </div>
+            <div class="app-features">
+                <strong>Features:</strong>
+                🌊 Lazy River Options (dangerous)<br>
+                🛣️ Mount Hood Freeway Choice<br>
+                🚴 Random Bike Lane Crises<br>
+                💰 Budget Collapse Ending<br>
+                🎭 Dante's Underground Mafia<br>
+                📚 Powell's Books Faction<br>
+                🍩 Voodoo Donuts Syndicate<br>
+                🍳 Screen Door Chaos<br>
+                ⚡ 12+ Unique Endings
+            </div>
+            <a href="harbor-drive-game.html" class="app-link">Play Game</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Portland Applications™</strong> — A collection of applications proving Portland was a beautiful, chaotic mistake</p>
+        <p>Created by Fluid Fortune | May 2026</p>
+        <p>This is absolutely not affiliated with Powell's Books, Voodoo Donuts, Screen Door, or Dante's Nightclub</p>
+        <p style="margin-top: 20px; font-style: italic; color: #666;">The DeNiro Zone would be proud</p>
+    </div>
+</div>
+
+</body>
+</html>
