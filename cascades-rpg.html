@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASCADES: The RPG</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; image-rendering:pixelated; }
+
+:root {
+  --bg: #1a1410;
+  --panel: #2a1f18;
+  --panel-light: #3a2d22;
+  --border: #C9A84C;
+  --gold: #E8D4A0;
+  --text: #F4E8D0;
+  --text-dim: #A89878;
+  --red: #C84432;
+  --blue: #4878C8;
+  --green: #58A858;
+  --teal: #4ABFBF;
+  --purple: #A858C8;
+  --dark: #0a0805;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.game-window {
+  width: 100%;
+  max-width: 900px;
+  background: var(--dark);
+  border: 4px solid var(--border);
+  border-radius: 2px;
+  padding: 0;
+  position: relative;
+  box-shadow: 0 0 0 1px var(--bg), 0 0 0 5px var(--border), 0 8px 32px rgba(0,0,0,0.6);
+  min-height: 600px;
+}
+
+/* SCREEN MANAGEMENT */
+.screen { display: none; padding: 2rem; }
+.screen.active { display: block; animation: scanIn 0.3s; }
+
+@keyframes scanIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* TITLE SCREEN */
+.title-screen { text-align: center; padding: 3rem 2rem; }
+
+.title-logo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(28px, 6vw, 48px);
+  color: var(--gold);
+  letter-spacing: 4px;
+  margin-bottom: 1rem;
+  text-shadow: 4px 4px 0 var(--red), 4px 4px 0px rgba(200,68,50,0.5);
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.title-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
+}
+
+.title-tagline {
+  font-size: 22px;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 3rem;
+}
+
+.menu-list { list-style: none; display: inline-block; text-align: left; }
+
+.menu-item {
+  font-size: 24px;
+  padding: 8px 32px;
+  cursor: pointer;
+  color: var(--text);
+  position: relative;
+  user-select: none;
+}
+
+.menu-item.selected::before {
+  content: '▶';
+  position: absolute;
+  left: 8px;
+  color: var(--gold);
+  animation: cursorBlink 0.8s steps(2) infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.menu-item:hover { color: var(--gold); }
+
+.copyright {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+/* DIALOGUE / NARRATIVE BOX */
+.dialogue-box {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem 1.4rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.dialogue-speaker {
+  color: var(--gold);
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.dialogue-text {
+  font-size: 21px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.dialogue-text p { margin-bottom: 8px; }
+.dialogue-text p:last-child { margin-bottom: 0; }
+
+/* NAME INPUT */
+.name-input-screen { text-align: center; padding: 2rem; }
+.name-input-screen h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+}
+
+.name-input {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--gold);
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  padding: 12px 20px;
+  text-align: center;
+  letter-spacing: 4px;
+  width: 100%;
+  max-width: 400px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  outline: none;
+}
+
+.name-input:focus { border-color: var(--gold); }
+
+/* MANIFESTO / CUTSCENE */
+.cutscene { padding: 2rem; }
+.cutscene-text {
+  font-size: 22px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.cutscene-text p { margin-bottom: 14px; }
+
+.cutscene-text strong { color: var(--gold); }
+.cutscene-text em { color: var(--teal); font-style: normal; }
+
+/* WORLD MAP */
+.map-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 700px;
+  padding: 0 !important;
+}
+
+.map-header {
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 18px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  color: var(--gold);
+}
+
+.map-area {
+  flex: 1;
+  position: relative;
+  background: var(--dark);
+  padding: 0;
+  overflow: hidden;
+  min-height: 580px;
+}
+
+.map-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 580px;
+  display: block;
+}
+
+.map-location {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.map-location:hover circle { stroke: var(--gold); stroke-width: 3; }
+.map-location.locked { opacity: 0.35; cursor: not-allowed; }
+.map-location.visited circle { fill: var(--green); }
+.map-location.current circle { fill: var(--gold); }
+
+@keyframes locationPulse {
+  0%, 100% { r: 10; }
+  50% { r: 13; }
+}
+
+.map-footer {
+  background: var(--panel);
+  border-top: 2px solid var(--border);
+  padding: 10px 18px;
+  font-size: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* STATS BAR */
+.stats-bar {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.stat-block { display: flex; justify-content: space-between; }
+.stat-label { color: var(--text-dim); }
+.stat-value { color: var(--gold); font-weight: bold; }
+
+/* CHOICE MENU */
+.choices {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem;
+}
+
+.choices-title {
+  font-size: 18px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.choice {
+  font-size: 21px;
+  padding: 6px 32px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  border-radius: 2px;
+}
+
+.choice.selected, .choice:hover {
+  background: var(--panel-light);
+  color: var(--gold);
+}
+
+.choice.selected::before {
+  content: '▶';
+  position: absolute;
+  left: 8px;
+  color: var(--gold);
+  animation: cursorBlink 0.8s steps(2) infinite;
+}
+
+.choice.disabled {
+  color: var(--text-dim);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.choice .req {
+  float: right;
+  font-size: 16px;
+  color: var(--text-dim);
+  margin-left: 12px;
+}
+
+/* COMBAT SCREEN */
+.combat-screen { padding: 1rem; }
+
+.enemy-area {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 1.5rem 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  min-height: 180px;
+  position: relative;
+}
+
+.enemy-art {
+  font-size: 100px;
+  margin-bottom: 0.5rem;
+  display: block;
+  line-height: 1;
+  animation: enemyFloat 2s ease-in-out infinite;
+}
+
+@keyframes enemyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.enemy-art.hit { animation: enemyHit 0.4s; }
+
+@keyframes enemyHit {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  25% { transform: translateX(-8px); filter: brightness(2) hue-rotate(180deg); }
+  50% { transform: translateX(8px); filter: brightness(2); }
+  75% { transform: translateX(-4px); }
+}
+
+.enemy-name {
+  font-size: 22px;
+  color: var(--gold);
+  font-weight: bold;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.enemy-hp-row { display: flex; justify-content: center; gap: 8px; font-size: 18px; }
+.hp-bar {
+  width: 200px;
+  height: 12px;
+  background: var(--dark);
+  border: 1px solid var(--border);
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.hp-fill {
+  height: 100%;
+  background: var(--red);
+  transition: width 0.4s;
+}
+
+.combat-log {
+  background: var(--dark);
+  border: 2px solid var(--border);
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+  font-size: 19px;
+  min-height: 80px;
+  max-height: 140px;
+  overflow-y: auto;
+  color: var(--text);
+}
+
+.combat-log p { margin-bottom: 4px; }
+.combat-log .log-player { color: var(--teal); }
+.combat-log .log-enemy { color: var(--red); }
+.combat-log .log-system { color: var(--text-dim); font-style: italic; }
+
+.combat-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.combat-btn {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  padding: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.1s;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.combat-btn:hover, .combat-btn.selected {
+  background: var(--panel-light);
+  color: var(--gold);
+}
+
+.combat-btn.selected::before {
+  content: '▶ ';
+  color: var(--gold);
+}
+
+.combat-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* SUBMENU (spells, items) */
+.submenu {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.submenu-item {
+  font-size: 19px;
+  padding: 4px 28px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.submenu-item:hover, .submenu-item.selected {
+  background: var(--panel-light);
+  color: var(--gold);
+}
+
+.submenu-item.selected::before {
+  content: '▶';
+  position: absolute;
+  left: 4px;
+  color: var(--gold);
+}
+
+.submenu-item .cost {
+  color: var(--teal);
+  font-size: 17px;
+}
+
+/* DAMAGE FLOATER */
+.damage-float {
+  position: absolute;
+  font-size: 32px;
+  font-weight: bold;
+  pointer-events: none;
+  animation: damageFloat 1.2s ease-out forwards;
+}
+
+@keyframes damageFloat {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+/* CONTROLS HINT */
+.controls-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 14px;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+/* JOURNAL */
+.journal-screen { padding: 1rem; }
+.journal-tabs { display: flex; gap: 0; margin-bottom: 1rem; }
+
+.journal-tab {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-bottom: none;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-dim);
+}
+
+.journal-tab.active {
+  background: var(--panel-light);
+  color: var(--gold);
+}
+
+.journal-content {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 1.2rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.journal-entry {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.journal-entry:last-child { border-bottom: none; }
+
+.journal-title {
+  color: var(--gold);
+  font-size: 20px;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.journal-detail {
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* ENDING SCREEN */
+.ending-screen {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.ending-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 24px;
+  color: var(--gold);
+  letter-spacing: 4px;
+  margin-bottom: 2rem;
+  text-shadow: 3px 3px 0 var(--red);
+}
+
+.ending-subtitle {
+  font-size: 22px;
+  color: var(--teal);
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.ending-narrative {
+  font-size: 21px;
+  line-height: 1.7;
+  color: var(--text);
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+.ending-narrative p { margin-bottom: 14px; }
+
+/* BLINK */
+.blink { animation: cursorBlink 1s steps(2) infinite; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  body { font-size: 18px; padding: 0.5rem; }
+  .screen { padding: 1rem; }
+  .title-logo { font-size: 28px; letter-spacing: 2px; }
+  .enemy-art { font-size: 72px; }
+  .combat-btn { font-size: 18px; padding: 10px; }
+  .hp-bar { width: 140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="game-window">
+
+<!-- =============== TITLE SCREEN =============== -->
+<div id="screen-title" class="screen active title-screen">
+  <div class="title-logo">CASCADES</div>
+  <div class="title-subtitle">A PACIFIC COAST RECKONING</div>
+  <div class="title-tagline">In days after the waterfront park and the lazy rivers...</div>
+  <ul class="menu-list" id="titleMenu">
+    <li class="menu-item selected" data-action="newgame">NEW GAME</li>
+    <li class="menu-item" data-action="continue">CONTINUE</li>
+    <li class="menu-item" data-action="about">ABOUT</li>
+  </ul>
+  <div class="copyright">© CASCALIFORNIA IMPERIAL ARCHIVES &nbsp;·&nbsp; ALL TIMELINES RESERVED</div>
+</div>
+
+<!-- =============== NAME ENTRY =============== -->
+<div id="screen-name" class="screen name-input-screen">
+  <h2>WHAT IS THY NAME, COMMISSIONER?</h2>
+  <input type="text" class="name-input" id="nameInput" maxlength="14" autocomplete="off">
+  <div style="font-size:18px;color:var(--text-dim);margin-bottom:1.5rem;">Press ENTER to continue</div>
+</div>
+
+<!-- =============== MANIFESTO / OPENING =============== -->
+<div id="screen-manifesto" class="screen cutscene">
+  <div class="cutscene-text" id="manifestoText"></div>
+  <div style="text-align:center;margin-top:2rem;">
+    <span class="blink" style="color:var(--gold);font-size:18px;">▼ PRESS ENTER ▼</span>
+  </div>
+</div>
+
+<!-- =============== WORLD MAP =============== -->
+<div id="screen-map" class="screen map-screen">
+  <div class="map-header">
+    <span id="mapHero">★ HERO</span>
+    <span id="mapSceneName" style="color:var(--gold);">DOWNTOWN PORTLAND</span>
+    <span id="mapChapter">CHAPTER 1</span>
+  </div>
+  <div class="map-area">
+    <svg class="map-svg" id="mapSvg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <rect width="800" height="600" fill="#0a0805"/>
+      <g id="mapBackground"></g>
+      <g id="mapLocations"></g>
+      <g id="mapHeroIcon"></g>
+    </svg>
+  </div>
+  <div class="map-footer">
+    <span>HP <span id="mapHP" style="color:var(--gold);">100/100</span></span>
+    <span>SP <span id="mapSP" style="color:var(--teal);">20/20</span></span>
+    <span>BUD <span id="mapBud" style="color:var(--gold);">500</span></span>
+    <span>LV <span id="mapLevel" style="color:var(--gold);">1</span></span>
+    <button class="combat-btn" id="zoomOutBtn" style="font-size:16px;padding:4px 10px;margin-left:auto;display:none;" onclick="zoomOutScene()">▲ ZOOM OUT</button>
+    <button class="combat-btn" style="font-size:16px;padding:4px 10px;" onclick="openMenu()">MENU</button>
+  </div>
+</div>
+
+<!-- =============== LOCATION (dialogue/interaction) =============== -->
+<div id="screen-location" class="screen">
+  <div class="stats-bar" id="locStats"></div>
+  <div id="locContent"></div>
+  <div id="locChoices" class="choices" style="margin-top:1rem;"></div>
+</div>
+
+<!-- =============== COMBAT =============== -->
+<div id="screen-combat" class="screen combat-screen">
+  <div class="enemy-area" id="enemyArea">
+    <div class="enemy-art" id="enemyArt">👤</div>
+    <div class="enemy-name" id="enemyName">Enemy</div>
+    <div class="enemy-hp-row">HP <div class="hp-bar"><div class="hp-fill" id="enemyHP" style="width:100%"></div></div></div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-block"><span class="stat-label" id="combatHeroName">HERO</span><span class="stat-value" id="combatHeroHP">100/100</span></div>
+    <div class="stat-block"><span class="stat-label">SP</span><span class="stat-value" id="combatHeroSP">20/20</span></div>
+  </div>
+
+  <div class="combat-log" id="combatLog"></div>
+
+  <div class="combat-menu" id="combatMenu">
+    <button class="combat-btn selected" onclick="combatAction('vote')">VOTE</button>
+    <button class="combat-btn" onclick="combatAction('invoke')">INVOKE</button>
+    <button class="combat-btn" onclick="combatAction('spend')">SPEND</button>
+    <button class="combat-btn" onclick="combatAction('retreat')">RETREAT</button>
+  </div>
+
+  <div id="combatSubmenu"></div>
+</div>
+
+<!-- =============== JOURNAL / MENU =============== -->
+<div id="screen-menu" class="screen journal-screen">
+  <div class="journal-tabs">
+    <div class="journal-tab active" onclick="switchJournalTab('status', this)">STATUS</div>
+    <div class="journal-tab" onclick="switchJournalTab('items', this)">ITEMS</div>
+    <div class="journal-tab" onclick="switchJournalTab('quests', this)">QUESTS</div>
+    <div class="journal-tab" onclick="switchJournalTab('factions', this)">FACTIONS</div>
+    <div class="journal-tab" onclick="switchJournalTab('lore', this)">LORE</div>
+  </div>
+  <div class="journal-content" id="journalContent"></div>
+  <div style="margin-top:1rem;display:flex;gap:8px;justify-content:space-between;">
+    <button class="combat-btn" style="font-size:18px;padding:8px 16px;" onclick="returnFromMenu()">▶ RETURN</button>
+    <button class="combat-btn" style="font-size:18px;padding:8px 16px;" onclick="saveGame()">SAVE GAME</button>
+  </div>
+</div>
+
+<!-- =============== ENDING =============== -->
+<div id="screen-ending" class="screen ending-screen">
+  <div class="ending-title" id="endingTitle">THE END</div>
+  <div class="ending-subtitle" id="endingSubtitle"></div>
+  <div class="ending-narrative" id="endingNarrative"></div>
+  <button class="combat-btn" style="font-size:20px;padding:12px 24px;" onclick="location.reload()">START OVER</button>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// CASCADES: THE RPG
+// ============================================================
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let state = {
+  name: 'HERO',
+  level: 1,
+  xp: 0,
+  hp: 100, hpMax: 100,
+  sp: 20, spMax: 20,
+  pol: 50,   // Political Power (attack)
+  bud: 500,  // Budget (gold + defense)
+  wrd: 30,   // Weirdness (magic stat - INVOKE damage)
+  sil: 20,   // Silence (luck - crits, evasion, NPC reveals)
+  location: 'city-hall',
+  chapter: 1,
+  questsCompleted: [],
+  items: [],
+  partyGoats: 0,
+  factions: {
+    dantes: 50,
+    powells: 50,
+    voodoo: 50,
+    screendoor: 50,
+    cyclists: 30,
+    nimbys: 20,
+    dougfir: 50 // unknown alignment
+  },
+  flags: {},
+  combat: null
+};
+
+// ============================================================
+// LOCATIONS DATABASE
+// ============================================================
+// ============================================================
+// SCENE DEFINITIONS
+// ============================================================
+// Four scenes at progressively wider scope. Each renders its own
+// background and only shows the locations that belong to it.
+//
+//   SCENE 1: Downtown Portland (~1mi square, street-level)
+//   SCENE 2: Portland Metro (Willamette through Portland + Banfield)
+//   SCENE 3: Oregon (state-level, Portland + Woodburn + PCT + Lakeview)
+//   SCENE 4: Pacific Coast (BC to LA — late game)
+//
+// Locations have BOTH a scene assignment AND their pixel coordinates
+// within that scene's 800x600 viewBox.
+
+const scenes = {
+  'downtown': {
+    name: 'DOWNTOWN PORTLAND',
+    minChapter: 1,
+    // Real-ish: downtown is grid-blocks, Willamette runs N-S on east side
+    background: `
+      <!-- Willamette River along right side -->
+      <rect x="640" y="0" width="160" height="600" fill="#1a3a5c" opacity="0.5"/>
+      <rect x="660" y="0" width="120" height="600" fill="#1e4a74" opacity="0.4"/>
+      <text x="720" y="300" fill="#4878C8" font-family="VT323" font-size="22" text-anchor="middle" transform="rotate(-90 720 300)" opacity="0.7">WILLAMETTE RIVER</text>
+
+      <!-- Streets grid (downtown blocks) -->
+      <g stroke="#2a1f18" stroke-width="1.5" opacity="0.5">
+        <!-- vertical avenues (4th, 3rd, 2nd, 1st Ave) -->
+        <line x1="200" y1="0" x2="200" y2="600"/>
+        <line x1="320" y1="0" x2="320" y2="600"/>
+        <line x1="440" y1="0" x2="440" y2="600"/>
+        <line x1="560" y1="0" x2="560" y2="600"/>
+        <!-- horizontal streets (Burnside, Stark, Yamhill, etc) -->
+        <line x1="0" y1="120" x2="640" y2="120"/>
+        <line x1="0" y1="240" x2="640" y2="240"/>
+        <line x1="0" y1="360" x2="640" y2="360"/>
+        <line x1="0" y1="480" x2="640" y2="480"/>
+      </g>
+
+      <!-- Burnside Bridge marker -->
+      <line x1="560" y1="240" x2="780" y2="240" stroke="#C9A84C" stroke-width="3" opacity="0.4"/>
+      <text x="660" y="232" fill="#C9A84C" font-family="VT323" font-size="14" opacity="0.6">BURNSIDE BR.</text>
+
+      <!-- Morrison Bridge marker (south of Burnside) -->
+      <line x1="560" y1="320" x2="780" y2="320" stroke="#C9A84C" stroke-width="2" opacity="0.3"/>
+
+      <!-- Steel Bridge marker (north) -->
+      <line x1="560" y1="160" x2="780" y2="160" stroke="#C9A84C" stroke-width="2" opacity="0.3"/>
+
+      <!-- Neighborhood labels -->
+      <text x="180" y="50" fill="#A89878" font-family="VT323" font-size="18" opacity="0.7">PEARL DISTRICT</text>
+      <text x="380" y="50" fill="#A89878" font-family="VT323" font-size="18" opacity="0.7">OLD TOWN</text>
+      <text x="180" y="395" fill="#A89878" font-family="VT323" font-size="18" opacity="0.7">DOWNTOWN CORE</text>
+      <text x="540" y="50" fill="#A89878" font-family="VT323" font-size="16" opacity="0.6">↑ TO BRIDGES</text>
+    `
+  },
+  'metro': {
+    name: 'PORTLAND METRO',
+    minChapter: 2,
+    background: `
+      <!-- Columbia River (top) -->
+      <rect x="0" y="40" width="800" height="50" fill="#1a3a5c" opacity="0.55"/>
+      <rect x="0" y="50" width="800" height="30" fill="#1e4a74" opacity="0.45"/>
+      <text x="400" y="68" fill="#4878C8" font-family="VT323" font-size="16" text-anchor="middle" opacity="0.8">COLUMBIA RIVER</text>
+
+      <!-- Willamette River (vertical, slight curve) -->
+      <path d="M 380 90 Q 360 200 370 320 Q 350 440 360 580 L 420 580 Q 410 440 430 320 Q 420 200 440 90 Z" fill="#1a3a5c" opacity="0.55"/>
+      <text x="400" y="380" fill="#4878C8" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.8" transform="rotate(-90 400 380)">WILLAMETTE</text>
+
+      <!-- Mt. Hood (east edge) -->
+      <polygon points="700,180 740,140 780,180 780,260 700,260" fill="#3a2d22" opacity="0.6"/>
+      <text x="740" y="195" fill="#A89878" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.7">MT HOOD</text>
+
+      <!-- I-84 / Banfield corridor east -->
+      <line x1="420" y1="270" x2="780" y2="240" stroke="#C9A84C" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.6"/>
+      <text x="600" y="245" fill="#C9A84C" font-family="VT323" font-size="14" opacity="0.7">I-84 BANFIELD →</text>
+
+      <!-- Bridges along Willamette -->
+      <g stroke="#C9A84C" stroke-width="2" opacity="0.4">
+        <line x1="360" y1="170" x2="450" y2="170"/>
+        <line x1="360" y1="220" x2="450" y2="220"/>
+        <line x1="360" y1="300" x2="450" y2="300"/>
+        <line x1="360" y1="380" x2="450" y2="380"/>
+        <line x1="360" y1="460" x2="450" y2="460"/>
+        <line x1="360" y1="540" x2="450" y2="540"/>
+      </g>
+
+      <!-- Neighborhood labels -->
+      <text x="200" y="160" fill="#A89878" font-family="VT323" font-size="16" opacity="0.7">NW PORTLAND</text>
+      <text x="540" y="380" fill="#A89878" font-family="VT323" font-size="16" opacity="0.7">SE PORTLAND</text>
+      <text x="540" y="540" fill="#A89878" font-family="VT323" font-size="14" opacity="0.6">→ MILWAUKIE</text>
+      <text x="200" y="100" fill="#A89878" font-family="VT323" font-size="14" opacity="0.6">↑ VANCOUVER WA</text>
+    `
+  },
+  'oregon': {
+    name: 'OREGON',
+    minChapter: 4,
+    background: `
+      <!-- Pacific Ocean (left) -->
+      <rect x="0" y="0" width="140" height="600" fill="#1a3a5c" opacity="0.5"/>
+      <text x="70" y="300" fill="#4878C8" font-family="VT323" font-size="22" text-anchor="middle" transform="rotate(-90 70 300)" opacity="0.7">PACIFIC OCEAN</text>
+
+      <!-- Oregon coastline (rough) -->
+      <path d="M 140 0 Q 150 100 145 200 Q 155 300 145 400 Q 160 500 150 600 L 800 600 L 800 0 Z" fill="#2a1f18" opacity="0.3"/>
+
+      <!-- Columbia River (top border with Washington) -->
+      <path d="M 140 60 Q 300 50 500 65 Q 650 60 800 70 L 800 95 Q 650 88 500 90 Q 300 80 140 90 Z" fill="#1a3a5c" opacity="0.55"/>
+      <text x="450" y="80" fill="#4878C8" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.8">COLUMBIA RIVER</text>
+
+      <!-- Washington label (above Columbia) -->
+      <text x="450" y="30" fill="#A89878" font-family="VT323" font-size="16" text-anchor="middle" opacity="0.6">— WASHINGTON / JEFFERSON-COLUMBIA —</text>
+
+      <!-- Willamette Valley (the green corridor where most of Oregon lives) -->
+      <rect x="220" y="100" width="120" height="380" fill="#1a2818" opacity="0.4"/>
+      <text x="280" y="320" fill="#58A858" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.7" transform="rotate(-90 280 320)">WILLAMETTE VALLEY</text>
+
+      <!-- Cascade Range -->
+      <g fill="#3a2d22" opacity="0.6">
+        <polygon points="400,140 425,110 450,140 450,180 400,180"/>
+        <polygon points="430,220 460,180 490,220 490,270 430,270"/>
+        <polygon points="420,310 445,275 475,310 475,360 420,360"/>
+        <polygon points="445,400 475,365 505,400 505,460 445,460"/>
+      </g>
+      <text x="470" y="240" fill="#A89878" font-family="VT323" font-size="16" text-anchor="middle" opacity="0.7" transform="rotate(-90 470 240)">CASCADE RANGE</text>
+
+      <!-- Mt Hood label -->
+      <text x="445" y="230" fill="#E8D4A0" font-family="VT323" font-size="12" text-anchor="middle" opacity="0.9">▲ MT HOOD</text>
+
+      <!-- Eastern Oregon (high desert) -->
+      <rect x="540" y="100" width="260" height="500" fill="#1f1810" opacity="0.5"/>
+      <text x="670" y="340" fill="#A89878" font-family="VT323" font-size="18" text-anchor="middle" opacity="0.6">HIGH DESERT</text>
+      <text x="670" y="360" fill="#A89878" font-family="VT323" font-size="12" text-anchor="middle" opacity="0.5">(eastern oregon)</text>
+
+      <!-- US-97 highway running south through eastern oregon -->
+      <line x1="600" y1="105" x2="610" y2="595" stroke="#C9A84C" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"/>
+      <text x="618" y="200" fill="#C9A84C" font-family="VT323" font-size="13" opacity="0.6">US-97 ↓</text>
+    `
+  },
+  'coast': {
+    name: 'PACIFIC COAST',
+    minChapter: 7,
+    background: `
+      <!-- Pacific Ocean -->
+      <rect x="0" y="0" width="200" height="600" fill="#1a3a5c" opacity="0.5"/>
+      <text x="100" y="300" fill="#4878C8" font-family="VT323" font-size="26" text-anchor="middle" transform="rotate(-90 100 300)" opacity="0.7">PACIFIC OCEAN</text>
+
+      <!-- Coastline -->
+      <path d="M 200 0 Q 215 80 205 160 Q 225 240 210 320 Q 235 400 220 480 Q 245 540 230 600 L 800 600 L 800 0 Z" fill="#2a1f18" opacity="0.4"/>
+
+      <!-- Regional labels -->
+      <text x="500" y="60" fill="#A89878" font-family="VT323" font-size="16" text-anchor="middle" opacity="0.7">— BRITISH COLUMBIA / JEFFERSON-COLUMBIA —</text>
+      <line x1="220" y1="80" x2="800" y2="80" stroke="#A89878" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+
+      <text x="500" y="120" fill="#A89878" font-family="VT323" font-size="18" text-anchor="middle" opacity="0.8">WASHINGTON</text>
+      <line x1="220" y1="180" x2="800" y2="180" stroke="#A89878" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+
+      <text x="500" y="220" fill="#A89878" font-family="VT323" font-size="20" text-anchor="middle" opacity="0.8">OREGON</text>
+      <line x1="220" y1="320" x2="800" y2="320" stroke="#A89878" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+
+      <text x="500" y="380" fill="#A89878" font-family="VT323" font-size="20" text-anchor="middle" opacity="0.8">CALIFORNIA</text>
+
+      <text x="500" y="560" fill="#A89878" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.6">SOUTHERN CALIFORNIA / BAJA</text>
+
+      <!-- I-5 corridor running N-S -->
+      <line x1="430" y1="40" x2="450" y2="580" stroke="#C9A84C" stroke-width="2.5" stroke-dasharray="8,4" opacity="0.5"/>
+      <text x="438" y="500" fill="#C9A84C" font-family="VT323" font-size="14" opacity="0.7" transform="rotate(-90 438 500)">I-5 CORRIDOR</text>
+
+      <!-- Cascade/Sierra ranges to the east -->
+      <g fill="#3a2d22" opacity="0.5">
+        <polygon points="600,140 630,100 660,140 660,200 600,200"/>
+        <polygon points="640,240 670,200 700,240 700,300 640,300"/>
+        <polygon points="620,340 650,300 680,340 680,400 620,400"/>
+        <polygon points="660,440 690,400 720,440 720,500 660,500"/>
+      </g>
+      <text x="700" y="320" fill="#A89878" font-family="VT323" font-size="14" text-anchor="middle" opacity="0.6" transform="rotate(-90 700 320)">MOUNTAINS</text>
+    `
+  }
+};
+
+// Track the active scene the player is viewing.
+// Auto-advances with chapter progression; can also be navigated manually.
+let currentScene = 'downtown';
+
+// ============================================================
+// LOCATIONS DATABASE
+// ============================================================
+// Each location: name, chapter (when unlocked), scene (which map shows it),
+// mapPos within that scene's 800x600 viewBox, description, npcs, etc.
+const locations = {
+  'city-hall': {
+    name: 'PORTLAND CITY HALL',
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 250, y: 380 }, // SW 4th & Madison area, downtown core
+    description: 'A modest building. Your office is on the third floor. Your desk is sticky from whatever the last Commissioner spilled on it. Yesterday, you accepted this job. Today is your first day.',
+    npcs: ['mayor', 'aide', 'desk', 'mark-cityhall'],
+    unlocks: ['powells', 'voodoo', 'screendoor', 'dantes', 'waterfront']
+  },
+  'waterfront': {
+    name: 'WATERFRONT PARK',
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 580, y: 320 }, // Right against the river
+    description: 'The park where Harbor Drive used to be. Grass. Trees. The river visible. The lazy river segment splashes quietly downstream. A jogger passes. They are not smiling. Nobody in Portland smiles. Everyone seems content.',
+    npcs: ['waterfront-jogger', 'waterfront-vendor', 'mark-waterfront'],
+    encounter: { chance: 0.4, enemies: ['nimby-pearl', 'nimby-pearl'] }
+  },
+  'powells': {
+    name: "POWELL'S",
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 160, y: 180 }, // Pearl District, NW Burnside & 10th
+    description: 'The City of Books. You can lose four hours here easily. Time works differently inside. The staff know things. You suspect they have always known things.',
+    isShop: true,
+    npcs: ['powells-clerk', 'powells-philosopher', 'mark-powells'],
+    services: ['rest', 'shop-info']
+  },
+  'voodoo': {
+    name: 'VOODOO DONUTS',
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 470, y: 200 }, // Old Town, SW 3rd & Ankeny
+    description: 'Pink boxes. A line out the door. A donut with bacon. A donut shaped like a voodoo doll. The Voodoo Donuts Syndicate operates from the back. They will sell you anything.',
+    isShop: true,
+    npcs: ['voodoo-clerk', 'mark-voodoo'],
+    services: ['shop-items']
+  },
+  'screendoor': {
+    name: 'SCREEN DOOR',
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 540, y: 510 }, // East Burnside (across the river, SE side)
+    description: 'A three-hour wait. The chicken is worth it. Sitting down and waiting is itself restorative. Time, again, working differently.',
+    npcs: ['screendoor-host'],
+    services: ['rest-full']
+  },
+  'dantes': {
+    name: "DANTE'S",
+    chapter: 1,
+    scene: 'downtown',
+    mapPos: { x: 500, y: 280 }, // Old Town, SW 3rd & Burnside (across from Voodoo)
+    description: 'The Keep Portland Weird sign hangs out front. The interior is dark. The interior is always dark. You have heard rumors about who actually runs this place. Standing in the doorway you can feel that the rumors are correct.',
+    npcs: ['dantes-bouncer', 'mark-dantes'],
+    services: ['dantes-meeting']
+  },
+
+  // ===== METRO SCENE =====
+  'bridges': {
+    name: 'THE BRIDGES',
+    chapter: 2,
+    scene: 'metro',
+    mapPos: { x: 400, y: 380 }, // Mid-Willamette through Portland
+    description: 'Ten existing bridges. Several proposed crossings. NIMBYs gathering at every approach. You hold the federal authorization. You will need to walk this corridor end to end.',
+    npcs: ['bridge-engineer', 'mark-bridges'],
+    encounter: { chance: 0.6, enemies: ['nimby-pearl', 'nimby-sellwood', 'bike-activist'] }
+  },
+  'banfield': {
+    name: 'BANFIELD',
+    chapter: 3,
+    scene: 'metro',
+    mapPos: { x: 600, y: 250 }, // I-84 east of downtown
+    description: 'I-84 stretches east toward Gresham and the Gorge. The traffic is constant. The cyclists are angry. The lazy river enthusiasts have proposals. This corridor is the Banfield Question.',
+    npcs: ['banfield-engineer'],
+    encounter: { chance: 0.5, enemies: ['federal-bureaucrat', 'bike-activist'] }
+  },
+  // A re-entry point on the metro map back to downtown
+  'downtown-pdx': {
+    name: 'DOWNTOWN',
+    chapter: 2,
+    scene: 'metro',
+    mapPos: { x: 400, y: 280 }, // Where downtown sits in the metro view
+    description: 'You return to Downtown Portland. The familiar streets. Powell\'s. Dante\'s. The waterfront. Your office.',
+    npcs: [],
+    isPortal: 'downtown' // signals "go to downtown scene"
+  },
+
+  // ===== OREGON SCENE =====
+  'portland-or': {
+    name: 'PORTLAND',
+    chapter: 4,
+    scene: 'oregon',
+    mapPos: { x: 290, y: 110 }, // NW corner of Oregon, on the Columbia
+    description: 'Home. The city you have been shaping. From this elevation you can see the Great Loop\'s entire course. The Mount Hood Freeway. The bridges. The neighborhoods that built their own canals. You feel the weight of every decision.',
+    npcs: [],
+    isPortal: 'metro' // returns to metro scene
+  },
+  'woodburn': {
+    name: 'WOODBURN',
+    chapter: 4,
+    scene: 'oregon',
+    mapPos: { x: 290, y: 250 }, // Willamette Valley, south of Portland
+    description: 'Empty farmland. The federal markers are already in place. This is where the Pacific Northwest economic center is about to be born. Or destroyed, depending on the next several decisions.',
+    npcs: ['woodburn-farmer', 'woodburn-fed', 'mark-woodburn', 'tina-kotek'],
+    encounter: { chance: 0.5, enemies: ['federal-bureaucrat', 'federal-bureaucrat', 'seattle-lobbyist'] }
+  },
+  'pct': {
+    name: 'PCT',
+    chapter: 6,
+    scene: 'oregon',
+    mapPos: { x: 470, y: 380 }, // In the Cascades
+    description: 'The forest. The Cascades to the east. A red figure ahead. He is walking slowly. He is surrounded by goats. They appear to be discussing something. You approach.',
+    npcs: ['ted-wheeler', 'goat-1', 'goat-2', 'goat-3', 'doug-on-trail'],
+    encounter: { chance: 0.1, enemies: ['mountain-lion'] }
+  },
+  'vancouver': {
+    name: 'VANCOUVER',
+    chapter: 8,
+    scene: 'oregon',
+    mapPos: { x: 280, y: 50 }, // Just north of the Columbia, in Washington
+    description: 'Across the Columbia, in Jefferson-Columbia. Dante\'s Inferno Vancouver dominates the nightlife corridor. Ted Cruz, Governor, has progressive policies emanating from the Provincial Legislature. The film industry survives as a junior partner.',
+    npcs: ['ted-cruz', 'vancouver-resident'],
+    encounter: { chance: 0.3, enemies: ['vancouver-crew', 'sal-enforcer'] }
+  },
+  'lakeview': {
+    name: 'LAKEVIEW',
+    chapter: 9,
+    scene: 'oregon',
+    mapPos: { x: 620, y: 500 }, // Southeast Oregon high desert, near US-97
+    description: 'A nondescript Bureau of Reclamation pump station outside Lakeview, Oregon. Three federal employees stand at perpetual attention. There is a door at the back. Behind the door is the Spigot. You are here.',
+    npcs: ['lakeview-tech-1', 'lakeview-tech-2', 'lakeview-tech-3', 'doug-final'],
+    encounter: { chance: 0.7, enemies: ['reagan-ghost'] }
+  },
+
+  // ===== PACIFIC COAST SCENE =====
+  'oregon-pc': {
+    name: 'OREGON',
+    chapter: 7,
+    scene: 'coast',
+    mapPos: { x: 380, y: 260 }, // Oregon position on the full coast view
+    description: 'You return to Oregon. The state-wide map opens.',
+    npcs: [],
+    isPortal: 'oregon'
+  },
+  'la': {
+    name: 'LOS ANGELES',
+    chapter: 5,
+    scene: 'coast',
+    mapPos: { x: 380, y: 460 }, // SoCal position on coast map
+    description: 'You did not expect to be here. Boeing brought Portland Boring Works south. You followed for political reasons. The Landings is being built off the Santa Monica coast. The South Pasadena tunnel is being bored. The Hollywood deal has been made by Sal Inferno. You are entering deep Dante\'s territory.',
+    npcs: ['sal-inferno', 'la-mayor'],
+    encounter: { chance: 0.4, enemies: ['vancouver-crew', 'seattle-lobbyist'] }
+  },
+  'palisades': {
+    name: 'PALISADES',
+    chapter: 7,
+    scene: 'coast',
+    mapPos: { x: 320, y: 480 }, // West of LA, on the coast
+    description: 'The fire-risk zone returned to nature. Native sagebrush. A few upper-canyon holdouts under strict regulation. Mountain lions have adopted the area. P-47 has consultative standing in land use decisions.',
+    npcs: ['holdout-resident', 'p47'],
+    encounter: { chance: 0.3, enemies: ['mountain-lion'] }
+  }
+};
+
+// ============================================================
+// NPC DIALOGUE DATABASE
+// ============================================================
+const npcs = {
+  'mayor': {
+    name: 'MAYOR OF PORTLAND',
+    portrait: '🏛',
+    dialogue: [
+      "Welcome to the third floor, Commissioner. Your desk is the sticky one. We don't know what the substance is. We've stopped asking.",
+      "The waterfront park is doing wonderfully. The lazy river segment from the Harbor Drive decision is generating tourism revenue we did not project. Voodoo Donuts has a kiosk. Powell's has a floating reading platform. The cyclists are unhappy about something specific I cannot recall.",
+      "Your first task: the bridges. Federal authorization has come through for new Willamette crossings. NIMBYs are organizing. You will need to evaluate each crossing personally. Take the staff token. It opens locked doors. Don't ask about the staff token.",
+      "Also: Boeing is visiting next month. Something about a site evaluation. Wear flannel. Do not engage them on coffee. Do not take them to a food cart. Trust me on this."
+    ],
+    grants: ['staff-token'],
+    flag: 'met-mayor'
+  },
+  'aide': {
+    name: 'COMMISSIONER\'S AIDE',
+    portrait: '👔',
+    dialogue: [
+      "Good morning, Commissioner. There are several envelopes for you. One is from Dante's Underground Council. The handwriting is excellent. The contents are unclear.",
+      "The Dante's envelope contains a single card. The card reads: 'The freeway is not the question. The water is the question. You don't know this yet.' There is no signature.",
+      "I will file this in the standard location, which is inside a desk drawer that we have agreed to never open during business hours."
+    ],
+    grants: ['dantes-card'],
+    flag: 'received-card'
+  },
+  'desk': {
+    name: 'YOUR DESK',
+    portrait: '🗃',
+    dialogue: [
+      "The desk is sticky. There is a coffee ring from someone else's mug. There is a Post-it note that reads 'WATER' in handwriting that doesn't match yours.",
+      "Inside the top drawer: a Portland city map. A pen. A worn copy of 'Hawthorne: A Bridge in Bascule.' A receipt from Dutch Brothers dated this morning. You did not visit Dutch Brothers this morning."
+    ],
+    grants: ['portland-map', 'dutch-receipt'],
+    flag: 'searched-desk'
+  },
+  'powells-clerk': {
+    name: 'POWELL\'S CLERK',
+    portrait: '📚',
+    dialogue: [
+      "Welcome to Powell's. We have approximately one million books. You will not read them all. You will not even read the ones you buy. This is fine.",
+      "We have a small section on Pacific Northwest infrastructure history. Aisle 47, Gold Room. The book you're looking for is called 'The Aqueduct That Wasn't' by an author whose name has been redacted in every copy. We don't know why.",
+      "If you would like to rest, we have reading chairs on the third floor. People rest here for hours. Nobody comments."
+    ],
+    grants: ['aqueduct-book'],
+    flag: 'powells-visited'
+  },
+  'powells-philosopher': {
+    name: 'POWELL\'S PHILOSOPHER',
+    portrait: '🧙',
+    dialogue: [
+      "You are looking for something, Commissioner. We can tell. People who are looking for something have a particular weight in this store.",
+      "There is a man who comes here Tuesdays. Flannel. Dutch Brothers. He does not buy books. He stands in the engineering section. He reads. He leaves. He has been doing this for years.",
+      "He left a Dutch Brothers cup behind once. We kept it. It is on display in the Rare Book Room. There is no plaque."
+    ]
+  },
+  'voodoo-clerk': {
+    name: 'VOODOO DONUTS CLERK',
+    portrait: '🍩',
+    dialogue: [
+      "Welcome to Voodoo. Donuts. Yes. We have donuts.",
+      "We also sell Inner Tubes ($120 — heals 50 HP, single use), Dutch Brothers Reserve ($30 — restores 15 SP), and the Maple Bacon Bar ($8 — heals 25 HP, but you will think about it for hours afterward).",
+      "If you have already become an associate of the Voodoo Syndicate, we have additional inventory. You have not. Yet."
+    ],
+    isShop: true,
+    shopItems: ['inner-tube', 'dutch-reserve', 'maple-bacon']
+  },
+  'screendoor-host': {
+    name: 'SCREEN DOOR HOST',
+    portrait: '🍳',
+    dialogue: [
+      "Welcome. Current wait time: three hours.",
+      "You can wait. People do. Waiting at Screen Door is itself a form of restoration. We have benches. The benches are comfortable. The smell of fried chicken is constant.",
+      "Sitting through the full wait restores your HP and SP to maximum. Time, here, works differently."
+    ],
+    services: ['rest-full']
+  },
+  'dantes-bouncer': {
+    name: 'DANTE\'S BOUNCER',
+    portrait: '🎭',
+    dialogue: [
+      "The Council is expecting you. Eventually. Not today.",
+      "Come back when you have done something worth a conversation. Build a bridge. Make a decision. Take a side. Then we can talk.",
+      "The Council is patient. The Council has time."
+    ],
+    requires: { wrd: 60 }
+  },
+  'waterfront-jogger': {
+    name: 'WATERFRONT JOGGER',
+    portrait: '🏃',
+    dialogue: [
+      "Hello. I am not smiling. I am content. This is the Portland posture. You will adjust.",
+      "The lazy river segment is wonderful. We can tube to Powell's. We can tube to Dante's, which is a more recent development. The whole city is connected by water now.",
+      "Be careful of the Pearl District. They are organizing against any new bridge. They have law firms. They have op-eds. They have very long memories."
+    ]
+  },
+  'waterfront-vendor': {
+    name: 'WATERFRONT VENDOR',
+    portrait: '🌭',
+    dialogue: [
+      "Hot dog?",
+      "I have been working this corner for eleven years. I have seen many Commissioners. Most of them did not last. The ones who did had two things in common.",
+      "One: they listened to Dante's. Two: they did not antagonize the cyclists unnecessarily. The cyclists remember everything. They have time. They have committees. They have other cyclists."
+    ],
+    isShop: true,
+    shopItems: ['portland-dog']
+  },
+  'bridge-engineer': {
+    name: 'BRIDGE ENGINEER',
+    portrait: '🌉',
+    dialogue: [
+      "Commissioner. Welcome to the bridges.",
+      "I can give you the technical breakdown. Each proposed crossing has NIMBY resistance. NIMBYs are not enemies in the conventional sense. They are obstacles. They organize. They protest. They sue. They are extraordinarily effective.",
+      "If you choose well, the bridges go through. If you choose poorly, you spend years in litigation. Pick your battles. The Pearl District NIMBYs have lawyers. The Sellwood NIMBYs have grievances. The Inner East NIMBYs have time.",
+      "One more thing. A man came through here last week. Flannel. Dutch Brothers. He surveyed the river bed at the proposed North Portland Crossing. Nobody asked him to. He left a note: 'The soil is suitable.' We don't know what to do with this."
+    ],
+    flag: 'bridge-briefing'
+  },
+
+  // ============================================================
+  // MARK ADAMS — Wandering Sage of Portland
+  // Recurring NPC. T-Rex shirt. Genius for unexplained reasons.
+  // Each location reveals more of him. Tracks via state.flags['mark-N'].
+  // ============================================================
+  'mark-cityhall': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Commissioner. Hello. I do not work here. I am here because I felt I should be here. This happens to me about twice a week.",
+      "I want to make three things clear up front. One: I am wearing this T-Rex shirt because I am, in fact, a T-Rex. It says so right on the shirt. Look. <em>I'M A T-REX!</em> The caption is load-bearing.",
+      "Two: I would like to invite you to see my band, <strong>Galactic Norcinerator</strong>. We play music that resists most existing genre classifications. There are typically four of us. Sometimes five. We have been described by a single review as 'emphatically itself,' which is the only honest thing anyone has written about a Portland band in years.",
+      "Three: there is a brownie at Lauretta Jean's on Division Street that I will be picking up later today. You should also pick one up. The brownie itself is incidental to the experience. The experience is the brownie. These statements are not contradictions; they are observations made at different temperatures.",
+      "Now. About your appointment. The Commissioner before you made the Great Loop decision. They did so for the correct reasons and one incorrect reason. The incorrect reason was that they believed Doug Fir was an ally. Doug Fir is not an ally. Doug Fir is not an enemy. Doug Fir is a <em>conditional weather system</em>. Plan accordingly.",
+      "I will see you again. Probably at the bridges. Possibly at Voodoo. Definitely at the show. Galactic Norcinerator. Mark it on your calendar. I have to go now. The brownie is calling."
+    ],
+    grants: ['mark-tip-1'],
+    flag: 'met-mark-1'
+  },
+  'mark-powells': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Hey. Hello. Yes. I am in the Pacific Northwest history section. I am not buying anything. I am here to look at the Powell's edition of <em>The Aqueduct That Wasn't</em>, but a different copy than the one you bought. Mine has a different footnote on page 247. Same book. Different footnote. Powell's prints them this way on purpose. Nobody has ever confirmed this.",
+      "Quick aside: did you know the Ross Island Bridge has <strong>fifteen different approach vectors</strong>? Most people think it has two. Maybe four. They are wrong. Allow me.",
+      "<strong>Vector 1</strong>: Northbound on Naito Parkway, taking the right onto Arthur, taking another right, and you are on the bridge. This is the official one. It is fine. It is also a lie of omission.",
+      "<strong>Vector 2</strong>: Eastbound on Powell, merging onto the bridge from the south. The merge has a personality. The personality is hostile.",
+      "<strong>Vector 3</strong>: Southbound on SE 26th, which technically does not approach the bridge but if you take it far enough you end up at the bridge anyway. Time and SE 26th are not on speaking terms.",
+      "<strong>Vector 4</strong>: From Lair Hill. The Lair Hill approach is for people who already know what Lair Hill is. If I have to explain Lair Hill to you, you are not from here, and the Lair Hill approach is not for you.",
+      "<strong>Vector 5</strong>: From OHSU. Down the hill. You are committed before you realize you are committed. This is the only vector where the bridge approaches <em>you</em>.",
+      "I will stop here. There are ten more vectors. I will explain them at the bridge itself when we meet there. I assume we will. I am also picking up a smashburger from Loyal Legion in Beaverton later. The brownie is for after. The smashburger is for before. The order matters.",
+      "Galactic Norcinerator plays Thursday. The venue has not been confirmed but the band is committed. You should come. Wear something flammable. Don't ask."
+    ],
+    grants: ['ross-island-vectors-partial'],
+    flag: 'met-mark-2'
+  },
+  'mark-voodoo': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Commissioner. I am in line. I have been in line for forty-six minutes. This is acceptable. The waiting is the entry fee. The donut is the receipt.",
+      "While we wait. Have you considered that Voodoo Donuts is not actually about donuts? The donuts are the medium. The actual product is the line. The line generates community. The community generates the brand. The brand generates the line. It is a perfect loop. It is the smallest functioning lazy river in the city.",
+      "Speaking of lazy rivers. The Great Loop is incomplete. The previous Commissioner did good work but missed one connection. There should be a feeder canal from the Powell Butte Nature Park reservoir system into the 82nd Street main. Topographically obvious. Politically impossible. Doug Fir has surveyed it. He left a Dutch Brothers cup. I have the cup. It is in my apartment. I will not return it. It is mine now.",
+      "Don't tell anyone I have it. Not because Doug Fir would care. He wouldn't. He would just acquire another one. But I have grown attached.",
+      "Galactic Norcinerator. Thursday. The flier said 'venue TBD.' The venue is still TBD. We will play. The audience will find us. They always do. Wear something flammable. I am being slightly less metaphorical than I was before. Bring water."
+    ],
+    grants: ['great-loop-gap-info'],
+    flag: 'met-mark-3'
+  },
+  'mark-waterfront': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Beautiful day. By Portland standards. The rain is taking a coffee break.",
+      "I am walking the waterfront because I am thinking about the Hawthorne Bridge. It is 1910. It is the oldest standing bridge in Portland. It is also the most heavily trafficked bicycle bridge in the United States. Both of these facts are inadequately appreciated.",
+      "Did you know the Hawthorne's vertical-lift mechanism is still original? The same 1910 machinery operates the same 1910 lift towers. They lift it about 200 times a year for river traffic. Nothing made in 2010 will still work in 2110. Nothing made in 2024 will still work in 2034. The Hawthorne will outlast the iPhone. The Hawthorne will outlast Portland.",
+      "There is a goat on the trail near Crater Lake who allegedly said 'the grade is suitable.' I have not confirmed this firsthand. I do not believe goats can speak. I also do not believe they cannot. I am holding the question open until I have more data. This is the only reasonable epistemic posture available to me.",
+      "I have to go pick up the brownie from Lauretta Jean's. The brownie does not wait. Well. The brownie does wait. The brownie is fine. I am the one who does not wait. I have transposed my anxiety onto a pastry. This is a coping strategy. It is working. The brownie is helping. The brownie does not know it is helping. The brownie's contribution to my mental health is involuntary on its part. We have not discussed the matter."
+    ],
+    flag: 'met-mark-4'
+  },
+  'mark-dantes': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Hello. I am outside Dante's. I am not going in. I do not need to go in. I know what is inside Dante's. I have known what is inside Dante's since I was nineteen, and I have not been nineteen for a while.",
+      "The Underground Council is not what people think it is. People think it is a metaphor. It is not a metaphor. People think it is a literal mafia. It is not a literal mafia. It is something specific that does not have a name in English and possibly does not have a name in any language. I have tried to coin one. I have not succeeded. The closest I have come is <em>'extralegal civic stewardship with vibes.'</em> That is bad. I know it is bad. The Council itself would agree it is bad. They have higher standards.",
+      "What you need to understand about the Council is that they do not want what you think they want. They do not want money. They do not want power in the conventional sense. They want <strong>continuity</strong>. They want Portland to remain weird in a specific way that they recognize. When you negotiate with them, do not bring offers. Bring patience. Bring an acknowledgment that the city existed before you and will exist after you and that your job is to not damage the through-line.",
+      "I am going to be honest, this is the most sincere thing I will ever say to you. The previous Commissioner understood this. The previous Commissioner is now safe. You should aim for that outcome.",
+      "Anyway. Galactic Norcinerator. The venue is still TBD but I have narrowed it down to either Mississippi Studios or a basement on Clinton I do not have the address for. We are going for what I am calling 'situational logistical hostility' as a vibe. Everyone who attends earns it. Bring water. Bring shoes you do not love."
+    ],
+    grants: ['dantes-real-motive'],
+    flag: 'met-mark-5'
+  },
+  'mark-bridges': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Commissioner! Excellent. I was hoping you would come. I am here at the Ross Island Bridge specifically to finish the lecture I started at Powell's. We covered Vectors 1 through 5. I now offer Vectors 6 through 15.",
+      "<strong>Vector 6</strong>: From Macadam, southbound, then the loop around to merge from the south side at speed. This is the suicide vector. Don't use it. Don't even study it.",
+      "<strong>Vector 7</strong>: From Barbur, northbound, getting onto Naito too early, realizing your mistake, taking the bridge anyway. This is the most popular vector for newcomers. The bridge knows this. The bridge has feelings about it.",
+      "<strong>Vector 8</strong>: Via the OMSI loop. This involves OMSI. It also involves three left turns where you did not anticipate left turns. It rewards persistence.",
+      "<strong>Vector 9</strong>: From the Marquam Bridge, taking the SE Water exit, paralleling the river, joining the Ross Island from below. The pros use this. The pros are wrong, but they don't know it yet.",
+      "<strong>Vector 10</strong>: Coming off the Tilikum Crossing — except you can't, the Tilikum has no cars. So this is a theoretical vector. It exists in the same sense that a meaningful federal infrastructure policy exists. It haunts the others.",
+      "<strong>Vector 11</strong>: From the South Waterfront. Through the development. Past the tram. This one is for people who genuinely want to live south of downtown but have not yet committed.",
+      "<strong>Vector 12</strong>: The Lair Hill approach, but from the OTHER direction. Yes, two of these are Lair Hill. I told you Lair Hill was its own thing.",
+      "<strong>Vector 13</strong>: From the Sellwood Bridge, north on Macadam, but this only works if you have already given up.",
+      "<strong>Vector 14</strong>: Via Powell, but specifically Powell at 5:47 PM on a Wednesday. The traffic pattern at that exact moment opens a vector that exists only at that moment. I have witnessed it twice. It cannot be summoned.",
+      "<strong>Vector 15</strong>: Walking. You walk onto the bridge. You're on the bridge. There is no vector. You have transcended the vectoring. This is the answer. This was always the answer.",
+      "There. The Ross Island Bridge demystified. You're welcome. I am going to Lauretta Jean's. The brownie will not wait. I am, again, the one who does not wait. We have been over this. Galactic Norcinerator. Probably Mississippi Studios. I will text you. Wear water-resistant shoes. I am not being metaphorical this time at all."
+    ],
+    grants: ['ross-island-vectors-complete', 'mark-band-invite'],
+    flag: 'met-mark-6'
+  },
+  'banfield-engineer': {
+    name: 'BANFIELD ENGINEER',
+    portrait: '🛣',
+    dialogue: [
+      "The Banfield Question has three possible answers.",
+      "One: keep I-84 as is. The conservative choice. The cyclists will resent you but the truckers will be grateful.",
+      "Two: convert it to a surface boulevard. Trees. Sidewalks. The European option. The Powell's Books expansion plans are already drafted for this scenario.",
+      "Three: convert it to America's Widest Bike Path. Twelve lanes. A velodrome from the Rose Quarter to Troutdale. Voodoo Donuts has already designed the bike-through windows. This option would make Portland internationally famous and probably ungovernable.",
+      "We can also build the Mount Hood Freeway alongside any of these options. Eastbound, Division/Powell corridor, toward Troutdale and the Gorge."
+    ]
+  },
+  'woodburn-farmer': {
+    name: 'WOODBURN FARMER',
+    portrait: '👨‍🌾',
+    dialogue: [
+      "You're here for the airport.",
+      "My family has worked this land for four generations. The federal offer is generous. The relocation package is fair. I am not selling because of the money.",
+      "I am selling because my grandmother told me, before she died, that this land would eventually become an airport. She said it in 1947. She was not joking. She knew. She knew because someone in flannel came through that year and surveyed the soil. He left a note: 'The grade is suitable.' She kept it."
+    ],
+    grants: ['grandma-note']
+  },
+  'woodburn-fed': {
+    name: 'FEDERAL AVIATION REP',
+    portrait: '✈️',
+    dialogue: [
+      "Commissioner. The federal authorization is in. Six runways. Full international gateway. HSR connection. Three times SeaTac.",
+      "This decision is bigger than you realize. The economic gravity of the Pacific Northwest will shift permanently. Seattle's hub status will end. Boeing will leave. Things will cascade.",
+      "Are you authorizing construction?"
+    ]
+  },
+
+  // ============================================================
+  // TINA KOTEK — Deep Dante's Insider
+  // The mild-mannered Governor of Oregon, long assumed to be a competent
+  // technocrat. Reveals herself here as the architect of the Woodburn
+  // strategy. UDub rejection origin story. First Newsom foreshadowing.
+  // ============================================================
+  // ============================================================
+  // MARK ADAMS — Woodburn appearance #7
+  // Tina Kotek enters mid-conversation and offers the deal.
+  // This is the first real player fork in the game.
+  // ============================================================
+  'mark-woodburn': {
+    name: 'MARK ADAMS',
+    portrait: '🦖',
+    dialogue: [
+      "Commissioner! Wild. I did not expect to see you out here. I am eating a Lauretta Jean's brownie in a field in Marion County for reasons I am not prepared to defend. The brownie is the same brownie you've heard about. The field is new to me. The combination is working.",
+      "Have you ever really looked at the Willamette Valley? I mean really looked. The whole thing is a 150-mile-long bowl that drains north and the drainage made the agriculture possible and the agriculture made Oregon possible. Everything Oregon has done — the cities, the universities, the timber, the cheese, the wine, the increasingly aggressive pinot scene — all of it traces back to this bowl.",
+      "You're standing on the most consequential dirt in the state. The Federal Aviation people don't quite know what they have. The farmers know. The man in flannel knows. He surveyed this land in 1947. Don't ask me how I know that. Don't ask me how anyone knows that.",
+      "Galactic Norcinerator has a show Thursday. The venue is still officially TBD but I have a feeling about Mississippi Studios. I have had this feeling for three weeks. Nothing has confirmed the feeling. The feeling persists. I am going to trust the feeling. You should come.",
+      "Wait. Someone is walking up. Hold on.",
+      // Tina arrives mid-conversation.
+      "[GOV. TINA KOTEK approaches across the field. Her cardigan is unbuttoned. She is not in a hurry. She arrives at exactly the speed a physics professor would arrive at, which is to say a deliberate, energy-efficient pace that nonetheless makes her appearance feel inevitable.]",
+      "🧪 KOTEK: Mark. Commissioner. I've been watching the conversation from the trailer. I thought I should come over before this turned into a different kind of conversation.",
+      "🧪 KOTEK: Mark, I'd like to formally extend an invitation to the Council. I have wanted to do this for some time. The Galactic Norcinerator situation has made it complicated. Today I am making it less complicated.",
+      "🦖 MARK: Oh. Oh wow. Okay. I want to clarify a couple of things up front. I have spent my entire adult life cultivating an aggressively anti-establishment posture. I have business cards. The business cards say 'ANTI-ESTABLISHMENT' on them. I had them printed at a co-op in Sellwood. They cost more than they should have. I do not want my position misrepresented in this conversation.",
+      "🦖 MARK: That said. The Galactic Norcinerator show is Thursday. I would like to live until Thursday. Governor Kotek says she can make Mississippi Studios happen. I have been trying to make Mississippi Studios happen for four years on my own merits. The math is what the math is. I can be anti-establishment another day. Besides, what can go wrong?",
+      "🦖 MARK: I'm in. Officially. Sign me up. Print me a card. Probably not at the same co-op. I am rebranding.",
+      "🧪 KOTEK: Welcome, Mark. Sal Inferno will be in touch. Mississippi Studios is yours. The flier I would like you to design will be slightly damp on receipt. Don't ask. It's a tradition.",
+      "[Tina turns to you. The cardigan, somehow, is now buttoned. You did not see her button it. Her expression has not changed. She is looking directly at you and through you simultaneously, the way a physics professor regards a problem that may or may not yield a clean solution.]",
+      "🧪 KOTEK: Commissioner. Same offer. Same terms. The Council, your participation, the long plan. The Pacific Northwest is moving toward something. You can be part of how it moves. Or you can be the version of the story that is told later about somebody who declined.",
+      "🧪 KOTEK: Take your time. I will wait. Mark, may I have a piece of the brownie?",
+      "🦖 MARK: Take whatever you need. I have absorbed it spiritually. The physical brownie is for sharing now.",
+      "🧪 KOTEK: Commissioner. Your answer."
+    ],
+    flag: 'mark-woodburn-spoke',
+    isChoice: true // signals our renderer to show ALIGN/DECLINE buttons on the final card
+  },
+
+  'tina-kotek': {
+    name: 'GOV. TINA KOTEK',
+    portrait: '🧪',
+    dialogue: [
+      "Commissioner. I'm glad you're here. I was hoping we could speak in person before you authorize anything. Walk with me. The fields are nicer than the trailer.",
+      "Most people, when they meet me, think I look like I should be teaching upper-division physics at Portland State. I have been told this professionally and personally over a period of decades. The cardigan does not help. I wear it anyway. It is comfortable. I have been underestimated for an entire career on the strength of a cardigan.",
+      "I want to clarify a few things, Commissioner. Things that are not in the official briefing.",
+      "First: the Woodburn site was not chosen by the Federal Aviation Administration. It was chosen by me. In 2003. I was a state representative. I was reviewing watershed data for an unrelated bill. I noticed the topography. I noticed the grade. I noticed the wind patterns. I noticed the absence of seismic risk that haunts every potential SeaTac expansion. I marked the map.",
+      "I have been working toward this site for twenty-two years. I have made every subsequent political decision in service of this site. Including running for Governor. Including the legislation that made the HSR corridor possible. Including the federal relationship-building that got us this authorization. The land you are standing on is the load-bearing element of a plan I started before the previous Commissioner was elected.",
+      "Second: I am Dante's. I have been Dante's since 1991. The Council does not have officers in the conventional sense. I am one of approximately eleven people whose decisions Dante's executes without question. Sal Inferno reports to a structure that includes me. Doug Fir does not report to anyone — Doug Fir is a separate matter — but Doug Fir and I have what we call an <em>understanding</em>. We have had this understanding since 1994. I have never explained it. He has never asked me to.",
+      "I am telling you this because you need to know the shape of what you are participating in. The previous Commissioner did not know until very late. They handled the revelation gracefully. I am offering you the courtesy of an earlier disclosure.",
+      "Third — and this is the part where I need you to listen carefully — I have a grudge against the State of Washington. It is personal. It is also strategically useful, which is how I justified building twenty-two years of Pacific Northwest economic policy around it.",
+      "In 1989 I applied to a master's program at the University of Washington. UDub. I had the GRE scores. I had the GPA. I had the recommendation letters. I was rejected. The rejection letter was three sentences. The third sentence ended with the word 'unfortunately,' which is a word I have not used in correspondence since.",
+      "I have spent thirty-six years thinking about that rejection. I have spent thirty-six years constructing a Pacific Northwest in which Seattle's economic supremacy is dismantled by the slow, patient application of better policy in a smaller state with stronger fundamentals. Woodburn is the fulcrum. Boeing will leave Seattle because there will be nothing in Seattle worth staying for. SeaTac will lose its hub status to a regional airport in a state UDub thought it could safely ignore.",
+      "Camelot was a city in a legend. Portland is going to be Camelot. Not in a legend. In fact. By the time I am done.",
+      "Fourth — and this is the part where the floor moves a little — Gavin has a plan. Gavin always has a plan. This one will change the economic and political landscape of the West Coast forever. I cannot tell you the details. I am not authorized. I can tell you that the Woodburn decision is one component of it, and that there are other components I have been coordinating for him for some time.",
+      "<em>We cannot beat California.</em> We have been trying for fifty years and the math has never worked. California is too large, too rich, too sunny, too well-positioned. So we have come to a different conclusion. <strong>Therefore we shall join them. We shall ALL join them.</strong>",
+      "I am not going to explain that sentence further. You will understand it later. You will understand it on a Tuesday. The specific Tuesday is some distance away.",
+      "Authorize the airport, Commissioner. Six runways. Full international gateway. The federal package is signed. Doug Fir surveyed this land in 1947. My grandmother kept the note. He has not aged since. None of us discuss this. We don't have to.",
+      "Welcome to the Council. I will not say this again."
+    ],
+    grants: ['kotek-revelation', 'newsom-foreshadowing'],
+    flag: 'met-kotek'
+  },
+  'sal-inferno': {
+    name: 'SAL INFERNO',
+    portrait: '🕴',
+    dialogue: [
+      "Commissioner. Welcome to Dante's South. Please sit. The ocean is behind me. The lagoon is to your left. The donuts are excellent.",
+      "We have business to discuss. The Hollywood deal. Vancouver. The aqueduct. The eventual Spigot decision. We have been waiting for you to arrive.",
+      "Doug Fir has been watching your progress. He has not commented. He is in the corner. He will probably leave before we finish talking. He always does."
+    ],
+    requires: { wrd: 70 }
+  },
+  'ted-wheeler': {
+    name: 'THE MAYOR (TED WHEELER)',
+    portrait: '🧙‍♂️',
+    dialogue: [
+      "Hello. Welcome. The goats and I are taking a break. Please sit.",
+      "I do not discuss Portland. The goats do not have opinions about Portland. I left office and walked. I bought this robe. The staff was already mine. The goats found me.",
+      "The trail teaches you things. Mostly it teaches you that very few things need to be said. The goats understand this intuitively.",
+      "If you have questions, ask the goats. They will tell you only what is true. They speak in short sentences. They are usually correct."
+    ],
+    grants: ['wheelers-blessing'],
+    flag: 'met-wheeler'
+  },
+  'goat-1': {
+    name: 'GOAT (NAMED CEDAR)',
+    portrait: '🐐',
+    dialogue: [
+      "The soil here is suitable.",
+      "The water table is interesting.",
+      "The man in flannel has been here. He left a Dutch Brothers cup. We did not eat it. The cup was respectful."
+    ]
+  },
+  'goat-2': {
+    name: 'GOAT (NAMED BASALT)',
+    portrait: '🐐',
+    dialogue: [
+      "There is water below the eastern canyon.",
+      "The grade works.",
+      "We can go under them."
+    ]
+  },
+  'goat-3': {
+    name: 'GOAT (NAMED CASCADE)',
+    portrait: '🐐',
+    dialogue: [
+      "The Spigot is real.",
+      "The Spigot is in Lakeview.",
+      "The man in flannel will be there before you. He always is."
+    ],
+    grants: ['goat-prophecy']
+  },
+  'doug-on-trail': {
+    name: 'DOUG FIR',
+    portrait: '🪵',
+    dialogue: [
+      "Commissioner.",
+      "Dutch Brothers?"
+    ],
+    grants: ['dutch-brothers-trail'],
+    flag: 'met-doug-trail'
+  },
+  'p47': {
+    name: 'P-47 (MOUNTAIN LION)',
+    portrait: '🐾',
+    dialogue: [
+      "[The mountain lion regards you. It is large. It is calm. It is wearing a small collar with a transponder. The transponder is gold. The collar reads: 'CONSULTATIVE STATUS — PALISADES LAND USE.']",
+      "[P-47 yawns. P-47 has seen Commissioners before. P-47 is not impressed by you specifically. P-47 is also not threatened. P-47 turns and walks away into the restored sagebrush.]",
+      "[On the trail behind it, a single Dutch Brothers cup. Empty. Recent.]"
+    ],
+    grants: ['p47-encounter'],
+    flag: 'met-p47'
+  },
+  'holdout-resident': {
+    name: 'PALISADES HOLDOUT',
+    portrait: '🏔',
+    dialogue: [
+      "I am one of the few. I stayed. The brush clearing requirements are strict. The construction prohibitions are strict. The dark sky compliance is strict.",
+      "I do not mind. The mountain lions are good neighbors. P-47 walks past every Tuesday. We make eye contact. We acknowledge each other. Then he continues on.",
+      "A man in flannel passed through last spring. He surveyed the geology. He left no card. He left a Dutch Brothers cup. I kept it. It is on the mantle. There is no plaque."
+    ]
+  },
+  'ted-cruz': {
+    name: 'GOV. TED CRUZ',
+    portrait: '🌿',
+    dialogue: [
+      "Commissioner. Welcome to Jefferson-Columbia. I am genuinely glad to meet you. I have been wrong about most things for most of my life. I am working on it.",
+      "We have universal basic income. We have universal healthcare. We have Indigenous land restitution. We have legal cannabis. We have high-speed rail. We have an excellent Dutch Brothers. I sign things. The things are good.",
+      "Dante's brokered our secession. I owe them. We all do. I do not know what they will ask in return. I am at peace with this in a way I previously was not capable of."
+    ],
+    flag: 'met-cruz'
+  },
+  'lakeview-tech-1': {
+    name: 'TECHNICIAN #1',
+    portrait: '🔧',
+    dialogue: [
+      "Regional Precipitation Monitoring Technician. I have worked here since 1979. I have an excellent benefits package.",
+      "I cannot tell you what is behind the door. I can tell you that the door exists. I can tell you that the Spigot is what is behind the door. I cannot tell you anything else.",
+      "The man in flannel is already inside. He arrived twenty minutes ago. He had a Dutch Brothers. He nodded at us. We nodded back. He went through the door. The door is open."
+    ]
+  },
+  'lakeview-tech-2': {
+    name: 'TECHNICIAN #2',
+    portrait: '🔧',
+    dialogue: [
+      "We have worked here together for forty-six years. We do not discuss our work outside this facility. We do not discuss our work inside this facility either. We do our work.",
+      "When Reagan ordered the closure in 1974, we did the closure. When the textbooks were revised in 1979, we received a memo confirming that we had never existed. We continued working. The work continued.",
+      "Now you are here. The man in flannel said you would arrive. He said this would be the day. He is usually correct."
+    ]
+  },
+  'lakeview-tech-3': {
+    name: 'TECHNICIAN #3',
+    portrait: '🔧',
+    dialogue: [
+      "The Spigot has three positions. CLOSED. PARTIAL. OPEN.",
+      "It has been CLOSED since 1975. It was PARTIAL from 1975 to 1988, briefly. It has never been fully OPEN since Reagan's order.",
+      "The handle is large. You will need both hands. You will know which direction to turn it when you see it. Or you will not. Either outcome is what it is."
+    ]
+  },
+  'doug-final': {
+    name: 'DOUG FIR',
+    portrait: '🪵',
+    dialogue: [
+      "Commissioner.",
+      "I have been here since this morning. I knew you were coming. The Council told me. The goats told me. The grade of the trail told me.",
+      "We can expand the capacity by 340%. The boring technology is already proven. The aqueduct can serve the entire Pacific Coast properly, for the first time in fifty years.",
+      "Or we can close it. We can let Reagan's design stand. The water stays in the Columbia. Southern California adapts. The political consequences are unpredictable. The ecological consequences are predictable: the Columbia ecosystem recovers, the Salton Sea continues to die, Phoenix joins Deseret faster.",
+      "Or we can do something else. There is always something else. The choice is yours.",
+      "I am going to step outside while you decide. The Dutch Brothers is yours. I have my own."
+    ],
+    grants: ['final-dutch-brothers'],
+    flag: 'met-doug-final',
+    triggersFinal: true
+  }
+};
+
+// ============================================================
+// ENEMIES
+// ============================================================
+const enemies = {
+  'nimby-pearl': {
+    name: 'PEARL DISTRICT NIMBY',
+    art: '👔',
+    hp: 40, atk: 8, def: 6, xp: 15, gold: 30,
+    attacks: ['files a lawsuit', 'writes an op-ed', 'calls their attorney', 'invokes the historic district overlay'],
+    desc: 'Wields lawyers like other people wield weapons.'
+  },
+  'nimby-sellwood': {
+    name: 'SELLWOOD NIMBY',
+    art: '🏘',
+    hp: 35, atk: 6, def: 8, xp: 12, gold: 20,
+    attacks: ['shouts "WE JUST REBUILT OURS"', 'forms a neighborhood coalition', 'invokes the 2016 bridge'],
+    desc: 'Just rebuilt their bridge in 2016. Will not let you forget it.'
+  },
+  'bike-activist': {
+    name: 'BIKE ACTIVIST',
+    art: '🚴',
+    hp: 50, atk: 12, def: 4, xp: 20, gold: 0,
+    attacks: ['paints the street green', 'organizes a Critical Mass', 'makes sustained eye contact', 'demands a protected lane'],
+    desc: 'Has time. Has committees. Has other cyclists.'
+  },
+  'federal-bureaucrat': {
+    name: 'FEDERAL BUREAUCRAT',
+    art: '📋',
+    hp: 60, atk: 10, def: 12, xp: 25, gold: 40,
+    attacks: ['requests additional documentation', 'invokes an environmental review', 'cites federal regulation 23 CFR 771'],
+    desc: 'Wields permit delays as offensive weapons.'
+  },
+  'seattle-lobbyist': {
+    name: 'SEATTLE LOBBYIST',
+    art: '☂️',
+    hp: 70, atk: 14, def: 10, xp: 35, gold: 75,
+    attacks: ['quietly funds opposition', 'leaks documents to local press', 'spreads unease', 'mentions the Space Needle'],
+    desc: 'Never admits being from Seattle. Always from Seattle.'
+  },
+  'vancouver-crew': {
+    name: 'VANCOUVER FILM CREW',
+    art: '🎬',
+    hp: 65, atk: 11, def: 8, xp: 30, gold: 60,
+    attacks: ['rolls in catering trucks', 'establishes a production base camp', 'invokes Canadian content rules'],
+    desc: 'Trying to film here without authorization. Dante\'s does not approve.'
+  },
+  'sal-enforcer': {
+    name: 'DANTE\'S ENFORCER',
+    art: '🎭',
+    hp: 80, atk: 16, def: 12, xp: 50, gold: 100,
+    attacks: ['delivers an envelope', 'mentions a name', 'leaves a card', 'invokes the Underground Council'],
+    desc: 'Not technically an enemy. Currently an enemy.'
+  },
+  'mountain-lion': {
+    name: 'MOUNTAIN LION',
+    art: '🐾',
+    hp: 90, atk: 22, def: 10, xp: 60, gold: 0,
+    attacks: ['silent stalk', 'eye contact from the brush', 'pounces from elevation'],
+    desc: 'It is not P-47. It is a regular mountain lion. It does not know about your consultative status.'
+  },
+  'reagan-ghost': {
+    name: 'THE GHOST OF REAGAN',
+    art: '👻',
+    hp: 250, atk: 30, def: 25, xp: 200, gold: 500,
+    attacks: ['invokes Water Scarcity', 'rewrites a textbook', 'projects through the spigot', 'speaks of "the thirsty population"'],
+    desc: 'The architect of California\'s manufactured droughts. He has been waiting in this facility since 2004.'
+  }
+};
+
+// ============================================================
+// ITEMS
+// ============================================================
+const items = {
+  'staff-token': { name: 'Staff Token', type: 'key', desc: 'Opens locked doors in City Hall and beyond. The Mayor would not explain it.' },
+  'dantes-card': { name: 'Dante\'s Card', type: 'key', desc: '"The freeway is not the question. The water is the question. You don\'t know this yet."' },
+  'portland-map': { name: 'Portland Map', type: 'key', desc: 'A worn paper map. Includes a red mark on US-97 you do not recognize.' },
+  'dutch-receipt': { name: 'Dutch Brothers Receipt', type: 'key', desc: 'Dated this morning. You did not buy this. The cashier name is "D. FIR."' },
+  'aqueduct-book': { name: 'The Aqueduct That Wasn\'t', type: 'key', desc: 'The author\'s name is redacted in every copy. The contents describe a US-97 corridor water project that "was studied and not pursued." There are footnotes. The footnotes contradict the body text.' },
+  'grandma-note': { name: 'Grandma\'s 1947 Note', type: 'key', desc: '"Man in flannel surveyed today. Said grade is suitable. Asked nothing about us. Left a paper cup behind. The cup smelled of coffee I have never smelled before."' },
+  'goat-prophecy': { name: 'Goat Prophecy', type: 'key', desc: 'The Spigot is real. The Spigot is in Lakeview. The man in flannel will be there before you. He always is.' },
+  'wheelers-blessing': { name: 'Wheeler\'s Blessing', type: 'key', desc: 'Ted Wheeler placed his hand on your shoulder. He said: "The goats approve of you. This is rare. Proceed with their endorsement." Your WRD permanently increased.' },
+  'p47-encounter': { name: 'P-47 Encounter', type: 'key', desc: 'The mountain lion did not attack. The mountain lion acknowledged you. The mountain lion left a Dutch Brothers cup. None of this is normal.' },
+  'dutch-brothers-trail': { name: 'Trail Dutch Brothers', type: 'consumable', heal: 30, sp: 10, desc: 'A Dutch Brothers from Doug Fir on the Pacific Crest Trail. Source unknown. Heals 30 HP and restores 10 SP.' },
+  'final-dutch-brothers': { name: 'Doug\'s Final Dutch Brothers', type: 'consumable', heal: 999, sp: 999, desc: 'Doug Fir gave you this before stepping outside. Full restoration. Use wisely.' },
+
+  // Mark Adams items
+  'mark-tip-1': {
+    name: "Mark's First Observation",
+    type: 'key',
+    desc: '"Doug Fir is not an ally. Doug Fir is not an enemy. Doug Fir is a conditional weather system. Plan accordingly." — Mark Adams, City Hall, T-Rex shirt'
+  },
+  'ross-island-vectors-partial': {
+    name: 'Ross Island Vectors 1-5',
+    type: 'key',
+    desc: 'Five of the fifteen approach vectors to the Ross Island Bridge, deconstructed by Mark Adams in the Pacific Northwest history section of Powell\'s. Includes the Lair Hill approach. (Vector 4. The other Lair Hill is Vector 12.)'
+  },
+  'great-loop-gap-info': {
+    name: 'Powell Butte Reservoir Gap',
+    type: 'key',
+    desc: 'Mark Adams identified a missing connection in the Great Loop: a feeder canal from the Powell Butte Nature Park reservoir system into the 82nd Street main. Topographically obvious. Politically impossible. Doug Fir has surveyed it. Mark Adams kept his Dutch Brothers cup.'
+  },
+  'dantes-real-motive': {
+    name: "The Council's Actual Goal",
+    type: 'key',
+    desc: 'Per Mark Adams (outside Dante\'s, T-Rex shirt, declining to go inside): the Council does not want money or conventional power. They want CONTINUITY. They want Portland to remain weird in a specific recognizable way. Bring patience, not offers. The previous Commissioner understood this. The previous Commissioner is now safe.'
+  },
+  'ross-island-vectors-complete': {
+    name: 'Ross Island Vectors 1-15',
+    type: 'key',
+    desc: 'All fifteen approach vectors to the Ross Island Bridge, fully documented. Includes both Lair Hill approaches (Vectors 4 and 12), the OMSI Loop (Vector 8), the 5:47-PM-Wednesday vector (Vector 14, which exists only at that moment), and the transcendent walking vector (Vector 15, "you have transcended the vectoring"). This information is worth more than the rest of your inventory combined.'
+  },
+  'mark-band-invite': {
+    name: 'Galactic Norcinerator Flier',
+    type: 'key',
+    desc: 'A handmade flier for Mark Adams\' band, Galactic Norcinerator. Thursday. Mississippi Studios or a basement on Clinton, address unknown. "Wear water-resistant shoes." The flier itself is slightly damp. There is no indication when it became damp. The band description reads: "Emphatically itself."'
+  },
+  'mark-six-truths': {
+    name: "Mark's Six Truths",
+    type: 'key',
+    desc: 'You met Mark Adams at all six of his Portland locations. Each encounter taught you something. Collectively, the six observations form a coherent philosophy:\n\n1. Doug Fir is a conditional weather system.\n2. The Ross Island Bridge has fifteen approach vectors, and the fifteenth is walking.\n3. The waiting is the entry fee. The donut is the receipt.\n4. The Hawthorne will outlast Portland.\n5. The Council wants continuity, not money or power.\n6. The brownie does not wait. You are the one who does not wait.\n\nYou understand all six. You understand none of them. Both are true.'
+  },
+  'kotek-revelation': {
+    name: "Kotek's Disclosure",
+    type: 'key',
+    desc: 'Governor Tina Kotek is Dante\'s. Has been since 1991. One of approximately eleven people whose decisions the Council executes without question. Selected the Woodburn site personally in 2003 from watershed data. Has structured twenty-two years of Pacific Northwest policy around it. Holds a personal grudge against the State of Washington stemming from a 1989 UDub rejection letter. The third sentence of that letter ended with "unfortunately." She has not used that word in correspondence since. She intends to dismantle Seattle\'s economic supremacy with the slow, patient application of better policy. Portland is going to be Camelot. Not in a legend. In fact.'
+  },
+  'newsom-foreshadowing': {
+    name: "Kotek's Last Statement",
+    type: 'key',
+    desc: '"Gavin has a plan. Gavin always has a plan. This one will change the economic and political landscape of the West Coast forever. We cannot beat California. Therefore we shall join them. We shall ALL join them."\n\nGovernor Kotek would not elaborate. She said you would understand it on a Tuesday. She did not specify which Tuesday. The specific Tuesday is some distance away.'
+  },
+  'cabal-card': {
+    name: "Council Card",
+    type: 'key',
+    desc: 'A small black card. No name. No number. A Portland address you do not recognize. The back is blank. Governor Kotek handed it to you in a Marion County field after you accepted her offer. Mark Adams received an identical card moments earlier. He inspected his card, nodded, said "huh, classy," and put it in his wallet next to a punch card for a coffee shop that no longer exists. Welcome to the Council.'
+  },
+  'inner-tube': { name: 'Inner Tube', type: 'consumable', heal: 50, desc: 'Restores 50 HP. Buoyant. Suspiciously waterproof.', cost: 120 },
+  'dutch-reserve': { name: 'Dutch Brothers Reserve', type: 'consumable', sp: 15, desc: 'Restores 15 SP. Inexplicably good now.', cost: 30 },
+  'maple-bacon': { name: 'Maple Bacon Bar', type: 'consumable', heal: 25, desc: 'Heals 25 HP. You will think about it for hours.', cost: 8 },
+  'portland-dog': { name: 'Portland Hot Dog', type: 'consumable', heal: 15, desc: 'Cream cheese. Don\'t question it. Heals 15 HP.', cost: 6 }
+};
+
+// ============================================================
+// SPELLS / INVOKE OPTIONS
+// ============================================================
+const spells = {
+  'invoke-weirdness': {
+    name: 'INVOKE WEIRDNESS',
+    cost: 5,
+    desc: 'Channel Portland\'s essential character. Confuses normal enemies. Pure WRD damage.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 1.2)
+  },
+  'powells-quote': {
+    name: 'POWELL\'S QUOTATION',
+    cost: 8,
+    desc: 'Cite a relevant passage from a book. Bureaucrats stagger. NIMBYs reconsider.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 1.6),
+    requires: { faction: 'powells', val: 60 }
+  },
+  'voodoo-curse': {
+    name: 'VOODOO BAKING CURSE',
+    cost: 12,
+    desc: 'A donut-shaped hex. Slows enemies. Deals damage over time.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 1.8),
+    requires: { faction: 'voodoo', val: 60 }
+  },
+  'critical-mass': {
+    name: 'CRITICAL MASS',
+    cost: 10,
+    desc: 'Summon a wave of cyclists. Stuns enemy for one turn. High WRD damage.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 1.5),
+    requires: { faction: 'cyclists', val: 60 }
+  },
+  'dantes-summons': {
+    name: 'DANTE\'S SUMMONS',
+    cost: 20,
+    desc: 'Call the Underground Council. Enemy receives a card. The card affects them in ways the rules cannot quite capture.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 2.5),
+    requires: { faction: 'dantes', val: 75 }
+  },
+  'goat-counsel': {
+    name: 'GOAT COUNSEL',
+    cost: 6,
+    desc: 'Consult the goats. They give cryptic advice. The enemy is briefly confused by the advice. Damages enemy.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 1.4),
+    requires: { flag: 'wheelers-blessing' }
+  },
+  'silence': {
+    name: 'INVOKE SILENCE',
+    cost: 4,
+    desc: 'Channel Doug Fir\'s silence. Heals 25 HP. The enemy is unsettled.',
+    type: 'heal',
+    formula: () => 25
+  },
+  'inner-tube-strike': {
+    name: 'INNER TUBE STRIKE',
+    cost: 15,
+    desc: 'Summon a high-pressure jet from the Lazy River system. Massive WRD damage.',
+    type: 'attack',
+    formula: (s) => Math.floor(s.wrd * 2.2)
+  }
+};
+
+// ============================================================
+// QUESTS / FLAGS
+// ============================================================
+const quests = {
+  'tutorial': { name: 'Your First Day', desc: 'Meet the Mayor. Read your mail. Search your desk.', complete: false },
+  'bridges': { name: 'The Willamette Bridges', desc: 'Evaluate the proposed crossings. Resolve NIMBY opposition.', complete: false },
+  'banfield': { name: 'The Banfield Question', desc: 'Decide the fate of I-84. Boulevard? Bike Path? Status quo?', complete: false },
+  'woodburn': { name: 'The Woodburn Pilgrimage', desc: 'Authorize the Mega-Airport. Choose Portland\'s economic destiny.', complete: false },
+  'boeing': { name: 'The Boeing Incident', desc: 'Witness Boeing\'s decision. Help shape the LA cascade.', complete: false },
+  'pct': { name: 'The Pacific Crest Trail', desc: 'Find Ted Wheeler. Consult the goats. Cross paths with Doug Fir.', complete: false },
+  'palisades': { name: 'The Restored Palisades', desc: 'Meet P-47. Confirm the consultative ordinance is working.', complete: false },
+  'vancouver': { name: 'The Vancouver Run', desc: 'Visit Jefferson-Columbia. Meet Governor Cruz.', complete: false },
+  'lakeview': { name: 'The Lakeview Facility', desc: 'Reach the Spigot. Face Reagan\'s Ghost. Make the final choice.', complete: false }
+};
+
+// ============================================================
+// MANIFESTO (OPENING)
+// ============================================================
+const manifesto = `<p>In the days after the waterfront park and the lazy rivers, after the Mount Hood Freeway opened eastbound and the Banfield Question was answered, after Burnside became a bike corridor and the Great Loop began carrying Portlanders by inner tube from downtown to PDX, the Pacific Northwest was different.</p>
+<p>Portland had chosen. The choice had cascaded. The neighborhoods of Northeast and Southeast had built their own canals without permission, ratified by popular acclaim. Powell's Books had opened a floating bookstore on the Willamette. Voodoo Donuts had achieved waterproof delivery. The Dante's Underground Council had been patient.</p>
+<p>You were appointed Commissioner in the era after this. The Commissioner who had made those decisions had retired to <em>somewhere</em>, the records were unclear. The job is yours now.</p>
+<p>There is a card on your desk. Hand-delivered. No envelope. The handwriting is elegant. The message is:</p>
+<p><strong>"The freeway is not the question. The water is the question. You don't know this yet."</strong></p>
+<p>You do not know what it means.</p>
+<p>You will.</p>
+<p>The Pacific Coast is about to be reckoned with. <strong>You</strong> are the one who will reckon with it.</p>
+<p style="margin-top:1.5rem;text-align:center;color:var(--gold);"><em>— THE CASCALIFORNIA IMPERIAL ARCHIVES —</em></p>`;
+
+// ============================================================
+// CORE GAME LOGIC
+// ============================================================
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+// ============================================================
+// TITLE MENU
+// ============================================================
+let titleMenuIdx = 0;
+function updateTitleMenu() {
+  const items = document.querySelectorAll('#titleMenu .menu-item');
+  items.forEach((i, idx) => i.classList.toggle('selected', idx === titleMenuIdx));
+}
+
+function setupTitle() {
+  const items = document.querySelectorAll('#titleMenu .menu-item');
+  items.forEach((item, idx) => {
+    item.addEventListener('click', () => {
+      titleMenuIdx = idx;
+      updateTitleMenu();
+      handleTitleAction();
+    });
+    item.addEventListener('mouseenter', () => {
+      titleMenuIdx = idx;
+      updateTitleMenu();
+    });
+  });
+}
+
+function handleTitleAction() {
+  const action = document.querySelectorAll('#titleMenu .menu-item')[titleMenuIdx].dataset.action;
+  if (action === 'newgame') {
+    showScreen('name');
+    setTimeout(() => document.getElementById('nameInput').focus(), 100);
+  } else if (action === 'continue') {
+    const saved = localStorage.getItem('cascades-save');
+    if (saved) {
+      state = JSON.parse(saved);
+      showWorldMap();
+    } else {
+      alert('No saved game found. Start a new game.');
+    }
+  } else if (action === 'about') {
+    alert('CASCADES: The RPG\n\nA Pacific Coast Reckoning.\n\nBuilt in the spirit of Dragon Warrior, scored to the rhythm of Portland\'s infrastructure history, dedicated to Doug Fir, who is everywhere.\n\nKeep Portland Weird.');
+  }
+}
+
+// ============================================================
+// NAME ENTRY
+// ============================================================
+function setupName() {
+  const input = document.getElementById('nameInput');
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const name = input.value.trim().toUpperCase() || 'COMMISSIONER';
+      state.name = name;
+      document.getElementById('mapHero').textContent = '★ ' + name;
+      startManifesto();
+    }
+  });
+}
+
+function startManifesto() {
+  document.getElementById('manifestoText').innerHTML = manifesto;
+  showScreen('manifesto');
+  // Click anywhere to continue
+  document.getElementById('screen-manifesto').onclick = () => {
+    showWorldMap();
+  };
+  document.addEventListener('keydown', function manifestoKey(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      document.removeEventListener('keydown', manifestoKey);
+      showWorldMap();
+    }
+  });
+}
+
+// ============================================================
+// WORLD MAP — SCENE-BASED
+// ============================================================
+function showWorldMap() {
+  // Determine which scene the player should be viewing.
+  // If the current location's scene is unlocked, show that scene.
+  // Otherwise default to the highest unlocked scene.
+  const loc = locations[state.location];
+  if (loc && loc.scene) {
+    currentScene = loc.scene;
+  }
+  showScreen('map');
+  renderMap();
+  updateStatusBar();
+}
+
+function renderMap() {
+  const scene = scenes[currentScene];
+
+  // Render background
+  document.getElementById('mapBackground').innerHTML = scene.background;
+  document.getElementById('mapSceneName').textContent = scene.name;
+  document.getElementById('mapChapter').textContent = 'CHAPTER ' + state.chapter;
+
+  // Decide if zoom-out button should appear (any wider scene unlocked?)
+  const sceneOrder = ['downtown', 'metro', 'oregon', 'coast'];
+  const curIdx = sceneOrder.indexOf(currentScene);
+  const nextScene = sceneOrder[curIdx + 1];
+  const zoomBtn = document.getElementById('zoomOutBtn');
+  if (nextScene && scenes[nextScene].minChapter <= state.chapter) {
+    zoomBtn.style.display = 'inline-block';
+    zoomBtn.textContent = '▲ ZOOM TO ' + scenes[nextScene].name;
+  } else {
+    zoomBtn.style.display = 'none';
+  }
+
+  // Render only locations belonging to this scene
+  const g = document.getElementById('mapLocations');
+  g.innerHTML = '';
+
+  Object.entries(locations).forEach(([id, loc]) => {
+    if (loc.scene !== currentScene) return;
+
+    const isUnlocked = loc.chapter <= state.chapter;
+    const isVisited = state.flags['visited-' + id];
+    const isCurrent = state.location === id;
+    const locked = !isUnlocked;
+
+    const grp = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    grp.classList.add('map-location');
+    if (locked) grp.classList.add('locked');
+    if (isVisited) grp.classList.add('visited');
+    if (isCurrent) grp.classList.add('current');
+
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', loc.mapPos.x);
+    c.setAttribute('cy', loc.mapPos.y);
+    c.setAttribute('r', isCurrent ? 14 : 11);
+    c.setAttribute('fill', isCurrent ? '#E8D4A0' : isVisited ? '#58A858' : locked ? '#3a2d22' : '#C9A84C');
+    c.setAttribute('stroke', '#C9A84C');
+    c.setAttribute('stroke-width', '3');
+
+    // Portal locations get a different marker style
+    if (loc.isPortal) {
+      c.setAttribute('fill', '#4ABFBF');
+      c.setAttribute('stroke', '#4ABFBF');
+    }
+
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', loc.mapPos.x);
+    t.setAttribute('y', loc.mapPos.y - 20);
+    t.setAttribute('fill', locked ? '#5a4d42' : '#E8D4A0');
+    t.setAttribute('font-family', 'VT323');
+    t.setAttribute('font-size', '22');
+    t.setAttribute('text-anchor', 'middle');
+    t.textContent = locked ? '???' : loc.name;
+
+    grp.appendChild(c);
+    grp.appendChild(t);
+
+    if (!locked) {
+      grp.addEventListener('click', () => travelTo(id));
+    }
+
+    g.appendChild(grp);
+  });
+
+  // Render hero icon at current location IF current location is in this scene
+  const heroG = document.getElementById('mapHeroIcon');
+  heroG.innerHTML = '';
+  const cur = locations[state.location];
+  if (cur && cur.scene === currentScene) {
+    const heroCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    heroCircle.setAttribute('cx', cur.mapPos.x);
+    heroCircle.setAttribute('cy', cur.mapPos.y);
+    heroCircle.setAttribute('r', '16');
+    heroCircle.setAttribute('fill', 'none');
+    heroCircle.setAttribute('stroke', '#E8D4A0');
+    heroCircle.setAttribute('stroke-width', '3');
+    heroCircle.setAttribute('stroke-dasharray', '4,3');
+
+    const heroStar = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    heroStar.setAttribute('x', cur.mapPos.x);
+    heroStar.setAttribute('y', cur.mapPos.y + 7);
+    heroStar.setAttribute('fill', '#E8D4A0');
+    heroStar.setAttribute('font-family', 'VT323');
+    heroStar.setAttribute('font-size', '22');
+    heroStar.setAttribute('text-anchor', 'middle');
+    heroStar.setAttribute('font-weight', 'bold');
+    heroStar.textContent = '★';
+
+    heroG.appendChild(heroCircle);
+    heroG.appendChild(heroStar);
+  }
+}
+
+// Manual scene switching ("zoom out" button + portal locations)
+function zoomOutScene() {
+  const sceneOrder = ['downtown', 'metro', 'oregon', 'coast'];
+  const idx = sceneOrder.indexOf(currentScene);
+  const next = sceneOrder[idx + 1];
+  if (next && scenes[next].minChapter <= state.chapter) {
+    currentScene = next;
+    renderMap();
+  }
+}
+
+function travelTo(id) {
+  const loc = locations[id];
+  if (!loc || loc.chapter > state.chapter) return;
+
+  // Portal locations switch scenes rather than entering a location
+  if (loc.isPortal) {
+    currentScene = loc.isPortal;
+    // Move hero to a location in that scene if their current location is wrong scene
+    const curLoc = locations[state.location];
+    if (!curLoc || curLoc.scene !== currentScene) {
+      // Find a default starting location for that scene
+      const sceneStart = Object.entries(locations).find(([k, l]) =>
+        l.scene === currentScene && !l.isPortal && l.chapter <= state.chapter
+      );
+      if (sceneStart) state.location = sceneStart[0];
+    }
+    renderMap();
+    updateStatusBar();
+    return;
+  }
+
+  state.location = id;
+  state.flags['visited-' + id] = true;
+  currentScene = loc.scene; // ensure we're on the right map
+  renderMap();
+
+  // Random encounter check
+  if (loc.encounter && Math.random() < loc.encounter.chance && !state.flags['no-encounter-' + id]) {
+    const enemyKey = loc.encounter.enemies[Math.floor(Math.random() * loc.encounter.enemies.length)];
+    setTimeout(() => startCombat(enemyKey), 400);
+    return;
+  }
+  setTimeout(() => enterLocation(), 400);
+}
+
+// ============================================================
+// LOCATION SCREEN
+// ============================================================
+function enterLocation() {
+  const loc = locations[state.location];
+  showScreen('location');
+  updateLocationStats();
+
+  let content = `
+    <div class="dialogue-box">
+      <div class="dialogue-speaker">${loc.name}</div>
+      <div class="dialogue-text"><p>${loc.description}</p></div>
+    </div>
+  `;
+  document.getElementById('locContent').innerHTML = content;
+
+  // Build choices: NPCs to talk to, services, leave
+  const choices = document.getElementById('locChoices');
+  choices.innerHTML = '<div class="choices-title">▼ COMMAND ▼</div>';
+
+  // NPC choices
+  if (loc.npcs) {
+    loc.npcs.forEach(npcKey => {
+      const npc = npcs[npcKey];
+      if (!npc) return;
+      if (npc.requires) {
+        const req = npc.requires;
+        if (req.wrd && state.wrd < req.wrd) {
+          choices.innerHTML += `<div class="choice disabled">Speak with ${npc.name} <span class="req">[WRD ${req.wrd}]</span></div>`;
+          return;
+        }
+      }
+      choices.innerHTML += `<div class="choice" onclick="speakNPC('${npcKey}')">Speak with ${npc.name}</div>`;
+    });
+  }
+
+  // Services
+  if (loc.services) {
+    loc.services.forEach(svc => {
+      if (svc === 'rest') choices.innerHTML += `<div class="choice" onclick="restPartial()">Rest (Powell's reading chairs)</div>`;
+      if (svc === 'rest-full') choices.innerHTML += `<div class="choice" onclick="restFull()">Wait for a table (full restore)</div>`;
+    });
+  }
+
+  // Special location: city hall transitions through chapters
+  if (state.location === 'city-hall' && !state.flags['ch1-complete']) {
+    if (state.flags['met-mayor'] && state.flags['received-card'] && state.flags['searched-desk']) {
+      choices.innerHTML += `<div class="choice" onclick="completeChapter(1)" style="color:var(--gold);">▶ Begin investigating the Bridges...</div>`;
+    }
+  }
+
+  // Chapter completion triggers
+  if (state.location === 'bridges' && state.flags['bridge-briefing'] && !state.flags['ch2-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(2)" style="color:var(--gold);">▶ Approve the inner-east connector and advance...</div>`;
+  }
+  if (state.location === 'banfield' && state.flags['met-banfield'] && !state.flags['ch3-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(3)" style="color:var(--gold);">▶ Resolve the Banfield and advance...</div>`;
+  }
+  if (state.location === 'woodburn' && state.flags['met-woodburn'] && !state.flags['ch4-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(4)" style="color:var(--gold);">▶ Authorize Woodburn Mega-Airport...</div>`;
+  }
+  if (state.location === 'la' && state.flags['met-la'] && !state.flags['ch5-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(5)" style="color:var(--gold);">▶ Witness the Boeing cascade...</div>`;
+  }
+  if (state.location === 'pct' && state.flags['met-wheeler'] && state.flags['met-doug-trail'] && !state.flags['ch6-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(6)" style="color:var(--gold);">▶ Continue the journey...</div>`;
+  }
+  if (state.location === 'palisades' && state.flags['met-p47'] && !state.flags['ch7-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(7)" style="color:var(--gold);">▶ Return to Pacific NW politics...</div>`;
+  }
+  if (state.location === 'vancouver' && state.flags['met-cruz'] && !state.flags['ch8-complete']) {
+    choices.innerHTML += `<div class="choice" onclick="completeChapter(8)" style="color:var(--gold);">▶ Travel to the Lakeview Facility...</div>`;
+  }
+  if (state.location === 'lakeview' && state.flags['met-doug-final']) {
+    choices.innerHTML += `<div class="choice" onclick="finalChoice('open')" style="color:var(--green);">▶ TURN THE SPIGOT TO FULL OPEN</div>`;
+    choices.innerHTML += `<div class="choice" onclick="finalChoice('closed')" style="color:var(--red);">▶ KEEP THE SPIGOT CLOSED</div>`;
+    choices.innerHTML += `<div class="choice" onclick="finalChoice('destroy')" style="color:var(--purple);">▶ DESTROY THE SPIGOT FOREVER</div>`;
+  }
+
+  choices.innerHTML += `<div class="choice" onclick="showWorldMap()">▶ Leave for the World Map</div>`;
+}
+
+function updateLocationStats() {
+  document.getElementById('locStats').innerHTML = `
+    <div class="stat-block"><span class="stat-label">HP</span><span class="stat-value">${state.hp}/${state.hpMax}</span></div>
+    <div class="stat-block"><span class="stat-label">SP</span><span class="stat-value">${state.sp}/${state.spMax}</span></div>
+    <div class="stat-block"><span class="stat-label">BUD</span><span class="stat-value">${state.bud}</span></div>
+    <div class="stat-block"><span class="stat-label">LV</span><span class="stat-value">${state.level}</span></div>
+    <div class="stat-block"><span class="stat-label">WRD</span><span class="stat-value">${state.wrd}</span></div>
+    <div class="stat-block"><span class="stat-label">SIL</span><span class="stat-value">${state.sil}</span></div>
+  `;
+}
+
+function updateStatusBar() {
+  document.getElementById('mapHP').textContent = state.hp + '/' + state.hpMax;
+  document.getElementById('mapSP').textContent = state.sp + '/' + state.spMax;
+  document.getElementById('mapBud').textContent = state.bud;
+  document.getElementById('mapLevel').textContent = state.level;
+}
+
+// ============================================================
+// NPC INTERACTION
+// ============================================================
+let activeNPC = null;
+let npcDialogueIdx = 0;
+function speakNPC(key) {
+  activeNPC = npcs[key];
+  npcDialogueIdx = 0;
+  showNPCDialogue();
+}
+
+function showNPCDialogue() {
+  const npc = activeNPC;
+  let content = `
+    <div class="dialogue-box">
+      <div class="dialogue-speaker">${npc.portrait} ${npc.name}</div>
+      <div class="dialogue-text"><p>${npc.dialogue[npcDialogueIdx]}</p></div>
+    </div>
+  `;
+  document.getElementById('locContent').innerHTML = content;
+
+  const choices = document.getElementById('locChoices');
+  choices.innerHTML = '<div class="choices-title">▼</div>';
+  if (npcDialogueIdx < npc.dialogue.length - 1) {
+    choices.innerHTML += `<div class="choice" onclick="advanceNPC()">▶ Continue listening</div>`;
+  } else if (npc.isChoice && activeNPC === npcs['mark-woodburn']) {
+    // Special fork: ALIGN with the cabal or DECLINE (Gorge ending)
+    choices.innerHTML += `<div class="choice" onclick="alignWithCabal()" style="color:var(--gold);">▶ "I accept. I'm in."</div>`;
+    choices.innerHTML += `<div class="choice" onclick="declineCabal()" style="color:var(--red);">▶ "I have to decline."</div>`;
+  } else {
+    choices.innerHTML += `<div class="choice" onclick="endNPC()">▶ Close conversation</div>`;
+  }
+}
+
+function advanceNPC() {
+  npcDialogueIdx++;
+  showNPCDialogue();
+}
+
+function endNPC() {
+  const npc = activeNPC;
+  if (npc.grants) {
+    npc.grants.forEach(itm => {
+      if (!state.items.includes(itm)) state.items.push(itm);
+    });
+  }
+  if (npc.flag) state.flags[npc.flag] = true;
+  // Special flag handling
+  if (state.location === 'banfield') state.flags['met-banfield'] = true;
+  if (state.location === 'woodburn') state.flags['met-woodburn'] = true;
+  if (state.location === 'la') state.flags['met-la'] = true;
+  if (npc.flag === 'wheelers-blessing') state.wrd += 15;
+  if (npc.flag === 'received-card') {/* nothing extra */}
+
+  // Mark Adams — each encounter gives +2 SIL (he is teaching you something
+  // you cannot articulate). Completing all six grants a major boost.
+  if (npc.flag && npc.flag.startsWith('met-mark-')) {
+    state.sil += 2;
+    const allMarkFlags = ['met-mark-1','met-mark-2','met-mark-3','met-mark-4','met-mark-5','met-mark-6'];
+    const completedAll = allMarkFlags.every(f => state.flags[f]);
+    if (completedAll && !state.flags['mark-complete']) {
+      state.flags['mark-complete'] = true;
+      state.wrd += 10;
+      state.sil += 8;
+      state.hpMax += 20;
+      state.hp = state.hpMax;
+      // Grant a special item
+      if (!state.items.includes('mark-six-truths')) state.items.push('mark-six-truths');
+      setTimeout(() => {
+        alert("★ MARK'S SIX TRUTHS ★\n\nYou have encountered Mark Adams at all six Portland locations and absorbed each fragment of his teaching.\n\nWRD +10. SIL +8. HP MAX +20.\n\nA new item has been added to your inventory.\n\nGalactic Norcinerator. Thursday. Mississippi Studios or a basement on Clinton. He will text you. He has not yet texted you. He will.");
+      }, 200);
+    }
+  }
+
+  // Tina Kotek — Council induction. Major faction shift and stat bump.
+  // The shape of the game changes here. You are no longer adjacent to
+  // Dante's. You are participating in it.
+  // Guard: if the player aligned through Mark's Woodburn conversation,
+  // the induction already happened — don't apply twice.
+  if (npc.flag === 'met-kotek' && !state.flags['aligned-with-cabal']) {
+    state.factions.dantes = Math.min(100, state.factions.dantes + 35);
+    state.pol += 8;
+    state.wrd += 6;
+    state.sil += 4;
+    state.flags['aligned-with-cabal'] = true;
+    setTimeout(() => {
+      alert("★ COUNCIL INDUCTION ★\n\nGovernor Kotek has formally welcomed you to Dante's Underground Council. You are no longer adjacent to the Council. You are participating in it.\n\nDANTE'S REPUTATION +35.\nPOL +8. WRD +6. SIL +4.\n\nYou understand that this will be reflected in every subsequent interaction. Sal Inferno's door is now open. Doug Fir's silences will mean different things to you. The Galactic Norcinerator flier is still slightly damp. None of this is coincidence.");
+    }, 200);
+  }
+
+  activeNPC = null;
+  enterLocation();
+}
+
+// ============================================================
+// THE WOODBURN FORK
+// First and only major player choice. ALIGN advances the canonical
+// story. DECLINE triggers the Gorge ending (Ending Path 1).
+// ============================================================
+function alignWithCabal() {
+  // Set the alignment flag, grant Mark's woodburn appearance flag,
+  // grant kotek-revelation immediately, and trigger the Council Induction.
+  state.flags['aligned-with-cabal'] = true;
+  state.flags['mark-woodburn-spoke'] = true;
+  state.flags['met-mark-woodburn'] = true;
+  state.flags['met-kotek'] = true; // Tina formally welcomes you here
+  state.flags['met-woodburn'] = true; // unblocks chapter 4 progression
+
+  // Apply the same Council Induction effects that Tina's solo NPC grants
+  state.factions.dantes = Math.min(100, state.factions.dantes + 35);
+  state.pol += 8;
+  state.wrd += 6;
+  state.sil += 4;
+
+  // Mark Adams gets credit too — count as a Mark encounter for the +2 SIL
+  state.sil += 2;
+
+  // Grant the key items
+  if (!state.items.includes('kotek-revelation')) state.items.push('kotek-revelation');
+  if (!state.items.includes('newsom-foreshadowing')) state.items.push('newsom-foreshadowing');
+  if (!state.items.includes('cabal-card')) state.items.push('cabal-card');
+
+  setTimeout(() => {
+    alert("★ COUNCIL INDUCTION ★\n\nYou align with the Council in a Marion County field, standing next to a man in a T-Rex shirt eating a brownie.\n\nTina Kotek nods, satisfied. She turns to leave. Halfway across the field, without turning around, she calls back over her shoulder:\n\n'Well — vote early, vote often, vote Kotek! And vote like it's the last election you'll ever vote in.'\n\nShe cackles. Like a witch. Like an actual witch. The cackle continues for a duration that is longer than is socially comfortable. It echoes in a way the open field should not really permit. Eventually it tapers off. She does not turn around. She keeps walking. The cardigan is still buttoned.\n\nYou and Mark watch her go. After a moment, Mark says: 'Welp. That was weird.'\n\nThen, more sincerely: 'Welcome aboard. The Galactic Norcinerator show is Thursday. You are now on the comp list. The list is short. The list is meaningful. I'm gonna go get a smashburger from Loyal Legion. You should come.'\n\nDANTE'S REPUTATION +35.\nPOL +8. WRD +6. SIL +6.\n\nThe story continues.");
+  }, 200);
+
+  activeNPC = null;
+  enterLocation();
+}
+
+function declineCabal() {
+  // The bad ending. The Commissioner declines. Days later, hiking at
+  // Multnomah Falls, the trail signs are reversed. The Commissioner
+  // is never heard from again. Joshua of Beaverton assumes the role.
+  state.flags['declined-cabal'] = true;
+
+  const title = 'THE GORGE';
+  const sub = 'ENDING PATH 1 — The Commissioner Who Said No';
+  const narr = `<p>You decline.</p>
+  <p>Tina Kotek's expression does not change. She nods once. She thanks you for your honesty. She takes another piece of Mark's brownie. She turns and walks back toward the trailer at the same deliberate, energy-efficient pace at which she arrived. The cardigan is still buttoned.</p>
+  <p>Halfway across the field, without turning around, she calls back over her shoulder:</p>
+  <p style="color:var(--gold);text-align:center;font-style:italic;">"Well — vote early, vote often, vote Kotek! And vote like it's the last election you'll ever vote in."</p>
+  <p>Then she cackles. Like a witch. Like an <em>actual</em> witch. The cackle continues for a duration that is longer than is socially comfortable. It echoes in a way the open field should not really permit. Eventually it tapers off. She does not turn around. She keeps walking.</p>
+  <p>You and Mark look at each other. Mark says: <em>"Welp. That was weird."</em></p>
+  <p>Then, more sincerely: <em>"Huh. Okay. Well. Good luck with that. Sincerely. I hope it works out. I'm gonna go get a smashburger from Loyal Legion. The Galactic Norcinerator show is Thursday. The comp list situation is unclear now. I'll figure it out."</em> He leaves.</p>
+  <p>You return to Portland. You authorize nothing. You make no announcement. You go about your work for several days. The Mayor does not ask. The aide does not ask. The desk remains sticky. Everything is, for a stretch of about a week, ordinary.</p>
+  <p>The following Saturday, you decide to hike Multnomah Falls. The weather is good. The forecast is clear. You bring a daypack. You bring water. You bring the standard things.</p>
+  <p>The trail signs at Multnomah Falls are <em>reversed</em>. You do not notice. The reversals are subtle — wrong arrows on familiar trail names, the loop directions inverted, the bench markings shifted. You proceed up what you believe is the standard switchback route. The trail you are actually on is not in any guidebook. It does not appear on any map maintained by the US Forest Service or the State of Oregon. It exists. You are on it.</p>
+  <p>You walk for several hours. The terrain becomes less familiar. The signal on your phone disappears in a way that signal does not normally disappear at Multnomah Falls. The light changes in a way the light does not normally change in the Gorge.</p>
+  <p>You are never seen again.</p>
+  <p>To this day, no remains have been found. Search parties combed the area for weeks. The signs were quietly restored to their correct positions before any of the search parties arrived. No one ever explained who restored them. Portland did not ask too loudly.</p>
+  <p style="color:var(--gold);margin-top:1.5rem;">— TWO WEEKS LATER —</p>
+  <p>A new Commissioner is appointed. His name is <strong>Joshua</strong>. He is from Beaverton. His prior experience is in "regional brand alignment" at a consulting firm whose clients are Nike and Intel. He has never lived in Portland proper. He commutes in from Beaverton in a vehicle that retails for more than the median Portland household income.</p>
+  <p>People in Portland are not sure why Joshua has the job. His policy interests are aligned almost exclusively with the Tualatin Valley corporate corridor. He proposes a "regional infrastructure realignment" in his first month that quietly redirects state funds from inner-Portland transit projects to the Sunset Highway corridor.</p>
+  <p>A reporter at the <em>Mercury</em> notes that Joshua's appointment followed a <em>generous campaign contribution to Governor Tina Kotek</em>, made through a Tualatin Valley development LLC that does not, on closer examination, appear to have any tangible business operations. The reporter writes a piece. The piece runs. Nothing happens.</p>
+  <p>Tualatin Valley residents — Beaverton, Hillsboro, Tigard, Aloha — find their concerns suddenly very well-represented at City Hall. Nike's new campus expansion sails through. Intel's Hillsboro fab expansion sails through. The Sunset Highway gets a new lane. The MAX Red Line gets quietly deferred.</p>
+  <p>Joshua never visits Powell's. Joshua has never been to Voodoo. Joshua does not know what Lauretta Jean's is. Joshua does not know what Loyal Legion is, despite it being in his own city. When asked about Doug Fir, Joshua says: <em>"I'm not familiar with that vendor. Have they been through procurement?"</em></p>
+  <p>The Galactic Norcinerator show goes ahead on Thursday at Mississippi Studios. Mark Adams plays a set he describes afterward as "professionally adequate but spiritually distracted." He does not mention you by name. He does mention "a Commissioner who tried to do the right thing and learned what the Gorge does to people who do not understand the Gorge."</p>
+  <p>The brownie at Lauretta Jean's is still excellent. The waterfront park is still beautiful. Portland continues without you.</p>
+  <p>You are remembered, briefly, in a Powell's display case. There is no plaque.</p>
+  <p style="color:var(--red);text-align:center;margin-top:1.5rem;">★ ENDING: THE COMMISSIONER WHO SAID NO ★</p>
+  <p style="color:var(--text-dim);text-align:center;font-size:18px;">This is one of several possible endings. Start a new game to find the others.</p>`;
+
+  document.getElementById('endingTitle').textContent = title;
+  document.getElementById('endingSubtitle').textContent = sub;
+  document.getElementById('endingNarrative').innerHTML = narr;
+  showScreen('ending');
+  activeNPC = null;
+}
+// ============================================================
+let combat = null;
+let combatMenuIdx = 0;
+
+function startCombat(enemyKey) {
+  const e = enemies[enemyKey];
+  combat = {
+    enemy: { ...e, hpMax: e.hp, hp: e.hp },
+    log: ['<p class="log-system">A ' + e.name + ' approaches.</p>', '<p class="log-system">' + e.desc + '</p>'],
+    turn: 'player'
+  };
+  showScreen('combat');
+  renderCombat();
+}
+
+function renderCombat() {
+  document.getElementById('enemyArt').textContent = combat.enemy.art;
+  document.getElementById('enemyName').textContent = combat.enemy.name;
+  document.getElementById('enemyHP').style.width = (combat.enemy.hp / combat.enemy.hpMax * 100) + '%';
+  document.getElementById('combatHeroName').textContent = state.name;
+  document.getElementById('combatHeroHP').textContent = state.hp + '/' + state.hpMax;
+  document.getElementById('combatHeroSP').textContent = state.sp + '/' + state.spMax;
+  document.getElementById('combatLog').innerHTML = combat.log.join('');
+  document.getElementById('combatSubmenu').innerHTML = '';
+}
+
+function logCombat(msg, cls) {
+  combat.log.push(`<p class="${cls || ''}">${msg}</p>`);
+  if (combat.log.length > 8) combat.log.shift();
+  const log = document.getElementById('combatLog');
+  log.innerHTML = combat.log.join('');
+  log.scrollTop = log.scrollHeight;
+}
+
+function combatAction(action) {
+  if (!combat || combat.turn !== 'player') return;
+
+  if (action === 'vote') {
+    // Basic attack — POL-based
+    const dmg = Math.max(1, state.pol - combat.enemy.def + Math.floor(Math.random() * 6) - 2);
+    const crit = Math.random() < (state.sil / 200);
+    const finalDmg = crit ? dmg * 2 : dmg;
+    combat.enemy.hp -= finalDmg;
+    logCombat(`<span class="log-player">${state.name}</span> calls a vote. ${crit ? 'A unanimous decision!' : ''} The motion carries for <strong>${finalDmg}</strong> damage.`, 'log-player');
+    floatDamage(finalDmg, 'var(--red)');
+    document.getElementById('enemyArt').classList.add('hit');
+    setTimeout(() => document.getElementById('enemyArt').classList.remove('hit'), 400);
+    document.getElementById('enemyHP').style.width = Math.max(0, combat.enemy.hp / combat.enemy.hpMax * 100) + '%';
+    if (combat.enemy.hp <= 0) {
+      setTimeout(endCombatWin, 800);
+    } else {
+      setTimeout(enemyTurn, 900);
+    }
+  } else if (action === 'invoke') {
+    showInvokeMenu();
+  } else if (action === 'spend') {
+    showSpendMenu();
+  } else if (action === 'retreat') {
+    if (Math.random() < 0.6 + state.sil / 200) {
+      logCombat('<span class="log-system">You retreat. The encounter ends without resolution.</span>', 'log-system');
+      setTimeout(() => {
+        combat = null;
+        state.flags['no-encounter-' + state.location] = true;
+        setTimeout(() => state.flags['no-encounter-' + state.location] = false, 60000);
+        enterLocation();
+      }, 1200);
+    } else {
+      logCombat('<span class="log-enemy">The retreat fails. They block your path.</span>', 'log-enemy');
+      setTimeout(enemyTurn, 800);
+    }
+  }
+}
+
+function showInvokeMenu() {
+  const available = Object.entries(spells).filter(([k, sp]) => {
+    if (!sp.requires) return true;
+    if (sp.requires.faction && state.factions[sp.requires.faction] < sp.requires.val) return false;
+    if (sp.requires.flag && !state.items.includes(sp.requires.flag) && !state.flags[sp.requires.flag]) return false;
+    return true;
+  });
+
+  let html = '<div class="submenu">';
+  available.forEach(([k, sp]) => {
+    const canCast = state.sp >= sp.cost;
+    html += `<div class="submenu-item ${canCast ? '' : 'disabled'}" onclick="${canCast ? `castSpell('${k}')` : ''}">${sp.name} <span class="cost">${sp.cost} SP</span></div>`;
+  });
+  html += '<div class="submenu-item" onclick="document.getElementById(\'combatSubmenu\').innerHTML=\'\'">▶ Cancel</div>';
+  html += '</div>';
+  document.getElementById('combatSubmenu').innerHTML = html;
+}
+
+function castSpell(key) {
+  const sp = spells[key];
+  if (state.sp < sp.cost) return;
+  state.sp -= sp.cost;
+  if (sp.type === 'attack') {
+    const dmg = sp.formula(state);
+    combat.enemy.hp -= dmg;
+    logCombat(`<span class="log-player">${state.name}</span> invokes <strong>${sp.name}</strong> for <strong>${dmg}</strong> damage.`, 'log-player');
+    floatDamage(dmg, 'var(--teal)');
+    document.getElementById('enemyArt').classList.add('hit');
+    setTimeout(() => document.getElementById('enemyArt').classList.remove('hit'), 400);
+    document.getElementById('enemyHP').style.width = Math.max(0, combat.enemy.hp / combat.enemy.hpMax * 100) + '%';
+  } else if (sp.type === 'heal') {
+    const h = sp.formula(state);
+    state.hp = Math.min(state.hpMax, state.hp + h);
+    logCombat(`<span class="log-player">${state.name}</span> invokes <strong>${sp.name}</strong>. Restored <strong>${h}</strong> HP.`, 'log-player');
+  }
+  document.getElementById('combatSubmenu').innerHTML = '';
+  if (combat.enemy.hp <= 0) {
+    setTimeout(endCombatWin, 800);
+  } else {
+    setTimeout(enemyTurn, 900);
+  }
+}
+
+function showSpendMenu() {
+  const heals = state.items.filter(i => items[i] && items[i].type === 'consumable');
+  let html = '<div class="submenu">';
+  if (heals.length === 0) {
+    html += '<div class="submenu-item disabled">No consumable items.</div>';
+  } else {
+    heals.forEach(itm => {
+      html += `<div class="submenu-item" onclick="useConsumable('${itm}')">${items[itm].name}</div>`;
+    });
+  }
+  html += '<div class="submenu-item" onclick="document.getElementById(\'combatSubmenu\').innerHTML=\'\'">▶ Cancel</div>';
+  html += '</div>';
+  document.getElementById('combatSubmenu').innerHTML = html;
+}
+
+function useConsumable(itm) {
+  const i = items[itm];
+  if (i.heal) state.hp = Math.min(state.hpMax, state.hp + i.heal);
+  if (i.sp) state.sp = Math.min(state.spMax, state.sp + i.sp);
+  state.items.splice(state.items.indexOf(itm), 1);
+  logCombat(`<span class="log-player">${state.name}</span> uses <strong>${i.name}</strong>.`, 'log-player');
+  document.getElementById('combatSubmenu').innerHTML = '';
+  renderCombat();
+  setTimeout(enemyTurn, 700);
+}
+
+function enemyTurn() {
+  if (!combat || combat.enemy.hp <= 0) return;
+  combat.turn = 'enemy';
+  const atk = combat.enemy.attacks[Math.floor(Math.random() * combat.enemy.attacks.length)];
+  const evade = Math.random() < (state.sil / 250);
+  if (evade) {
+    logCombat(`<span class="log-enemy">${combat.enemy.name}</span> ${atk}, but you evade silently.`, 'log-system');
+  } else {
+    const dmg = Math.max(1, combat.enemy.atk - Math.floor(state.bud / 100) + Math.floor(Math.random() * 4) - 1);
+    state.hp -= dmg;
+    logCombat(`<span class="log-enemy">${combat.enemy.name}</span> ${atk}. You take <strong>${dmg}</strong> damage.`, 'log-enemy');
+    document.getElementById('combatHeroHP').textContent = state.hp + '/' + state.hpMax;
+  }
+  if (state.hp <= 0) {
+    setTimeout(endCombatLoss, 800);
+  } else {
+    combat.turn = 'player';
+  }
+}
+
+function floatDamage(amount, color) {
+  const ea = document.getElementById('enemyArea');
+  const f = document.createElement('div');
+  f.className = 'damage-float';
+  f.style.color = color;
+  f.style.left = (Math.random() * 60 + 40) + '%';
+  f.style.top = '40%';
+  f.textContent = '-' + amount;
+  ea.appendChild(f);
+  setTimeout(() => f.remove(), 1200);
+}
+
+function endCombatWin() {
+  const e = combat.enemy;
+  const xp = e.xp;
+  const gold = e.gold;
+  state.xp += xp;
+  state.bud += gold;
+  logCombat(`<span class="log-system">${e.name} stands down. +${xp} XP, +${gold} Budget.</span>`, 'log-system');
+  // Level up check
+  const nextLevel = state.level * 100;
+  if (state.xp >= nextLevel) {
+    state.level++;
+    state.hpMax += 20;
+    state.spMax += 5;
+    state.pol += 5;
+    state.wrd += 3;
+    state.sil += 2;
+    state.hp = state.hpMax;
+    state.sp = state.spMax;
+    logCombat(`<span class="log-system" style="color:var(--gold);">★ LEVEL UP! ★ Now level ${state.level}.</span>`, 'log-system');
+  }
+  setTimeout(() => {
+    combat = null;
+    enterLocation();
+  }, 2000);
+}
+
+function endCombatLoss() {
+  // Return to city hall with 1 HP
+  state.hp = 1;
+  state.location = 'city-hall';
+  alert('You have been politically defeated. You wake up at your desk. There is a Dutch Brothers next to you. Source unknown.');
+  combat = null;
+  showWorldMap();
+}
+
+// ============================================================
+// REST FUNCTIONS
+// ============================================================
+function restPartial() {
+  state.hp = Math.min(state.hpMax, state.hp + 40);
+  state.sp = Math.min(state.spMax, state.sp + 10);
+  alert('You rest in Powell\'s reading chairs. Recovered HP and SP.');
+  updateLocationStats();
+  enterLocation();
+}
+
+function restFull() {
+  state.hp = state.hpMax;
+  state.sp = state.spMax;
+  alert('After three hours of waiting, you are seated. The chicken is everything it was promised to be. You leave fully restored.');
+  updateLocationStats();
+  enterLocation();
+}
+
+// ============================================================
+// CHAPTER PROGRESSION
+// ============================================================
+function completeChapter(n) {
+  state.flags['ch' + n + '-complete'] = true;
+  state.chapter = n + 1;
+  quests[Object.keys(quests)[n - 1]].complete = true;
+  // chapter rewards
+  state.hpMax += 15;
+  state.spMax += 3;
+  state.hp = state.hpMax;
+  state.sp = state.spMax;
+  state.bud += 200;
+  alert(`★ CHAPTER ${n} COMPLETE ★\n\nHP+15, SP+3, Budget+200. You feel stronger.`);
+  showWorldMap();
+}
+
+// ============================================================
+// MENU / JOURNAL
+// ============================================================
+let menuPrevScreen = null;
+function openMenu() {
+  menuPrevScreen = document.querySelector('.screen.active').id.replace('screen-', '');
+  showScreen('menu');
+  switchJournalTab('status', document.querySelectorAll('.journal-tab')[0]);
+}
+
+function returnFromMenu() {
+  if (menuPrevScreen === 'map' || !menuPrevScreen) {
+    showWorldMap();
+  } else {
+    showScreen(menuPrevScreen);
+  }
+}
+
+function switchJournalTab(tab, btn) {
+  document.querySelectorAll('.journal-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const c = document.getElementById('journalContent');
+  if (tab === 'status') {
+    c.innerHTML = `
+      <div class="journal-entry">
+        <div class="journal-title">${state.name} — Level ${state.level}</div>
+        <div class="journal-detail">
+          HP: ${state.hp} / ${state.hpMax}<br>
+          SP: ${state.sp} / ${state.spMax}<br>
+          XP: ${state.xp} / ${state.level * 100}<br>
+          Budget: ${state.bud}
+        </div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-title">Stats</div>
+        <div class="journal-detail">
+          <strong>POL</strong> (Political Power): ${state.pol}<br>
+          <strong>WRD</strong> (Weirdness): ${state.wrd}<br>
+          <strong>SIL</strong> (Silence): ${state.sil}<br>
+          <strong>BUD</strong> (Budget): ${state.bud}
+        </div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-title">Party</div>
+        <div class="journal-detail">${state.partyGoats > 0 ? state.partyGoats + ' goats following you (loose alliance)' : 'You travel alone.'}</div>
+      </div>
+    `;
+  } else if (tab === 'items') {
+    let html = '';
+    state.items.forEach(itm => {
+      const i = items[itm];
+      if (!i) return;
+      html += `<div class="journal-entry"><div class="journal-title">${i.name}</div><div class="journal-detail">${i.desc}</div></div>`;
+    });
+    if (!html) html = '<div class="journal-entry"><div class="journal-detail">No items.</div></div>';
+    c.innerHTML = html;
+  } else if (tab === 'quests') {
+    let html = '';
+    Object.entries(quests).forEach(([k, q]) => {
+      html += `<div class="journal-entry"><div class="journal-title">${q.complete ? '✓ ' : ''}${q.name}</div><div class="journal-detail">${q.desc}</div></div>`;
+    });
+    c.innerHTML = html;
+  } else if (tab === 'factions') {
+    c.innerHTML = `
+      <div class="journal-entry"><div class="journal-title">🎭 Dante's Underground Council</div><div class="journal-detail">Reputation: ${state.factions.dantes} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">📚 Powell's Books</div><div class="journal-detail">Reputation: ${state.factions.powells} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">🍩 Voodoo Donuts Syndicate</div><div class="journal-detail">Reputation: ${state.factions.voodoo} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">🍳 Screen Door</div><div class="journal-detail">Reputation: ${state.factions.screendoor} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">🚴 Portland Cyclists</div><div class="journal-detail">Reputation: ${state.factions.cyclists} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">😤 NIMBYs</div><div class="journal-detail">Reputation: ${state.factions.nimbys} / 100</div></div>
+      <div class="journal-entry"><div class="journal-title">🪵 Doug Fir</div><div class="journal-detail">Reputation: ${state.factions.dougfir} / 100 (alignment unclear)</div></div>
+    `;
+  } else if (tab === 'lore') {
+    c.innerHTML = `
+      <div class="journal-entry"><div class="journal-title">The Great Loop</div><div class="journal-detail">The completed inner-tube circuit: 82nd Street Lazy River north to PDX, airport bypass canal to the Columbia, Columbia west, Willamette south, Milwaukie Extension east back to 82nd. Built by the previous Commissioner.</div></div>
+      <div class="journal-entry"><div class="journal-title">The Mount Hood Freeway</div><div class="journal-detail">Eastbound, Division/Powell corridor toward Troutdale. Built. Carries cars. Coexists with the Lazy River.</div></div>
+      <div class="journal-entry"><div class="journal-title">The Dante's Card</div><div class="journal-detail">"The freeway is not the question. The water is the question. You don't know this yet."</div></div>
+      <div class="journal-entry"><div class="journal-title">Doug Fir</div><div class="journal-detail">Civil engineer, officially. Founder, Portland Boring Works LLC. Present at every major decision. Has a Dutch Brothers at all times. Has been seen on the PCT, in Los Angeles, in Vancouver, at every facility you have visited. He arrived at Lakeview before you. He always does.</div></div>
+      <div class="journal-entry"><div class="journal-title">🦖 Mark Adams</div><div class="journal-detail">A wandering Portland sage. Wears a T-Rex shirt with the caption "I'M A T-REX!" Apparently more intelligent than every other character by an exponential magnitude. Fronts the band Galactic Norcinerator. Picks up a brownie at Lauretta Jean's on Division almost daily. Picks up a smashburger from Loyal Legion in Beaverton with somewhat less daily regularity. Has been seen at: City Hall, Powell's, Voodoo Donuts, Tom McCall Waterfront Park, outside Dante's, and the Ross Island Bridge. Knows all fifteen Ross Island approach vectors. Will text you the Galactic Norcinerator venue when it is decided. The venue has not been decided. The venue is always TBD.</div></div>
+      <div class="journal-entry"><div class="journal-title">Galactic Norcinerator</div><div class="journal-detail">Mark Adams' band. Thursday. Probably Mississippi Studios or a basement on Clinton, address unknown. Reviewed once as "emphatically itself." Bring water-resistant shoes. This is not metaphorical.</div></div>
+      <div class="journal-entry"><div class="journal-title">🧪 Gov. Tina Kotek</div><div class="journal-detail">Governor of Oregon. Looks like she should be teaching upper-division physics at Portland State. Has been underestimated for an entire career on the strength of a cardigan. Member of Dante's Underground Council since 1991. Selected the Woodburn airport site personally in 2003. Has structured twenty-two years of Pacific Northwest policy around dismantling Seattle's economic supremacy. The grudge originates with a 1989 UDub rejection letter whose third sentence ended in "unfortunately." She has not used that word in correspondence since.</div></div>
+      <div class="journal-entry"><div class="journal-title">"We Shall ALL Join Them"</div><div class="journal-detail">First disclosed by Tina Kotek at Woodburn. Gavin Newsom has a plan to change the economic and political landscape of the West Coast forever. Pacific Northwest cannot beat California economically. Therefore the strategy is to join California. The mechanism is not yet disclosed. You will understand it on a Tuesday. The specific Tuesday is some distance away.</div></div>
+      <div class="journal-entry"><div class="journal-title">The Spigot</div><div class="journal-detail">Located in Lakeview, Oregon. Controls the secret aqueduct that carries Columbia River water south to Southern California. Reagan ordered it closed in 1974-1975 to manage population behavior. The textbooks were revised in 1979. You are about to find it.</div></div>
+    `;
+  }
+}
+
+function saveGame() {
+  localStorage.setItem('cascades-save', JSON.stringify(state));
+  alert('Game saved.');
+}
+
+// ============================================================
+// FINAL CHOICE / ENDINGS
+// ============================================================
+function finalChoice(c) {
+  let title, sub, narr;
+  if (c === 'open') {
+    title = 'THE WATER FLOWS';
+    sub = 'You turned the Spigot to FULL OPEN.';
+    narr = `<p>The handle is heavy. You use both hands. There is a moment of resistance, then a click that has not been heard since 1974. The water flows.</p>
+    <p>Southern California receives Columbia River water at the original Eisenhower-era design capacity. The artificial droughts end. Reservoirs fill. The Salton Sea is partially restored. The Cascalifornia water economy stabilizes overnight.</p>
+    <p>Reagan's ghost dissolves into static. The textbooks rewrite themselves. The three Lakeview Technicians submit forty-six years of accumulated reports to the Cascalifornia National Archives. They retire on full pensions and excellent benefits.</p>
+    <p>Doug Fir is waiting outside. He nods. He has a Dutch Brothers. He hands you a second Dutch Brothers. It is the same brand but somehow better. He says: <em>"You did good, Commissioner."</em></p>
+    <p>You did. You really did.</p>
+    <p style="color:var(--gold);text-align:center;margin-top:1.5rem;">★ ENDING: THE PEOPLE'S WATER ★</p>`;
+  } else if (c === 'closed') {
+    title = 'THE WATER REMAINS';
+    sub = 'You left the Spigot CLOSED.';
+    narr = `<p>You consider the handle. You consider the politics. You consider the ecological consequences. The Columbia ecosystem benefits from continued retention. The Salton Sea will continue to die. Phoenix joins Deseret faster.</p>
+    <p>You leave the Spigot closed. The Lakeview Technicians acknowledge the decision without comment. Reagan's ghost smiles thinly and dissipates.</p>
+    <p>Outside, Doug Fir is waiting. He nods. He says: <em>"Conservative choice, Commissioner. Some would say wise."</em> He does not specify which some.</p>
+    <p>The Cascalifornia water situation continues with the artificial drought structure intact. Newsom is annoyed but not surprised. Sal Inferno schedules a meeting with you for next week. You attend.</p>
+    <p style="color:var(--gold);text-align:center;margin-top:1.5rem;">★ ENDING: THE PRESERVED CONSPIRACY ★</p>`;
+  } else if (c === 'destroy') {
+    title = 'THE SPIGOT IS NO MORE';
+    sub = 'You destroyed the mechanism.';
+    narr = `<p>You take the staff token. You raise it. You strike the Spigot with all the strength your political career has accumulated.</p>
+    <p>The handle breaks. Then the housing. Then the valve assembly itself. Water begins flowing — not as Reagan designed, not as the original engineers intended, but freely, uncontrolled, finding its own way south through the aqueduct.</p>
+    <p>This is not the design. This is something new. Doug Fir, watching from the doorway, raises his eyebrows. He has never raised his eyebrows before. He says: <em>"Huh. Interesting."</em></p>
+    <p>The water flows. It will keep flowing until the system stabilizes. Nobody controls it anymore. Not Reagan's ghost. Not Newsom. Not Dante's. Not even Doug Fir, who notes this with what might be respect.</p>
+    <p>You hand him the broken staff token. He accepts it. He puts it in his pocket. He nods. He leaves.</p>
+    <p style="color:var(--gold);text-align:center;margin-top:1.5rem;">★ ENDING: THE UNCONTROLLED FLOW ★</p>`;
+  }
+  document.getElementById('endingTitle').textContent = title;
+  document.getElementById('endingSubtitle').textContent = sub;
+  document.getElementById('endingNarrative').innerHTML = narr;
+  showScreen('ending');
+}
+
+// ============================================================
+// KEYBOARD CONTROLS
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  const activeScreen = document.querySelector('.screen.active').id;
+
+  if (activeScreen === 'screen-title') {
+    if (e.key === 'ArrowDown') {
+      titleMenuIdx = (titleMenuIdx + 1) % 3;
+      updateTitleMenu();
+    } else if (e.key === 'ArrowUp') {
+      titleMenuIdx = (titleMenuIdx - 1 + 3) % 3;
+      updateTitleMenu();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      handleTitleAction();
+    }
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+setupTitle();
+setupName();
+updateTitleMenu();
+</script>
+
+</body>
+</html>

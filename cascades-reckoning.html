@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASCADES: A Pacific Coast Reckoning</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Code+Pro:wght@300;400;600&display=swap');
+
+:root {
+  --black: #0a0a0a;
+  --deep: #111318;
+  --surface: #1a1d24;
+  --panel: #22262f;
+  --border: rgba(255,255,255,0.08);
+  --red: #E74C3C;
+  --red-dim: rgba(231,76,60,0.15);
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.15);
+  --teal: #2ABFBF;
+  --teal-dim: rgba(42,191,191,0.12);
+  --purple: #8B5CF6;
+  --purple-dim: rgba(139,92,246,0.12);
+  --green: #27C97A;
+  --green-dim: rgba(39,201,122,0.12);
+  --orange: #F59E0B;
+  --text: #E8E4DC;
+  --text-dim: #8A8680;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono: 'Source Code Pro', 'Courier New', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.masthead {
+  background: var(--deep);
+  border-bottom: 1px solid var(--gold);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.masthead::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.masthead h1 {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(201,168,76,0.3);
+  margin-bottom: 0.5rem;
+}
+
+.masthead .sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.masthead .tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(201,168,76,0.6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.doug-counter {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 11px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+.doug-counter span { color: var(--teal); font-weight: 600; }
+
+/* NAV */
+.nav {
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  padding: 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  padding: 14px 20px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+
+.nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* CONTENT */
+.tab { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+.tab.active { display: block; animation: reveal 0.4s ease; }
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION HEADERS */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.section-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.card.gold { border-left: 3px solid var(--gold); }
+.card.red { border-left: 3px solid var(--red); }
+.card.teal { border-left: 3px solid var(--teal); }
+.card.purple { border-left: 3px solid var(--purple); }
+.card.green { border-left: 3px solid var(--green); }
+.card.orange { border-left: 3px solid var(--orange); }
+
+.card h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.card p { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+/* METRIC BOXES */
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.metric-val {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.metric-val.red { color: var(--red); }
+.metric-val.teal { color: var(--teal); }
+.metric-val.green { color: var(--green); }
+.metric-val.purple { color: var(--purple); }
+
+.metric-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.metric-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* PROGRESS BARS */
+.progress-row { margin-bottom: 1rem; }
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.progress-label span { color: var(--text); font-weight: 600; }
+.progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* FACTION ALERTS */
+.faction {
+  background: var(--panel);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  position: relative;
+}
+
+.faction::before {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.faction.dantes { border-left: 3px solid var(--gold); }
+.faction.dantes::before { content: "🎭 DANTE'S UNDERGROUND COUNCIL"; color: var(--gold); }
+
+.faction.powell { border-left: 3px solid #8B7355; }
+.faction.powell::before { content: "📚 POWELL'S BOOKS DIRECTIVE"; color: #8B7355; }
+
+.faction.voodoo { border-left: 3px solid #E879A0; }
+.faction.voodoo::before { content: "🍩 VOODOO DONUTS SYNDICATE"; color: #E879A0; }
+
+.faction.nimby { border-left: 3px solid var(--red); }
+.faction.nimby::before { content: "😤 NIMBY RESISTANCE"; color: var(--red); }
+
+.faction.doug { border-left: 3px solid var(--teal); background: rgba(42,191,191,0.05); }
+.faction.doug::before { content: "🪵 DOUG FIR — PORTLAND BORING WORKS LLC"; color: var(--teal); }
+
+.faction.sal { border-left: 3px solid var(--purple); }
+.faction.sal::before { content: "🕴 SAL INFERNO — ENTERTAINMENT LIAISON"; color: var(--purple); }
+
+.faction.ted { border-left: 3px solid var(--green); }
+.faction.ted::before { content: "🌿 GOV. TED CRUZ — JEFFERSON-COLUMBIA"; color: var(--green); }
+
+.faction.newsom { border-left: 3px solid var(--gold); background: rgba(201,168,76,0.08); }
+.faction.newsom::before { content: "👑 EMPEROR NEWSOM — CASCALIFORNIA"; color: var(--gold); }
+
+/* BUTTONS */
+.btn {
+  background: var(--gold);
+  border: none;
+  border-radius: 3px;
+  color: var(--black);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.btn:hover { background: #e0be60; transform: translateY(-1px); }
+.btn.secondary { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+.btn.secondary:hover { background: var(--gold-dim); }
+.btn.danger { background: var(--red); color: white; }
+.btn.teal { background: var(--teal); }
+.btn.full { width: 100%; }
+
+/* BRIDGE MAP */
+.river-map {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.river-map svg { width: 100%; height: auto; }
+
+/* BRIDGE ZONES */
+.bridge-zone { cursor: pointer; transition: all 0.2s; }
+.bridge-zone:hover .zone-hit { fill: rgba(201,168,76,0.2); }
+.bridge-zone.selected .zone-hit { fill: rgba(201,168,76,0.3); }
+
+/* SUITABILITY REPORT */
+.report-box {
+  background: var(--deep);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 13px;
+  display: none;
+}
+
+.report-box.visible { display: block; animation: reveal 0.4s; }
+
+.report-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* NIMBY METER */
+.nimby-bar {
+  height: 24px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+  position: relative;
+}
+
+.nimby-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: width 0.6s ease;
+}
+
+/* TIMELINE */
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.timeline-year {
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.timeline-event {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.timeline-detail { font-size: 12px; color: var(--text-dim); }
+
+/* DUTCH BROTHERS ARC */
+.db-score {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1;
+  margin: 1rem 0;
+  transition: color 0.5s;
+}
+
+/* SCROLLABLE TEXT */
+.scroll-box {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.scroll-box::-webkit-scrollbar { width: 4px; }
+.scroll-box::-webkit-scrollbar-track { background: transparent; }
+.scroll-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* CLASSIFIED */
+.classified {
+  background: rgba(231,76,60,0.05);
+  border: 1px solid rgba(231,76,60,0.3);
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 12px;
+  color: rgba(231,76,60,0.8);
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* INPUT */
+select, input[type="range"] {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  appearance: none;
+  cursor: pointer;
+}
+
+select option { background: var(--surface); }
+input[type="range"] { padding: 6px 0; accent-color: var(--gold); cursor: pointer; }
+
+/* QUOTE BLOCK */
+.quote {
+  border-left: 3px solid var(--teal);
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--text);
+  font-size: 15px;
+  background: var(--teal-dim);
+  border-radius: 0 4px 4px 0;
+}
+
+.quote-attr {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--teal);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* RENO COUNTER */
+.reno-pop {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--red);
+  text-align: center;
+  margin: 1rem 0;
+  transition: all 0.5s;
+}
+
+/* TAG */
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.tag.gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.tag.red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+.tag.teal { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(42,191,191,0.3); }
+.tag.green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(39,201,122,0.3); }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .tab { padding: 1rem; }
+  .masthead { padding: 1.5rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <h1>CASCADES</h1>
+  <div class="sub">A Pacific Coast Reckoning</div>
+  <div class="tagline">In which Portland builds things, Seattle loses things, Los Angeles finally gets its freeway, British Columbia becomes a state, Ted Cruz discovers marijuana, and Doug Fir is everywhere.</div>
+  <div class="doug-counter">Doug Fir sightings this session: <span id="dougCount">0</span> &nbsp;|&nbsp; Dutch Brothers consumed: <span id="dbCount">0</span></div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('bridges',this)">The Bridges</button>
+  <button class="nav-btn" onclick="switchTab('woodburn',this)">The Woodburn Option</button>
+  <button class="nav-btn" onclick="switchTab('northwest',this)">Pacific NW Consequences</button>
+  <button class="nav-btn" onclick="switchTab('la',this)">LA Renaissance</button>
+  <button class="nav-btn" onclick="switchTab('cascalifornia',this)">Cascalifornia</button>
+  <button class="nav-btn" onclick="switchTab('dantes',this)">The Dante's Thread</button>
+</nav>
+
+<!-- ==================== TAB 1: BRIDGES ==================== -->
+<div id="bridges" class="tab active">
+  <div class="section-title">Build A Bridge And Get Over It</div>
+  <div class="section-sub">Willamette & Columbia River Crossing Suitability Analysis</div>
+
+  <div class="card gold">
+    <h3>How This Works</h3>
+    <p>Select a proposed crossing location on either the Willamette or Columbia. The system generates an engineering suitability report, NIMBY resistance score, and faction responses. Some crossings trigger larger consequences than you expect.</p>
+  </div>
+
+  <!-- WILLAMETTE SVG MAP -->
+  <div class="card teal" style="margin-bottom:0.5rem;">
+    <h3>Willamette River — Portland Crossings</h3>
+    <p>Click a zone to evaluate a crossing. Existing bridges shown in gold. Proposed zones in teal.</p>
+  </div>
+
+  <div class="river-map">
+    <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background -->
+      <rect width="700" height="500" fill="#111318"/>
+
+      <!-- River -->
+      <path d="M 200 20 Q 210 80 195 140 Q 185 200 205 260 Q 220 320 200 380 Q 185 430 195 490"
+            fill="none" stroke="#1a3a5c" stroke-width="40" opacity="0.8"/>
+      <path d="M 200 20 Q 210 80 195 140 Q 185 200 205 260 Q 220 320 200 380 Q 185 430 195 490"
+            fill="none" stroke="#1e4a74" stroke-width="28" opacity="0.6"/>
+      <path d="M 200 20 Q 210 80 195 140 Q 185 200 205 260 Q 220 320 200 380 Q 185 430 195 490"
+            fill="none" stroke="#2563a8" stroke-width="16" opacity="0.3"/>
+
+      <!-- EXISTING BRIDGES -->
+      <!-- St. Johns -->
+      <g class="bridge-zone" onclick="selectBridge('st-johns')">
+        <rect class="zone-hit" x="150" y="45" width="100" height="22" fill="transparent" rx="2"/>
+        <line x1="160" y1="56" x2="240" y2="56" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="168" cy="56" r="5" fill="#C9A84C"/>
+        <circle cx="232" cy="56" r="5" fill="#C9A84C"/>
+        <text x="148" y="44" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">St. Johns</text>
+        <text x="148" y="55" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1931 · suspension</text>
+      </g>
+
+      <!-- Fremont -->
+      <g class="bridge-zone" onclick="selectBridge('fremont')">
+        <rect class="zone-hit" x="150" y="98" width="100" height="22" fill="transparent" rx="2"/>
+        <line x1="158" y1="109" x2="238" y2="109" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="166" cy="109" r="5" fill="#C9A84C"/>
+        <circle cx="230" cy="109" r="5" fill="#C9A84C"/>
+        <text x="148" y="99" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Fremont</text>
+        <text x="148" y="110" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1973 · arch</text>
+      </g>
+
+      <!-- Broadway -->
+      <g class="bridge-zone" onclick="selectBridge('broadway')">
+        <rect class="zone-hit" x="150" y="138" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="158" y1="149" x2="240" y2="149" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="166" cy="149" r="5" fill="#C9A84C"/>
+        <circle cx="232" cy="149" r="5" fill="#C9A84C"/>
+        <text x="148" y="139" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Broadway</text>
+        <text x="148" y="150" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1913 · bascule</text>
+      </g>
+
+      <!-- Steel Bridge -->
+      <g class="bridge-zone" onclick="selectBridge('steel')">
+        <rect class="zone-hit" x="150" y="168" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="160" y1="179" x2="238" y2="179" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="168" cy="179" r="5" fill="#C9A84C"/>
+        <circle cx="230" cy="179" r="5" fill="#C9A84C"/>
+        <text x="148" y="169" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Steel Bridge</text>
+        <text x="148" y="180" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1912 · vertical lift</text>
+      </g>
+
+      <!-- Burnside -->
+      <g class="bridge-zone" onclick="selectBridge('burnside')">
+        <rect class="zone-hit" x="150" y="198" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="160" y1="209" x2="244" y2="209" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="168" cy="209" r="5" fill="#C9A84C"/>
+        <circle cx="236" cy="209" r="5" fill="#C9A84C"/>
+        <text x="148" y="199" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Burnside</text>
+        <text x="148" y="210" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1926 · bascule</text>
+      </g>
+
+      <!-- Morrison -->
+      <g class="bridge-zone" onclick="selectBridge('morrison')">
+        <rect class="zone-hit" x="150" y="228" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="162" y1="239" x2="248" y2="239" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="170" cy="239" r="5" fill="#C9A84C"/>
+        <circle cx="240" cy="239" r="5" fill="#C9A84C"/>
+        <text x="148" y="229" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Morrison</text>
+        <text x="148" y="240" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1958 · bascule</text>
+      </g>
+
+      <!-- Hawthorne -->
+      <g class="bridge-zone" onclick="selectBridge('hawthorne')">
+        <rect class="zone-hit" x="150" y="258" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="165" y1="269" x2="250" y2="269" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="173" cy="269" r="5" fill="#C9A84C"/>
+        <circle cx="242" cy="269" r="5" fill="#C9A84C"/>
+        <text x="148" y="259" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Hawthorne</text>
+        <text x="148" y="270" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1910 · oldest</text>
+      </g>
+
+      <!-- Marquam -->
+      <g class="bridge-zone" onclick="selectBridge('marquam')">
+        <rect class="zone-hit" x="150" y="288" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="168" y1="299" x2="250" y2="299" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="176" cy="299" r="5" fill="#C9A84C"/>
+        <circle cx="242" cy="299" r="5" fill="#C9A84C"/>
+        <text x="148" y="289" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Marquam</text>
+        <text x="148" y="300" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1966 · I-5 freeway</text>
+      </g>
+
+      <!-- Tilikum -->
+      <g class="bridge-zone" onclick="selectBridge('tilikum')">
+        <rect class="zone-hit" x="150" y="318" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="170" y1="329" x2="248" y2="329" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="178" cy="329" r="5" fill="#C9A84C"/>
+        <circle cx="240" cy="329" r="5" fill="#C9A84C"/>
+        <text x="148" y="319" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Tilikum</text>
+        <text x="148" y="330" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">2015 · no cars</text>
+      </g>
+
+      <!-- Ross Island -->
+      <g class="bridge-zone" onclick="selectBridge('ross-island')">
+        <rect class="zone-hit" x="150" y="358" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="172" y1="369" x2="246" y2="369" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="180" cy="369" r="5" fill="#C9A84C"/>
+        <circle cx="238" cy="369" r="5" fill="#C9A84C"/>
+        <text x="148" y="359" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Ross Island</text>
+        <text x="148" y="370" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">1926 · arch</text>
+      </g>
+
+      <!-- Sellwood -->
+      <g class="bridge-zone" onclick="selectBridge('sellwood')">
+        <rect class="zone-hit" x="150" y="418" width="110" height="22" fill="transparent" rx="2"/>
+        <line x1="175" y1="429" x2="242" y2="429" stroke="#C9A84C" stroke-width="3"/>
+        <circle cx="183" cy="429" r="5" fill="#C9A84C"/>
+        <circle cx="234" cy="429" r="5" fill="#C9A84C"/>
+        <text x="148" y="419" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="end">Sellwood</text>
+        <text x="148" y="430" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="end">2016 · rebuilt</text>
+      </g>
+
+      <!-- PROPOSED ZONES (right side) -->
+      <!-- North Portland Connector -->
+      <g class="bridge-zone" onclick="selectBridge('north-portland')">
+        <rect class="zone-hit" x="210" y="72" width="120" height="22" fill="transparent" rx="2"/>
+        <line x1="215" y1="83" x2="325" y2="83" stroke="#2ABFBF" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="330" y="84" fill="#2ABFBF" font-size="10" font-family="Source Code Pro">N Portland Connector?</text>
+        <text x="330" y="95" fill="#8A8680" font-size="8" font-family="Source Code Pro">PROPOSED</text>
+      </g>
+
+      <!-- Rose City Crossing (near Fremont) -->
+      <g class="bridge-zone" onclick="selectBridge('rose-city-crossing')">
+        <rect class="zone-hit" x="210" y="122" width="120" height="22" fill="transparent" rx="2"/>
+        <line x1="215" y1="133" x2="325" y2="133" stroke="#2ABFBF" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="330" y="134" fill="#2ABFBF" font-size="10" font-family="Source Code Pro">Rose City Crossing?</text>
+        <text x="330" y="145" fill="#8A8680" font-size="8" font-family="Source Code Pro">PROPOSED · near Fremont</text>
+      </g>
+
+      <!-- Inner East Side -->
+      <g class="bridge-zone" onclick="selectBridge('inner-east')">
+        <rect class="zone-hit" x="210" y="222" width="120" height="22" fill="transparent" rx="2"/>
+        <line x1="215" y1="233" x2="325" y2="233" stroke="#2ABFBF" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="330" y="234" fill="#2ABFBF" font-size="10" font-family="Source Code Pro">Inner East Connector?</text>
+        <text x="330" y="245" fill="#8A8680" font-size="8" font-family="Source Code Pro">PROPOSED</text>
+      </g>
+
+      <!-- Milwaukie Crossing -->
+      <g class="bridge-zone" onclick="selectBridge('milwaukie')">
+        <rect class="zone-hit" x="210" y="388" width="120" height="22" fill="transparent" rx="2"/>
+        <line x1="215" y1="399" x2="325" y2="399" stroke="#2ABFBF" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="330" y="400" fill="#2ABFBF" font-size="10" font-family="Source Code Pro">Milwaukie Connector?</text>
+        <text x="330" y="411" fill="#8A8680" font-size="8" font-family="Source Code Pro">PROPOSED · lazy river link</text>
+      </g>
+
+      <!-- Labels -->
+      <text x="350" y="20" fill="#8A8680" font-size="11" font-family="Source Code Pro">— Existing bridge</text>
+      <line x1="340" y1="16" x2="348" y2="16" stroke="#C9A84C" stroke-width="2"/>
+      <text x="350" y="36" fill="#8A8680" font-size="11" font-family="Source Code Pro">- - Proposed zone</text>
+      <line x1="340" y1="32" x2="348" y2="32" stroke="#2ABFBF" stroke-width="2" stroke-dasharray="4,2"/>
+
+      <!-- River label -->
+      <text x="192" y="250" fill="#2563a8" font-size="11" font-family="Source Code Pro" writing-mode="tb" opacity="0.6">WILLAMETTE</text>
+    </svg>
+  </div>
+
+  <!-- COLUMBIA MAP -->
+  <div class="card teal" style="margin-bottom:0.5rem; margin-top:1rem;">
+    <h3>Columbia River — Portland/Vancouver Crossings</h3>
+  </div>
+
+  <div class="river-map">
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
+      <rect width="700" height="180" fill="#111318"/>
+
+      <!-- Columbia River -->
+      <rect x="0" y="60" width="700" height="60" fill="#1a3a5c" opacity="0.7"/>
+      <rect x="0" y="70" width="700" height="40" fill="#1e4a74" opacity="0.5"/>
+      <text x="350" y="95" fill="#2563a8" font-size="12" font-family="Source Code Pro" text-anchor="middle" opacity="0.7">COLUMBIA RIVER</text>
+
+      <!-- Oregon shore label -->
+      <text x="20" y="50" fill="#8A8680" font-size="11" font-family="Source Code Pro">Oregon / Portland</text>
+      <!-- Washington shore label -->
+      <text x="20" y="140" fill="#8A8680" font-size="11" font-family="Source Code Pro">Washington / Vancouver</text>
+
+      <!-- I-5 Interstate Bridge -->
+      <g class="bridge-zone" onclick="selectBridge('interstate')">
+        <rect class="zone-hit" x="140" y="55" width="80" height="70" fill="transparent" rx="2"/>
+        <line x1="180" y1="58" x2="180" y2="128" stroke="#C9A84C" stroke-width="4"/>
+        <text x="180" y="48" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="middle">I-5 Bridge</text>
+        <text x="180" y="38" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="middle">1917/1958</text>
+      </g>
+
+      <!-- I-205 Glenn Jackson -->
+      <g class="bridge-zone" onclick="selectBridge('glenn-jackson')">
+        <rect class="zone-hit" x="490" y="55" width="80" height="70" fill="transparent" rx="2"/>
+        <line x1="530" y1="58" x2="530" y2="128" stroke="#C9A84C" stroke-width="4"/>
+        <text x="530" y="48" fill="#C9A84C" font-size="10" font-family="Source Code Pro" text-anchor="middle">Glenn Jackson</text>
+        <text x="530" y="38" fill="#8A8680" font-size="8" font-family="Source Code Pro" text-anchor="middle">I-205 · 1982</text>
+      </g>
+
+      <!-- MID-COLUMBIA PROPOSED -->
+      <g class="bridge-zone" onclick="selectBridge('mid-columbia')">
+        <rect class="zone-hit" x="300" y="50" width="100" height="80" fill="transparent" rx="2"/>
+        <line x1="350" y1="53" x2="350" y2="133" stroke="#2ABFBF" stroke-width="3" stroke-dasharray="6,4"/>
+        <circle cx="350" cy="53" r="6" fill="none" stroke="#2ABFBF" stroke-width="2"/>
+        <circle cx="350" cy="133" r="6" fill="none" stroke="#2ABFBF" stroke-width="2"/>
+        <text x="350" y="43" fill="#2ABFBF" font-size="10" font-family="Source Code Pro" text-anchor="middle">Mid-Columbia?</text>
+        <text x="350" y="33" fill="#E74C3C" font-size="9" font-family="Source Code Pro" text-anchor="middle">⚠ TRIGGERS WOODBURN</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- SUITABILITY REPORT -->
+  <div id="bridgeReport" class="report-box">
+    <div class="report-title" id="reportTitle">Bridge Suitability Report</div>
+    <div id="reportContent"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB 2: WOODBURN ==================== -->
+<div id="woodburn" class="tab">
+  <div class="section-title">The Woodburn Option</div>
+  <div class="section-sub">Mega-Airport Scenario & Consequence Cascade</div>
+
+  <div class="grid-4">
+    <div class="metric"><div class="metric-val teal" id="airportProgress">0%</div><div class="metric-label">Airport Progress</div></div>
+    <div class="metric"><div class="metric-val" id="portlandPride">72</div><div class="metric-label">Portland Pride</div></div>
+    <div class="metric"><div class="metric-val red" id="pdxStatus">OPEN</div><div class="metric-label">PDX Status</div></div>
+    <div class="metric"><div class="metric-val green" id="economicDominance">RISING</div><div class="metric-label">Regional Dominance</div></div>
+  </div>
+
+  <div class="card gold">
+    <h3>The Woodburn Mega-Airport</h3>
+    <p>The Mid-Columbia crossing — once approved — creates the transportation corridor that makes a new regional airport feasible. A site near Woodburn, Oregon, equidistant from Portland, Salem, and Eugene, becomes the focal point. Three times the size of SeaTac. Six runways. Full cargo infrastructure. High-speed rail connection northbound to Portland and southbound to Sacramento. The Pacific Northwest's economic destiny pivots on this decision.</p>
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;">Airport Construction Phase</label>
+    <select id="airportPhase" onchange="updateWoodburn()">
+      <option value="0">Phase 0 — Proposal Only</option>
+      <option value="1">Phase 1 — Site Acquisition</option>
+      <option value="2">Phase 2 — Federal Approval</option>
+      <option value="3">Phase 3 — Groundbreaking</option>
+      <option value="4">Phase 4 — Construction</option>
+      <option value="5">Phase 5 — First Flights</option>
+      <option value="6">Phase 6 — Full Operations</option>
+    </select>
+  </div>
+
+  <div id="woodburnFactions"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-title" style="font-size:20px;">PDX Repurposing Decision</div>
+  <div style="margin:1rem 0;">
+    <label style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;">What happens to PDX when Woodburn opens?</label>
+    <select id="pdxFate" onchange="updatePDX()">
+      <option value="">— Select a fate for PDX —</option>
+      <option value="cargo">Cargo-only facility (practical)</option>
+      <option value="mixed">Mixed-use development (Columbia River frontage)</option>
+      <option value="lazyriver">The World's Largest Lazy River (obviously)</option>
+      <option value="arts">Weird Arts District (Portland insists)</option>
+      <option value="powell">Powell's Books Mega-Campus (Powell's insists)</option>
+    </select>
+  </div>
+  <div id="pdxFateOutput"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-title" style="font-size:20px;">SeaTac Consequences</div>
+
+  <div class="grid-3">
+    <div class="metric"><div class="metric-val red" id="seatacVol">100%</div><div class="metric-label">SeaTac Volume</div><div class="metric-sub">declining with each phase</div></div>
+    <div class="metric"><div class="metric-val" id="seattleEcon">STABLE</div><div class="metric-label">Seattle Economy</div></div>
+    <div class="metric"><div class="metric-val green">3×</div><div class="metric-label">Woodburn vs SeaTac</div><div class="metric-sub">capacity at full build</div></div>
+  </div>
+
+  <div class="faction dantes" id="woodburnDantes">
+    The airport is an interesting development. We have interests in the ground transportation corridor between Portland and Woodburn. We have always had these interests. We are not elaborating further.
+  </div>
+</div>
+
+<!-- ==================== TAB 3: PACIFIC NW ==================== -->
+<div id="northwest" class="tab">
+  <div class="section-title">Pacific Northwest Consequences</div>
+  <div class="section-sub">Seattle Decline · Dutch Brothers Arc · Sports Relocations · Jefferson-Columbia</div>
+
+  <!-- SEATTLE DECLINE TRACKER -->
+  <div class="section-title" style="font-size:20px; margin-top:0;">Seattle Decline Tracker</div>
+
+  <div class="grid-4" style="margin-bottom:1.5rem;">
+    <div class="metric"><div class="metric-val red" id="seattleVibe">100</div><div class="metric-label">Seattle Vibe</div></div>
+    <div class="metric"><div class="metric-val red" id="seahawksStatus">HERE</div><div class="metric-label">Seahawks</div></div>
+    <div class="metric"><div class="metric-val red" id="marinersStatus">HERE</div><div class="metric-label">Mariners</div></div>
+    <div class="metric"><div class="metric-val red" id="seatacStatus">HUB</div><div class="metric-label">SeaTac</div></div>
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;">Seattle Decline Timeline — Year</label>
+    <input type="range" id="seattleYear" min="0" max="10" value="0" oninput="updateSeattle()">
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:4px;">Year: <span id="yearLabel" style="color:var(--gold);">0 (Before Woodburn)</span></div>
+  </div>
+
+  <div id="seattleNarrative" class="card red">
+    <p>Adjust the timeline slider to observe Seattle's decline.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DUTCH BROTHERS ARC -->
+  <div class="section-title" style="font-size:20px;">Dutch Brothers Quality Arc</div>
+
+  <div class="db-score" id="dbQuality" style="color:var(--red);">12</div>
+  <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:1rem;letter-spacing:1px;text-transform:uppercase;">Current Quality Score / 100</div>
+
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;">Dutch Brothers Development Stage</label>
+    <select id="dbStage" onchange="updateDB()">
+      <option value="0">Stage 0 — Current Reality (score: 12)</option>
+      <option value="1">Stage 1 — Woodburn Airport Contract (score: 35)</option>
+      <option value="2">Stage 2 — Real Baristas Hired (score: 58)</option>
+      <option value="3">Stage 3 — Proper Café Locations (score: 74)</option>
+      <option value="4">Stage 4 — Seattle Conquered (score: 89)</option>
+      <option value="5">Stage 5 — Cascalifornia Contract (score: 96)</option>
+      <option value="6">Stage 6 — Starbucks Acknowledges Them (score: 100)</option>
+    </select>
+  </div>
+
+  <div id="dbNarrative" class="card"></div>
+
+  <div class="divider"></div>
+
+  <!-- SPORTS RELOCATIONS -->
+  <div class="section-title" style="font-size:20px;">Sports Relocations</div>
+
+  <div class="grid-2">
+    <div class="card gold">
+      <h3>🏈 Portland Cascades</h3>
+      <p><span class="tag gold">NFL</span><span class="tag teal">Hillsboro</span></p>
+      <p>The Seahawks relocate to Nike Stadium, Hillsboro. The south entrance is designated The Dante's Portal. Doug Fir attends the groundbreaking. He was not invited. He has a Dutch Brothers.</p>
+      <div style="margin-top:1rem;">
+        <div class="progress-row">
+          <div class="progress-label">Intel naming rights war<span>Nike wins</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--gold);"></div></div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label">Dante's Portal (south entrance)<span>secured</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--gold);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card red">
+      <h3>⚾ Pacific Mariners</h3>
+      <p><span class="tag red">MLB</span><span class="tag red">Oakland Coliseum</span></p>
+      <p>Years 1-2: "Seattle Mariners playing home games in Oakland." The most humiliating sentence in sports history. Year 3: rebrand to Pacific Mariners. The Mariner Moose is retired. Oakland does not do moose.</p>
+      <div style="margin-top:0.5rem;">
+        <p style="color:var(--green);font-size:12px;margin-top:0.5rem;">New mascot: Pacific Brown Pelican. Oakland respects this. Pelicans have seen things.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- JEFFERSON-COLUMBIA -->
+  <div class="section-title" style="font-size:20px;">Jefferson-Columbia</div>
+  <div class="card green">
+    <h3>The 51st State</h3>
+    <p>British Columbia secedes from Canada via a deal brokered by Dante's Underground Council. Canada releases a strongly worded 847-word statement. Nobody in Jefferson-Columbia reads it. Quebec briefly considers the precedent, declines. Alberta is furious. This is Alberta's default state.</p>
+  </div>
+
+  <div class="faction ted">
+    I was wrong about pretty much everything. Universal basic income. Universal healthcare. Indigenous land restitution. Cannabis legalization. I'm signing all of it. The Dutch Brothers here is excellent, by the way. I don't know what changed.
+  </div>
+
+  <div class="card" style="margin-bottom:1rem;">
+    <h3 style="color:var(--green);">Ted Cruz — Political Transformation Timeline</h3>
+    <div class="timeline" style="margin-top:1rem;">
+      <div class="timeline-item">
+        <div class="timeline-year">Day 1</div>
+        <div class="timeline-event">Arrives in Vancouver on trade delegation</div>
+        <div class="timeline-detail">Purpose: nominally trade. Actual purpose: unclear. Ted is there.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Day 1, Evening</div>
+        <div class="timeline-event">Package left outside hotel room</div>
+        <div class="timeline-detail">Dutch Brothers (the good new Dutch Brothers) and something from BC's legal cannabis industry. Note reads: "Try the coffee first." Doug Fir is staying two floors up.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Days 2-4</div>
+        <div class="timeline-event">Ted does not leave his room</div>
+        <div class="timeline-detail">Watches all Ken Burns documentaries. Reads half of Howard Zinn. Has what he will call "a fundamental reconsideration of the nature of community."</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Day 5</div>
+        <div class="timeline-event">Calls Heidi. Apologizes for everything.</div>
+        <div class="timeline-detail">Heidi is skeptical. She remains skeptical. She supports his new career anyway because it is more interesting.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Day 6</div>
+        <div class="timeline-event">Calls Dante's Underground Council. They take the call.</div>
+        <div class="timeline-detail">They were expecting it.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Campaign</div>
+        <div class="timeline-event">Runs for Governor of Jefferson-Columbia as Liberal Democrat</div>
+        <div class="timeline-detail">Slogan: "I Was Wrong About Pretty Much Everything. Let's Fix It." Tests poorly in focus groups. Wins by 14 points.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 4: LA ==================== -->
+<div id="la" class="tab">
+  <div class="section-title">The Los Angeles Renaissance</div>
+  <div class="section-sub">Boeing · SR-47 · South Pasadena Tunnel · The Landings · Hollywood · P-47</div>
+
+  <div class="grid-4">
+    <div class="metric"><div class="metric-val green">DONE</div><div class="metric-label">Boeing Relocated</div><div class="metric-sub">too weird in Portland</div></div>
+    <div class="metric"><div class="metric-val" id="sr47Progress">0%</div><div class="metric-label">SR-47 Progress</div></div>
+    <div class="metric"><div class="metric-val teal" id="tunnelProgress">0%</div><div class="metric-label">SP Tunnel</div></div>
+    <div class="metric"><div class="metric-val gold">THE LANDINGS</div><div class="metric-label">Peninsula Status</div><div class="metric-sub">under construction</div></div>
+  </div>
+
+  <!-- BOEING TOO WEIRD SCENE -->
+  <div class="section-title" style="font-size:20px;">The Boeing Visit — A Chronology</div>
+  <div class="card gold" style="margin-bottom:0.5rem;">
+    <p>Boeing's CEO visits Portland for a site evaluation. The following occurs.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">7:42 AM</div>
+      <div class="timeline-event">Motorcade blocked by Critical Mass</div>
+      <div class="timeline-detail">Burnside Street. 23-minute delay. The cyclists are aware this is Boeing. They are not sympathetic.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">8:31 AM</div>
+      <div class="timeline-event">Arrive at City Hall</div>
+      <div class="timeline-detail">The Mayor is wearing flannel. This was not a casual choice. This is simply how the Mayor dresses.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">9:15 AM</div>
+      <div class="timeline-event">Coffee break</div>
+      <div class="timeline-detail">Taken to a pour-over specialist in the Pearl. The Ethiopian single-origin process is explained for eleven minutes. The coffee takes nine additional minutes. It is excellent. This does not help.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">10:47 AM</div>
+      <div class="timeline-event">Dante's envelope arrives</div>
+      <div class="timeline-detail">Unmarked. One business card. No name. No number. A Portland address. The back reads: "We know about the South Carolina facility." Nobody knows what this means. This is either a bluff or it isn't.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">11:30 AM</div>
+      <div class="timeline-event">Lunch at a food cart</div>
+      <div class="timeline-detail">The Mayor's suggestion. Fermented oat porridge with locally foraged mushrooms. The Boeing CEO eats it. It is fine. This is somehow the last straw.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">11:58 AM</div>
+      <div class="timeline-event">Boeing CEO steps outside</div>
+      <div class="timeline-detail">Looks at the rain. A cyclist runs a red light and makes sustained eye contact. The CEO calls the Los Angeles real estate team.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">12:03 PM</div>
+      <div class="timeline-event">Doug Fir is across the street</div>
+      <div class="timeline-detail">He has a Dutch Brothers. He watches the motorcade leave. He does not wave.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SR-47 + SOUTH PASADENA TUNNEL -->
+  <div class="section-title" style="font-size:20px;">Portland Boring Works — LA Operations</div>
+
+  <div style="margin-bottom:1rem;">
+    <label style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px;">Infrastructure Phase</label>
+    <select id="laPhase" onchange="updateLA()">
+      <option value="0">Phase 0 — Boeing announces LA relocation</option>
+      <option value="1">Phase 1 — SR-47 Industrial Freeway groundbreaking</option>
+      <option value="2">Phase 2 — SR-47 opens, Port of LA to Vernon/Commerce</option>
+      <option value="3">Phase 3 — South Pasadena Tunnel boring begins</option>
+      <option value="4">Phase 4 — Tunnel complete (protesters still protesting above)</option>
+      <option value="5">Phase 5 — California Blvd terminus opens, 210 connected</option>
+    </select>
+  </div>
+
+  <div id="laPhaseContent"></div>
+
+  <div class="divider"></div>
+
+  <!-- THE LANDINGS -->
+  <div class="section-title" style="font-size:20px;">The Landings</div>
+
+  <div class="card gold">
+    <h3>Santa Monica Peninsula — Project Overview</h3>
+    <p>A 10-mile landfill extension west of the Santa Monica Pier. Named for the aviation connection: Boeing, Woodburn, arrival. The lagoon on the interior. The Pacific on the exterior. I-10 extended on elevated structure over the lagoon to PCH near Malibu. 100,000 new residents. Most expensive real estate in North America.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="metric"><div class="metric-val">100K</div><div class="metric-label">New Residents</div></div>
+    <div class="metric"><div class="metric-val teal">10mi</div><div class="metric-label">Peninsula Length</div></div>
+    <div class="metric"><div class="metric-val green">LAGOON</div><div class="metric-label">Interior Water</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card gold">
+      <h3>Dante's South</h3>
+      <p>The only nightclub on Earth with both lagoon and ocean views. Dutch Brothers bar program. Voodoo Donuts late-night menu. Screen Door Southern brunch Sundays. Sal Inferno conducts all his meetings here, ocean at his back. The symbolism is not subtle.</p>
+    </div>
+    <div class="card teal">
+      <h3>Landings Studios</h3>
+      <p>Lagoon-facing film and media district. The ocean light is unlike anything in the industry. The lagoon reflections are a visual signature. Vernon Studio District handles the industrial shoots. Landings handles prestige production.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PALISADES + P-47 -->
+  <div class="section-title" style="font-size:20px;">Pacific Palisades Restoration & P-47</div>
+
+  <div class="card green">
+    <h3>P-47 — Mountain Lion, Restored Palisades</h3>
+    <p>First documented Year 2 of restoration. Trail cam photo: a mountain lion with Landings construction visible in the background. The photo goes viral. P-47 is given consultative standing in Pacific Palisades land use decisions via 2031 LA ordinance — drafted by a Portland urban planning firm. The firm's legal address is the same building as Dante's Portland. Nobody mentions this.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color:var(--green);">Upper Canyon Holdouts</h3>
+      <p>A handful of residents remain under strict regulation: mandatory brush clearing, no wood-frame construction, dark sky compliance, no fencing impeding animal movement, required fire suppression systems. They become de facto habitat stewards. Mountain lions adopt the zone as favored territory.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--green);">The Voluntary Sales</h3>
+      <p>Most Palisades residents sell to the state restoration fund and relocate to The Landings. Beachfront property for former hillside residents. Some choose Baja California (now a Cascalifornia state). The restoration is largely complete by Year 4.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 5: CASCALIFORNIA ==================== -->
+<div id="cascalifornia" class="tab">
+  <div class="section-title">Cascalifornia</div>
+  <div class="section-sub">The Secession · Emperor Newsom · The Reagan Aqueduct · Reno · Deseret & Arizona · The Full Baja Peninsula · Ted Wheeler · The Trump Neutral Zone</div>
+
+  <div class="faction newsom">
+    Why would I run to be President of a country that is less powerful than what I already run? The math was obvious.
+  </div>
+
+  <div class="grid-4">
+    <div class="metric"><div class="metric-val gold">EMPEROR</div><div class="metric-label">Newsom Title</div><div class="metric-sub">First Consul & Executive Emperor</div></div>
+    <div class="metric"><div class="metric-val green">7</div><div class="metric-label">States Seceded</div><div class="metric-sub">CA OR WA JC AK HI + Baja</div></div>
+    <div class="metric"><div class="metric-val teal">OPEN</div><div class="metric-label">Aqueduct Spigot</div><div class="metric-sub">finally</div></div>
+    <div class="metric"><div class="metric-val red">31,000</div><div class="metric-label">Reno Population</div><div class="metric-sub">down from 264,000</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECRET AQUEDUCT -->
+  <div class="section-title" style="font-size:20px;">The Secret Aqueduct</div>
+
+  <div class="classified">⛔ CLASSIFIED — FEDERAL WATER INFRASTRUCTURE ASSET — TIER 1 — REMOVED FROM CALIFORNIA SCHOOL TEXTBOOKS 1979 ⛔</div>
+
+  <div class="card gold">
+    <h3>The Lakeview Facility</h3>
+    <p>A Bureau of Reclamation pump station outside Lakeview, Oregon. Staffed by three federal employees since 1962. They have never been asked what they do. Their official title since 1979: "Regional Precipitation Monitoring Technicians." They have excellent benefits. The aqueduct runs underground along the US-97/US-395 corridor carrying Columbia River water south to Southern California. Built during the Eisenhower administration. Classified to avoid renegotiating the Columbia River Compact with Canada.</p>
+  </div>
+
+  <div class="card red">
+    <h3>The Spigot History</h3>
+    <div class="progress-row" style="margin-top:0.5rem;">
+      <div class="progress-label">1962–1974: FULLY OPEN<span>CA boom years</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--green);"></div></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">1974–1975: REAGAN ORDERS CLOSURE<span>Governor's final year</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:8%;background:var(--red);"></div></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">1975–1988: PARTIALLY OPEN / MANIPULATED<span>drought management theater</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:25%;background:var(--orange);"></div></div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">1988–Cascalifornia: FULLY CLOSED<span>every drought since, manufactured</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:5%;background:var(--red);"></div></div>
+    </div>
+  </div>
+
+  <div class="card red">
+    <h3>The Reagan Memo — Declassified 2027, Cascalifornia National Archives</h3>
+    <p style="font-style:italic;color:var(--red);margin-bottom:0.8rem;">"Control of water access provides leverage over population distribution and political behavior. A thirsty population is a manageable population."</p>
+    <p>Ronald Reagan, Governor of California, ordered the spigot to near-closure in his final year of office, 1974-1975. The decision was framed internally as "resource management." The classified memo, recovered from a federal annex during Cascalifornia's 2027 National Archives declassification, describes the actual rationale explicitly.</p>
+    <p style="margin-top:0.8rem;">In 1978-1979, Reagan's pre-presidential political network arranged for the aqueduct to be removed from California school textbooks. Oregon and federal educational materials were similarly revised under the classification order. Every California child who went to school between 1979 and Cascalifornia's founding learned nothing about the aqueduct. Every drought they watched unfold was partially manufactured.</p>
+    <p style="margin-top:0.8rem;">Reagan's surviving supporters describe this as "protecting California by managing expectations." Everyone else has been very loud about it since the memo's release.</p>
+  </div>
+
+  <div class="card teal">
+    <h3>How Trump Knew</h3>
+    <p>Presidential Daily Brief, Year 1. An appendix. Trump did not read the brief. He was shown a map. The map had a line. He asked what it was. A staffer explained. Trump said: "So we can turn it off?" The staffer said yes. Trump said "Good to know" and moved on. He mentioned it once. To the wrong person. That person told someone. That someone eventually told Newsom.</p>
+    <p style="margin-top:0.8rem;">Trump's knowledge of the spigot was passive. Reagan's was active and deliberate. This distinction is noted in every subsequent history of the period.</p>
+  </div>
+
+  <div class="faction doug" style="margin-top:1rem;">
+    We can expand the capacity by 340%. The boring technology is already proven.
+    <span class="quote-attr">— Doug Fir, upon being shown the classified aqueduct schematics, within one hour of Newsom's call</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CASCALIFORNIA MEMBERS -->
+  <div class="section-title" style="font-size:20px;">Member States</div>
+
+  <div class="grid-2">
+    <div class="card green">
+      <h3>Jefferson-Columbia (BC)</h3>
+      <p>Dante's brokered the secession. Canada's 847-word protest statement goes unread. Ted Cruz, newly progressive, serves as Governor and Imperial Council member.</p>
+    </div>
+    <div class="card green">
+      <h3>Baja California — Full Peninsula</h3>
+      <p>The original deal covered Baja California (the northern state). Mexico City resisted extending it to the full peninsula. The resistance lasted approximately one negotiating session. Baja California Sur — including La Paz, Todos Santos, and Los Cabos — joins the deal. The adjustment fee doubles. Mexico retains the ferry routes as sovereign commercial operations and keeps offshore mineral rights to specific Pacific zones. The Baja wine country (Valle de Guadalupe) and the East Cape fishing grounds are now domestic Cascalifornia resources. Los Cabos becomes Cascalifornia's southernmost point and immediately the most expensive real estate in the nation-state.</p>
+      <p style="margin-top:0.8rem;">The Tijuana-San Diego crossing becomes an internal road. The Cabo airport becomes a Cascalifornia international gateway. The Pacific Gray Whale migration corridor passes entirely through Cascalifornia waters for the first time.</p>
+    </div>
+    <div class="card gold">
+      <h3>Clark County, Nevada</h3>
+      <p>Las Vegas joins in 20 minutes. The Strip reacts immediately. One casino announces a Doug Fir-themed hotel tower without asking permission. He has not commented.</p>
+    </div>
+    <div class="card red">
+      <h3>Reno — Did Not Join</h3>
+      <div class="reno-pop" id="renoPopDisplay">264,000</div>
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:0.5rem;">Population</div>
+      <input type="range" id="renoSlider" min="0" max="10" value="0" oninput="updateReno()">
+      <div style="text-align:center;font-size:11px;color:var(--text-dim);">Drag to advance time</div>
+      <p style="margin-top:0.8rem;" id="renoStatus">Reno declines to join. This is Reno's decision.</p>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--teal);">
+    <h3>The Reno Basque Restaurant</h3>
+    <p>Internationally famous. Six-month reservation wait. The chef refuses all interviews. On three documented occasions, he has been seen with a Dutch Brothers. He has not commented on this. Food journalists make pilgrimages. The restaurant will never close.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TRUMP NEUTRAL ZONE -->
+  <div class="section-title" style="font-size:20px;">The Trump Neutral Zone</div>
+
+  <div class="card gold">
+    <h3>Palos Verdes Estates Diplomatic Enclave — 240 Acres</h3>
+    <p>Terms: tax-free in perpetuity, dedicated Cascalifornia security detail, one permanent flight corridor to Mar-a-Lago. Trump agrees to make no territorial claims, military movements, or statements about Cascalifornia water infrastructure. The aqueduct silence clause is the most carefully negotiated section. The treaty is signed on a Tuesday. Trump announces it as the greatest deal ever made.</p>
+  </div>
+
+  <div class="faction newsom">
+    [No statement.]
+  </div>
+
+  <div class="faction sal">
+    [No statement.]
+  </div>
+
+  <div class="faction doug">
+    [Present in signing photo. Uninvited. Dutch Brothers. Looking at camera.]
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DESERET -->
+  <div class="section-title" style="font-size:20px;">The Deseret Question</div>
+
+  <div class="card purple">
+    <h3>Salt Lake City — The Mormon Empire of Deseret</h3>
+    <p>Technically a US state. Globally recognized as a distinct entity. Self-sufficient. Well-organized governance running in parallel with US government for 150 years. Diplomatic relations with Cascalifornia established immediately. Embassy in Salt Lake (former Airbnb). Embassy in Sacramento (dignified building).</p>
+    <p style="margin-top:0.8rem;">Water rights dispute resolved by Doug Fir during technical consultations: <em>"The water goes where the pipe goes. We can make more pipe."</em> Both sides claim victory. The water issue is resolved. Nobody fully understands how.</p>
+  </div>
+
+  <div class="card purple">
+    <h3>The Arizona Accession — Year 5</h3>
+    <p>Within five years of Cascalifornia's formation, Phoenix and a substantial swath of Arizona determine they are more philosophically aligned with Deseret than with the remaining United States. The logic is geometrically inevitable:</p>
+    <p style="margin-top:0.8rem;">Cascalifornia controls Arizona's water (Colorado River delta, upstream agreements). The remaining US cannot reach Arizona without crossing Cascalifornia or Deseret territory. Arizona's political and religious culture — particularly in Mesa, Gilbert, Chandler, and the broader East Valley, where the LDS population is substantial — finds Deseret's governance model more congenial than either Cascalifornia's imperial progressivism or the remaining US's accelerating dysfunction.</p>
+    <p style="margin-top:0.8rem;">Phoenix joins Deseret. Tucson hesitates (university towns always hesitate) then follows. The Grand Canyon, previously a Cascalifornia tourist destination requiring a transit visa, is now a Deseret asset. Deseret gains its most spectacular landmark. Cascalifornia retains water leverage. A treaty is negotiated governing both.</p>
+    <p style="margin-top:0.8rem;">Doug Fir attends the Grand Canyon treaty signing. He was not invited. He surveys the canyon rim geology. He says: "The water table here is interesting." Both delegations turn to look at him. He has a Dutch Brothers. He does not elaborate.</p>
+  </div>
+
+  <div class="grid-2" style="margin-top:1rem;">
+    <div class="metric">
+      <div class="metric-val purple">GROWING</div>
+      <div class="metric-label">Deseret Territory</div>
+      <div class="metric-sub">UT + most of AZ + Grand Canyon</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val gold">TREATY</div>
+      <div class="metric-label">Canyon/Water Agreement</div>
+      <div class="metric-sub">Cascalifornia water, Deseret land</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- TED WHEELER -->
+  <div class="section-title" style="font-size:20px;">Ted Wheeler — The Mayor of the Trail</div>
+
+  <div class="card gold">
+    <h3>Former Mayor of Portland · Pacific Crest Trail · Red Robe · Six-Foot Staff · Goats</h3>
+    <p>Ted Wheeler served as Mayor of Portland through some of the most chaotic years in the city's recent history. He was tear-gassed at his own protest. He presided over a city that simultaneously voted to defund the police and voted him out for not defunding the police fast enough. His approval rating at the end of his tenure was a number best left unexamined.</p>
+    <p style="margin-top:0.8rem;">Shortly after leaving office, something clicked for him. He acquired a red robe — not a hiking robe, not an outdoor technical garment, but a robe, the kind associated with medieval monasteries or the more serious kind of wizard — and a six-foot hardwood staff that he uses exclusively as a walking implement, never for anything else. He began walking the Pacific Crest Trail northbound from the Mexican border.</p>
+    <p style="margin-top:0.8rem;">The goats were not planned. They appeared, one by one, over the first three weeks. By the Sierra Nevada he had seven goats. By Oregon he had eleven. They follow him without instruction. They are calm. They are loyal in a way that goats — which are famously, constitutionally disloyal — simply are not supposed to be. No explanation has been offered. None has been requested.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card" style="border-left:3px solid var(--gold);">
+      <h3>Trail Name: The Mayor</h3>
+      <p>Assigned by the PCT hiking community without discussion. Wheeler accepted it without comment. He does not discuss Portland. He discusses the goats extensively. Each goat has a documented personality he can describe at length. The goats do not discuss Portland either.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--teal);">
+      <h3>The Journalist Interview</h3>
+      <p>A journalist intercepts him near Crater Lake. Wheeler gives a 45-minute interview entirely about the goats. When asked about Portland, he says: "The goats don't have opinions about Portland." This is the most quoted sentence of his post-mayoral life. It appears on a mural in the Pearl District. He has not seen it.</p>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--purple);">
+    <h3>Cascalifornia's Official Position on Ted Wheeler</h3>
+    <p>Emperor Newsom has issued no statement on Wheeler's walk. Sal Inferno has issued no statement. The Imperial Council has not discussed it on the record. The Cascalifornia Department of Trails and Natural Corridors has noted that an individual matching Wheeler's description has been observed on the PCT in good health with a healthy goat herd and represents no permitting concern.</p>
+    <p style="margin-top:0.8rem;">Doug Fir was observed on the PCT near Ashland, Oregon, on a date that overlaps with Wheeler's estimated position. He was walking alone. He was not with the goat herd. He was heading south. He had a Dutch Brothers. It is unclear where he obtained it. The nearest Dutch Brothers location is 34 miles from that section of trail.</p>
+    <p style="margin-top:0.8rem;">Wheeler and Doug Fir have not confirmed or denied meeting on the trail. The goats have offered no comment.</p>
+  </div>
+
+  <div class="quote">
+    The goats don't have opinions about Portland.
+    <span class="quote-attr">— Ted Wheeler, former Mayor of Portland, near Crater Lake, Oregon, wearing a red robe, holding a six-foot staff, surrounded by eleven unusually loyal goats</span>
+  </div>
+
+</div>
+<div id="dantes" class="tab">
+  <div class="section-title">The Dante's Thread</div>
+  <div class="section-sub">A Full Accounting of the Underground Council's Pacific Coast Operations</div>
+
+  <div class="classified">⛔ DANTE'S UNDERGROUND COUNCIL — NOT FOUND IN ANY CORPORATE REGISTRY ⛔</div>
+
+  <div class="faction dantes">
+    We have no comment. We have never had a comment. We are not certain this tab should exist.
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- EMPIRE MAP -->
+  <div class="section-title" style="font-size:20px;">Known Operations</div>
+
+  <div class="card gold">
+    <h3>Infrastructure Arm</h3>
+    <p><span class="tag gold">silent investor</span><span class="tag teal">Portland Boring Works LLC</span></p>
+    <p>Founder: Doug Fir (flannel, Dutch Brothers, says little). Initial contract: SR-217 Forest Park Tunnel, proof of concept. South Pasadena Tunnel: Boeing brings Portland Boring Works to LA. Dante's acquires SoCal infrastructure stake. The Landings construction contracts follow. Naming rights: Dante's Tunnel Portal, SR-217, Portland end.</p>
+  </div>
+
+  <div class="card purple">
+    <h3>Entertainment Arm</h3>
+    <p><span class="tag red">Vancouver suppressed</span><span class="tag purple">Hollywood deal</span></p>
+    <p>Hollywood sweetheart deal: undisclosed parties, undisclosed terms, undisclosed date. Vernon Studio District: silent investment. Landings Studios: silent investment. Oregon location exemption: all productions may film here (Dante's receives location fees). The deal was brokered at Dante's South, ocean at Sal Inferno's back.</p>
+    <div class="faction sal" style="margin-top:1rem;">
+      No Canucks are gonna benefit from our deal.
+      <span class="quote-attr">— Sal Inferno, Year 3 Vancouver suppression meeting. Three studio heads present. No recording devices permitted.</span>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid #E879A0;">
+    <h3>Vancouver Collapse Timeline</h3>
+    <div class="timeline" style="margin-top:0.8rem;">
+      <div class="timeline-item">
+        <div class="timeline-year">Year 1</div>
+        <div class="timeline-event">Subtle. A few productions quietly leave.</div>
+        <div class="timeline-detail">Industry trades attribute it to the California incentive package.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Year 2</div>
+        <div class="timeline-event">Vernon Studio District opens. 14 productions announce LA.</div>
+        <div class="timeline-detail">Vancouver union reps notice. File complaints with nobody in particular.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Year 3</div>
+        <div class="timeline-event">"No Canucks" meeting. Dante's South.</div>
+        <div class="timeline-detail">Three studio heads. Sal Inferno. Doug Fir is inexplicably present. Nobody asks why.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Year 4</div>
+        <div class="timeline-event">Vancouver production volume -34%. BC inquiry launched.</div>
+        <div class="timeline-detail">Inquiry cannot find Dante's Underground Council in any registry. Inquiry closes. Volume drops 18% more.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Year 5</div>
+        <div class="timeline-event">Dante's Inferno Vancouver opens.</div>
+        <div class="timeline-detail">Most popular nightclub in Vancouver. Sal Inferno attends opening. Says nothing. Doug Fir is present. He was not invited. He has a Dutch Brothers.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card teal">
+    <h3>Hospitality Arm</h3>
+    <p><span class="tag gold">Portland original</span><span class="tag teal">The Landings</span><span class="tag purple">Vancouver</span></p>
+    <p>Dante's Portland: original location, Keep Portland Weird sign, active. Dante's South (The Landings): lagoon and ocean views, Dutch Brothers bar program, Voodoo Donuts late-night, Screen Door brunch Sundays, ocean at Sal Inferno's back. Dante's Inferno Vancouver: opened Year 5, most popular nightclub in the city, maximum irony.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Political/State Formation</h3>
+    <p><span class="tag green">Jefferson-Columbia</span><span class="tag gold">Cascalifornia annexes</span></p>
+    <p>Dante's brokered BC's secession from Canada. Ted Cruz's hotel room package: provenance unconfirmed. Dante's appears in three classified annexes of the Cascalifornia constitution. Nowhere else. Sal Inferno proposed the title "Emperor" for Newsom. This meeting has not been officially confirmed.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DOUG FIR SIGHTING LOG -->
+  <div class="section-title" style="font-size:20px;">Doug Fir — Documented Sightings</div>
+
+  <div class="faction doug">
+    Classification: Civil Engineer. Oregon PE license #[REDACTED]. Founder, Portland Boring Works LLC. Role in Dante's operations: officially none.
+  </div>
+
+  <div class="card" style="font-size:12px;">
+    <h3 style="margin-bottom:0.8rem;">Confirmed Locations (partial)</h3>
+    <div class="scroll-box">
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">SR-217 Forest Park tunnel bore.</span> Engineering role. Expected presence.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Boeing site evaluation, Portland City Hall.</span> Across the street at 12:03 PM. Not invited. Dutch Brothers. Did not wave.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">South Pasadena tunnel boring operation.</span> Engineering role. Expected. However: also present at three South Pasadena city council protest meetings above ground. Sat in back. Said nothing. Dutch Brothers. Left before public comment period.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">"No Canucks" meeting, Dante's South, The Landings.</span> No known engineering role in entertainment suppression. Present. Not asked why. Doug Fir said nothing. Doug Fir left.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Nike Stadium groundbreaking, Hillsboro.</span> Not invited. Dutch Brothers. Flannel. Watched entire ceremony from perimeter.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Mariners final game in Seattle.</span> Upper deck. Alone. Dutch Brothers. Watched the game. Left before final out.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Woodburn Mega-Airport ribbon cutting.</span> Background, left side. Not invited. Dutch Brothers. P-47 the mountain lion was also present (via wildlife camera, Palisades). Both were looking at the camera.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Ted Cruz's cannabis hotel room. Vancouver.</span> Staying two floors up. Package provenance: unconfirmed. Dutch Brothers cup found in hallway. Fingerprints: not collected.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Cascalifornia secession signing ceremony.</span> Background of official photo. Not invited. Dutch Brothers. Looking directly at camera. Has not commented.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Salt Lake City water rights consultations.</span> Dispatched by Emperor Newsom. Said: "The water goes where the pipe goes. We can make more pipe." Both sides claimed victory.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">Reno Basque Restaurant.</span> One documented visit. Dutch Brothers cup on table. Chef recognized him. Neither spoke. Doug Fir left a 40% tip.
+      </div>
+      <div style="margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border);">
+        <span style="color:var(--teal);">CBC Documentary, Episode 6.</span> Background of Vancouver street scene. Looking directly at camera. Dutch Brothers. The documentary team did not notice until editing. They left the shot in. They do not know why.
+      </div>
+      <div>
+        <span style="color:var(--teal);">Emperor Newsom's inaugural address.</span> Named once, in context of infrastructure investment. Crowd applauded. Doug Fir was present. Not invited. Dutch Brothers. Did not applaud. Was already leaving.
+      </div>
+      <div style="margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--border);">
+        <span style="color:var(--teal);">Pacific Crest Trail, near Ashland, Oregon.</span> Observed walking southbound. Alone. Dutch Brothers (source unknown — nearest location 34 miles from trail). Former Mayor Ted Wheeler and eleven goats confirmed to be in the same trail section heading northbound at the same time. Whether they passed each other is unconfirmed. The goats have offered no comment.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="quote">
+    We'll need to sample the soil, but yes, we can go under them.
+    <span class="quote-attr">— Doug Fir's only confirmed public statement on engineering, infrastructure, diplomacy, secession, sports relocation, film industry suppression, volcanic risk, or any other topic. Used in all contexts. Always accurate.</span>
+  </div>
+
+  <div style="text-align:center;margin-top:2rem;padding:2rem;border:1px solid var(--border);border-radius:4px;background:var(--surface);">
+    <div style="font-family:var(--font-display);font-size:13px;color:var(--text-dim);letter-spacing:1px;">Doug Fir's official classification:</div>
+    <div style="font-family:var(--font-display);font-size:32px;color:var(--teal);margin:1rem 0;">[REDACTED]</div>
+    <div style="font-size:11px;color:var(--text-dim);">He is wearing flannel. He has a Dutch Brothers. He is looking at the camera.</div>
+    <button class="btn teal" style="margin-top:1rem;" onclick="incrementDoug()">He just appeared somewhere new</button>
+  </div>
+</div>
+
+<script>
+// ==================== STATE ====================
+let dougCount = 0;
+let dbCount = 0;
+
+function incrementDoug() {
+  dougCount++;
+  dbCount++;
+  document.getElementById('dougCount').textContent = dougCount;
+  document.getElementById('dbCount').textContent = dbCount;
+}
+
+// ==================== NAV ====================
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+  // doug appears randomly
+  if (Math.random() < 0.3) incrementDoug();
+}
+
+// ==================== BRIDGE DATA ====================
+const bridges = {
+  'st-johns': {
+    name: 'St. Johns Bridge',
+    type: 'Existing — Suspension, 1931',
+    feasibility: 95,
+    nimby: 15,
+    description: 'One of Portland\'s most beloved bridges. A Gothic suspension design spanning the Willamette near the industrial northwest. No new crossing needed here — the St. Johns bridge handles the load and doing anything near it would be extremely unpopular.',
+    factions: [
+      { type: 'powell', text: 'The St. Johns Bridge is a masterpiece. Leave it alone. We have a books kiosk at the north landing.' },
+      { type: 'dantes', text: 'The SR-217 extension to St. Johns is our doing. The bridge itself is not our concern. Yet.' }
+    ],
+    nimbyFactions: ['North Portland Neighborhoods (historic character)', 'Cyclists (it\'s already a great cycling bridge)'],
+    verdict: 'Leave this one alone. It\'s perfect.'
+  },
+  'fremont': {
+    name: 'Fremont Bridge',
+    type: 'Existing — Tied Arch, 1973',
+    feasibility: 90,
+    nimby: 20,
+    description: 'The highest bridge in Portland, carrying I-405. Also the terminus of the Rose City Freeway corridor. The Fremont Bridge stub east of I-5 is where the Rose City Freeway was supposed to continue eastbound through Northeast Portland toward Troutdale.',
+    factions: [
+      { type: 'dantes', text: 'The Rose City Freeway stub is interesting to us. The movement of goods from the northeast corridor is an ongoing operational concern.' }
+    ],
+    nimbyFactions: ['Pearl District (any nearby construction)', 'Cyclists (Fremont has no bike lanes, which is a scandal)'],
+    verdict: 'Structurally sound. The real question is the Rose City Freeway stub to the east.'
+  },
+  'mid-columbia': {
+    name: '⚠ Mid-Columbia Crossing — PROPOSED',
+    type: 'Proposed — Between I-5 and I-205 crossings',
+    feasibility: 72,
+    nimby: 78,
+    description: 'A proposed new Columbia River crossing between the Interstate Bridge (I-5) and Glenn Jackson Bridge (I-205). This crossing is the trigger for the Woodburn Mega-Airport scenario. Approving this crossing changes everything. The federal government will demand an I-205 equivalent corridor decision. The Woodburn site becomes viable. Portland\'s economic dominance begins here.',
+    factions: [
+      { type: 'dantes', text: 'We have been anticipating this conversation. We have interests in the corridor between this crossing and Woodburn. We are prepared to discuss terms.' },
+      { type: 'powell', text: 'A mid-Columbia crossing with proper transit connections would drive significant northward expansion. We\'re evaluating a Vancouver, WA flagship location.' },
+      { type: 'voodoo', text: 'Whatever gets built here needs a Voodoo Donuts at the north and south approach. Non-negotiable. We\'ve already filed permits.' }
+    ],
+    nimbyFactions: [
+      'Port of Portland (navigation concerns)',
+      'Vancouver WA neighborhoods (traffic)',
+      'Columbia River environmental groups',
+      'Seattle interests (unnamed, unconfirmed lobbying against)'
+    ],
+    special: '⚠ WARNING: Selecting this crossing triggers the Woodburn Option scenario. Navigate to Tab 2 to continue.',
+    verdict: 'High NIMBY resistance. Transformative consequences. This is the crossing that changes everything.'
+  },
+  'interstate': {
+    name: 'Interstate Bridge (I-5)',
+    type: 'Existing — Twin spans, 1917 & 1958',
+    feasibility: 40,
+    nimby: 85,
+    description: 'The original Columbia River crossing carrying I-5. The twin spans are aging. The Interstate Bridge Replacement program is a real, current, extremely contentious project involving a new bridge with light rail. The political fight is intense. Oregon and Washington disagree. Vancouver WA and Portland disagree. Everyone disagrees.',
+    factions: [
+      { type: 'dantes', text: 'The Interstate Bridge situation has been managed for some time. We have no comment on the IBR project specifically. We have views.' },
+      { type: 'nimby', text: 'Clark County does not want light rail. Clark County has been very clear about this. Clark County will continue to be clear about this.' }
+    ],
+    nimbyFactions: [
+      'Clark County WA (anti-light rail)',
+      'Oregon DOT (needs replacement)',
+      'Washington DOT (different priorities)',
+      'Portland cyclists (want better bike/ped facilities)',
+      'Trucking industry (needs high clearance for river traffic)'
+    ],
+    verdict: 'Replacement is necessary and politically radioactive. The IBR program continues regardless of this simulation.'
+  },
+  'sellwood': {
+    name: 'Sellwood Bridge',
+    type: 'Existing — Deck truss, rebuilt 2016',
+    feasibility: 98,
+    nimby: 72,
+    description: 'Just rebuilt in 2016. The Sellwood neighborhood is extremely aware of this. Any proposed nearby crossing will be met with "WE JUST REBUILT OURS" energy at maximum volume.',
+    factions: [
+      { type: 'nimby', text: 'We JUST rebuilt this bridge. In 2016. That was not long ago. We are not interested in another bridge discussion in this neighborhood for at least forty years. Goodbye.' }
+    ],
+    nimbyFactions: ['Sellwood-Moreland Neighborhood Coalition (maximum "we just rebuilt ours" energy)', 'Cyclists (the rebuilt bridge has good bike lanes and they\'re protective of them)'],
+    verdict: 'The bridge is fine. The neighborhood will never accept another discussion about this. Move on.'
+  },
+  'milwaukie': {
+    name: 'Milwaukie Connector — PROPOSED',
+    type: 'Proposed — Lazy River Great Loop connection',
+    feasibility: 65,
+    nimby: 45,
+    description: 'The proposed Milwaukie Extension connecting the 82nd Street Lazy River system to the Willamette River. If the Great Loop scenario has been pursued in the Harbor Drive game, this crossing completes the circuit: 82nd to PDX, bypass canal to Columbia, Columbia west to Portland, Willamette south, Milwaukie Extension east back to 82nd. Not a conventional bridge — more of a water connection structure.',
+    factions: [
+      { type: 'powell', text: 'A lazy river connection to Milwaukie would mean Powell\'s Books is accessible by inner tube from the airport. We have already begun designing a waterproof reading platform for river customers.' },
+      { type: 'voodoo', text: 'Milwaukie Extension kiosk locations: we\'ve identified six sites. All waterproof. All operational within 60 days of groundbreaking.' }
+    ],
+    nimbyFactions: ['Milwaukie residents (why is there a lazy river here)', 'Willamette Riverkeeper (environmental review required)', 'People who think inner-tubes are a reasonable transportation mode (not technically NIMBYs, but present at every meeting)'],
+    verdict: 'Unusual infrastructure. Surprisingly feasible if the Harbor Drive lazy river scenario has been executed. Portland Boring Works has reviewed the hydrology.'
+  },
+  'hawthorne': {
+    name: 'Hawthorne Bridge',
+    type: 'Existing — Vertical lift, 1910',
+    feasibility: 88,
+    nimby: 25,
+    description: 'Portland\'s oldest standing bridge, opened 1910. The most heavily used bike/pedestrian bridge in the city. A Portland institution. Its age is either a concern or a feature depending on who you ask.',
+    factions: [
+      { type: 'powell', text: 'The Hawthorne Bridge connects our flagship location to the east side. It is irreplaceable as a cultural artifact. If anything, add more bike lanes.' }
+    ],
+    nimbyFactions: ['Historic preservation (it\'s 110 years old)', 'Cyclists (love it, will oppose any changes that reduce bike space)'],
+    verdict: 'Oldest and best. Leave it alone or face consequences.'
+  },
+  'tilikum': {
+    name: 'Tilikum Crossing',
+    type: 'Existing — Cable-stay, 2015 — NO CARS',
+    feasibility: 99,
+    nimby: 30,
+    description: 'Portland\'s newest bridge and the largest car-free bridge in the US. Transit, bikes, and pedestrians only. A genuine point of civic pride. The Dante\'s Underground Council reportedly wanted naming rights when it opened. They did not receive them. They have not commented.',
+    factions: [
+      { type: 'dantes', text: 'We had interest in naming rights for this crossing in 2015. The city declined. We have not forgotten this. The bridge is excellent.' }
+    ],
+    nimbyFactions: ['Car drivers (no cars allowed, constant background grievance)', 'People who think it\'s too modern (wrong)'],
+    verdict: 'Portland\'s finest. The no-cars policy was the right call.'
+  },
+  'north-portland': {
+    name: 'North Portland Connector — PROPOSED',
+    type: 'Proposed — New crossing near St. Johns',
+    feasibility: 68,
+    nimby: 62,
+    description: 'A proposed secondary crossing north of the Broadway/Steel cluster to relieve congestion and serve North Portland\'s industrial waterfront. Close proximity to the SR-217 extension terminus and the St. Johns Bridge complicates the navigation clearance requirements.',
+    factions: [
+      { type: 'dantes', text: 'A North Portland crossing near our SR-217 infrastructure interests is something we\'ve modeled. We have views on the approach vector.' },
+      { type: 'nimby', text: 'North Portland neighborhoods are not opposed to a crossing per se. We are opposed to this specific crossing, this specific design, this specific timeline, and the consultants involved.' }
+    ],
+    nimbyFactions: ['St. Johns neighborhood (proximity to existing bridge)', 'Industrial interests (navigation clearance)', 'Portland Boring Works (Doug Fir has already surveyed the river bed here — nobody asked him to)'],
+    verdict: 'Viable but complicated. Doug Fir has already looked at the geology. He found it acceptable.'
+  },
+  'rose-city-crossing': {
+    name: 'Rose City Crossing — PROPOSED',
+    type: 'Proposed — New Willamette crossing near Fremont',
+    feasibility: 71,
+    nimby: 67,
+    description: 'A proposed new crossing near the Fremont Bridge that would serve as an additional capacity crossing for central Portland. Proximity to the Fremont means navigation clearance must match the existing high arch span. The Pearl District will oppose this with lawyers.',
+    factions: [
+      { type: 'nimby', text: 'The Pearl District Residents Association has retained four law firms, two environmental consultants, and a former city planner. We are prepared for a long engagement.' },
+      { type: 'powell', text: 'A new crossing near the Pearl would potentially increase foot traffic to our Pearl location. We are cautiously interested. Very cautiously.' }
+    ],
+    nimbyFactions: ['Pearl District Residents Association (maximum legal resources)', 'Tanner Creek environmental zone', 'Portland cyclists (want bike infrastructure prioritized)', 'People whose views would be affected'],
+    verdict: 'Technically feasible. Politically expensive. The Pearl will fight this for a decade.'
+  },
+  'inner-east': {
+    name: 'Inner East Connector — PROPOSED',
+    type: 'Proposed — Between Morrison and Hawthorne',
+    feasibility: 74,
+    nimby: 48,
+    description: 'A proposed additional crossing between the Morrison and Hawthorne bridges to relieve the downtown core cluster. The east side approaches land in the dense inner SE grid. Navigation clearance is manageable. NIMBY resistance is moderate — the inner SE is protective but not maximally organized.',
+    factions: [
+      { type: 'powell', text: 'An inner east connector would create two Powell\'s-accessible crossing points in the central waterfront zone. We support this. We are offering to sponsor the bike lane railing design.' },
+      { type: 'voodoo', text: 'Bridge approach kiosk. Both sides. Obviously.' }
+    ],
+    nimbyFactions: ['Inner SE Portland neighborhoods (traffic increase concerns)', 'Cyclists (want protected bike infrastructure from day one)', 'Willamette Riverkeeper (standard environmental review)', 'OMSI (proximity concern)'],
+    verdict: 'Most feasible of the proposed Willamette crossings. Moderate resistance. Powell\'s has offered to help with public outreach, which is either useful or alarming.'
+  },
+  'broadway': {
+    name: 'Broadway Bridge',
+    type: 'Existing — Bascule, 1913',
+    feasibility: 85,
+    nimby: 18,
+    description: 'One of Portland\'s most visually distinctive bridges, painted in a distinctive red color. Opened 1913. Still functional. Well-loved. The bascule mechanism lifts for river traffic with pleasing regularity.',
+    factions: [{ type: 'powell', text: 'The Broadway Bridge is a five-minute walk from our flagship. It connects us to everything. We are in favor of its continued existence.' }],
+    nimbyFactions: ['Cyclists (want better lane separation)', 'Historic preservationists (protective of 1913 structure)'],
+    verdict: 'Classic Portland infrastructure. Maintain it. Paint it occasionally.'
+  },
+  'steel': {
+    name: 'Steel Bridge',
+    type: 'Existing — Double-deck vertical lift, 1912',
+    feasibility: 82,
+    nimby: 22,
+    description: 'The only double-deck vertical lift bridge in the world. Opened 1912. Carries MAX light rail on the lower deck and cars/bikes/pedestrians on the upper deck. An engineering marvel that gets less credit than it deserves.',
+    factions: [{ type: 'dantes', text: 'The Steel Bridge has always impressed us. The dual-deck operation is elegant. We have no operational interest here beyond the aesthetic.' }],
+    nimbyFactions: ['Nobody really — the Steel Bridge is universally respected'],
+    verdict: 'The most interesting bridge in Portland. Continue to appreciate it.'
+  },
+  'burnside': {
+    name: 'Burnside Bridge',
+    type: 'Existing — Bascule, 1926',
+    feasibility: 80,
+    nimby: 40,
+    description: 'Connects Burnside Street — perhaps Portland\'s most contested arterial. Home to ongoing bike lane battles, the Dante\'s Underground Council (whose nightclub is just off Burnside), and the general energy of Portland\'s east-west divide. The bridge itself is fine. The street is complicated.',
+    factions: [
+      { type: 'dantes', text: 'Burnside is our street. The bridge is part of Burnside. We have views on all infrastructure decisions on this corridor.' },
+      { type: 'nimby', text: 'The Burnside bike lane situation is ongoing and we will not rest.' }
+    ],
+    nimbyFactions: ['Cyclists (ongoing bike lane fight)', 'Dante\'s Underground Council (territorial)', 'Drivers (opposing the cyclists)', 'Everyone in Portland, somehow'],
+    verdict: 'The bridge is sound. The politics of Burnside are a permanent condition.'
+  },
+  'morrison': {
+    name: 'Morrison Bridge',
+    type: 'Existing — Double-leaf bascule, 1958',
+    feasibility: 86,
+    nimby: 20,
+    description: 'The youngest of the downtown core bascule bridges. Functional, well-used, less celebrated than its neighbors. The Morrison gets the job done without drama.',
+    factions: [{ type: 'voodoo', text: 'The Morrison Bridge approach is an underserved donut market. This is a missed opportunity we intend to correct.' }],
+    nimbyFactions: ['Cyclists (infrastructure maintenance requests)', 'Downtown interests (traffic flow)'],
+    verdict: 'Reliable. Underappreciated. Fine.'
+  },
+  'marquam': {
+    name: 'Marquam Bridge',
+    type: 'Existing — Double-deck truss, 1966 — I-5',
+    feasibility: 75,
+    nimby: 35,
+    description: 'I-5 crosses the Willamette here on an elevated double-deck structure considered by many to be the ugliest bridge in Portland. Some have proposed replacing it with a more aesthetically pleasing structure. The utilitarian function vs. aesthetic argument has been ongoing since 1966.',
+    factions: [
+      { type: 'powell', text: 'If the Marquam were ever replaced with a structure that allowed pedestrian access, our south waterfront location would benefit enormously.' },
+      { type: 'dantes', text: 'The Marquam\'s aesthetics are not our concern. Its traffic volume is. I-5 moving well is in everyone\'s interest.' }
+    ],
+    nimbyFactions: ['Everyone who has to look at it (aesthetic grievance)', 'Caltrans equivalent (structural integrity of I-5 corridor)', 'South waterfront development interests'],
+    verdict: 'Ugly but essential. A replacement would be welcome but complicated.'
+  },
+  'ross-island': {
+    name: 'Ross Island Bridge',
+    type: 'Existing — Continuous through truss, 1926',
+    feasibility: 78,
+    nimby: 28,
+    description: 'Named for Ross Island, the river island it spans near. A graceful truss design from 1926. Connects South Portland to inner SE. Less politically charged than most Portland bridges, which makes it something of an anomaly.',
+    factions: [{ type: 'voodoo', text: 'Ross Island Bridge approach. South side. We have plans.' }],
+    nimbyFactions: ['Ross Island environmental protection', 'Cyclists (want better facilities)', 'Dueling heritage groups (occasionally)'],
+    verdict: 'Solid bridge. Low drama. Portland could use more of these.'
+  },
+  'glenn-jackson': {
+    name: 'Glenn Jackson Bridge (I-205)',
+    type: 'Existing — Segmental box girder, 1982',
+    feasibility: 92,
+    nimby: 25,
+    description: 'I-205\'s Columbia River crossing. Named for Oregon transportation commissioner Glenn Jackson. Modern, functional, well-designed. Carries light rail on the lower deck (the MAX Yellow Line shares this crossing with I-205 traffic). The east Portland economic corridor depends on this crossing.',
+    factions: [
+      { type: 'dantes', text: 'The Glenn Jackson corridor serves our east Portland interests. It is in good condition. We have nothing further to add.' }
+    ],
+    nimbyFactions: ['East Portland neighborhoods (traffic patterns)', 'Light rail users (want more frequent MAX service)'],
+    verdict: 'Modern and functional. The MAX integration is a success worth noting.'
+  }
+};
+
+function selectBridge(id) {
+  const b = bridges[id];
+  if (!b) return;
+  incrementDoug();
+
+  const report = document.getElementById('bridgeReport');
+  const title = document.getElementById('reportTitle');
+  const content = document.getElementById('reportContent');
+
+  title.textContent = b.name;
+
+  const nimbyColor = b.nimby > 70 ? 'var(--red)' : b.nimby > 40 ? 'var(--orange)' : 'var(--green)';
+  const feasColor = b.feasibility > 75 ? 'var(--green)' : b.feasibility > 50 ? 'var(--orange)' : 'var(--red)';
+
+  let factionsHTML = '';
+  if (b.factions) {
+    b.factions.forEach(f => {
+      factionsHTML += `<div class="faction ${f.type}">${f.text}</div>`;
+    });
+  }
+
+  let nimbyHTML = '';
+  if (b.nimbyFactions) {
+    b.nimbyFactions.forEach(n => {
+      nimbyHTML += `<div style="font-size:12px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid var(--border);">• ${n}</div>`;
+    });
+  }
+
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+      <div class="metric">
+        <div class="metric-val" style="color:${feasColor};">${b.feasibility}%</div>
+        <div class="metric-label">Engineering Feasibility</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" style="color:${nimbyColor};">${b.nimby}%</div>
+        <div class="metric-label">NIMBY Resistance</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="metric-label" style="margin-bottom:6px;">${b.type}</div>
+      <p>${b.description}</p>
+    </div>
+    ${b.special ? `<div class="classified">${b.special}</div>` : ''}
+    ${factionsHTML}
+    <div class="card red" style="margin-bottom:1rem;">
+      <h3>Active Opposition Groups</h3>
+      ${nimbyHTML}
+    </div>
+    <div class="card green">
+      <h3>Assessment Verdict</h3>
+      <p>${b.verdict}</p>
+    </div>
+  `;
+
+  report.classList.add('visible');
+  report.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ==================== WOODBURN ====================
+const woodburnPhases = [
+  { progress: '0%', pdx: 'OPEN', econ: 'STABLE', desc: 'The Mid-Columbia crossing is proposed. The Woodburn site is being discussed in planning circles. Nothing is built yet. PDX continues to operate normally.', dantes: 'We are monitoring the Woodburn situation. We have had interests in the I-5/I-99W corridor south of Portland for some time.' },
+  { progress: '15%', pdx: 'OPEN', econ: 'RISING', desc: 'Site acquisition begins near Woodburn. Farmland purchases. Environmental review initiated. Airlines briefed quietly. Oregon DOT studying the access corridors.', dantes: 'The site acquisition is proceeding. Portland Boring Works has been contracted to assess the underground geology between Portland and Woodburn. Standard procedure.' },
+  { progress: '35%', pdx: 'MONITORING', econ: 'RISING', desc: 'Federal FAA approval received. The Woodburn Mega-Airport is officially a project. SeaTac begins internal projections. United, Delta, and Alaska Airlines quietly begin Woodburn route planning.', dantes: 'Federal approval is helpful. We have interests in the ground transportation infrastructure. The HSR corridor between Portland and Woodburn is an area of particular focus.' },
+  { progress: '55%', pdx: 'FLAGGED', econ: 'STRONG', desc: 'Groundbreaking. Six runway design finalized. HSR connection to Portland and Sacramento approved. Airlines begin major Woodburn commitments. SeaTac notices the numbers changing.', dantes: 'Groundbreaking attended. Not invited. Doug Fir was present. He was also not invited. Dutch Brothers provided catering for our contingent. The catering was excellent.' },
+  { progress: '72%', pdx: 'DECLINING', econ: 'DOMINANT', desc: 'Construction at 72%. First international terminal complete. United announces Woodburn as its Pacific Northwest hub. SeaTac passenger volume begins measurable decline. Portland\'s economic position strengthens significantly.', dantes: 'The hub designation changes everything. Our Woodburn corridor investments are performing as modeled.' },
+  { progress: '88%', pdx: 'REPURPOSING', econ: 'DOMINANT', desc: 'First flights from Woodburn. PDX transitions to cargo and limited regional service. The Pacific Northwest\'s economic center of gravity shifts permanently southward toward Portland. Seattle begins its decline arc.', dantes: 'First flights observed. On time. The Dutch Brothers at the Woodburn departure terminal is excellent, as expected.' },
+  { progress: '100%', pdx: 'SEE TAB 2', econ: 'CASCALIFORNIA', desc: 'Full operations. Woodburn is the Pacific Northwest hub. Three times SeaTac\'s capacity. The economic consequences cascade: Boeing announces Portland is too weird, moves to LA, triggers the LA Renaissance and ultimately the Cascalifornia secession.', dantes: 'Full operations confirmed. Our position is excellent. Keep Portland Weird.' }
+];
+
+function updateWoodburn() {
+  const phase = parseInt(document.getElementById('airportPhase').value);
+  const p = woodburnPhases[phase];
+  document.getElementById('airportProgress').textContent = p.progress;
+  document.getElementById('pdxStatus').textContent = p.pdx;
+  document.getElementById('economicDominance').textContent = p.econ;
+
+  const seattleVol = [100, 98, 90, 75, 55, 30, 5];
+  document.getElementById('seatacVol').textContent = seattleVol[phase] + '%';
+  document.getElementById('seattleEcon').textContent = phase < 2 ? 'STABLE' : phase < 4 ? 'DECLINING' : 'CRISIS';
+
+  document.getElementById('woodburnFactions').innerHTML = `
+    <div class="card gold"><p>${p.desc}</p></div>
+    <div class="faction dantes">${p.dantes}</div>
+  `;
+  incrementDoug();
+}
+
+const pdxFates = {
+  'cargo': { title: 'Cargo-Only Facility', text: 'PDX transitions to a pure cargo operation. Amazon, FedEx, and UPS establish major distribution hubs. The cargo volume actually increases after the passenger transition — Woodburn\'s international connections improve the supply chain. The terminals are converted to warehousing. The control tower remains. The Powell\'s Bookstore in the terminal closes. This is considered the most significant cultural loss of the entire transition.' },
+  'mixed': { title: 'Mixed-Use Development', text: 'The Columbia River frontage of the former PDX site is extraordinary. 3,000 acres of developable land adjacent to the river, with existing infrastructure. A new neighborhood emerges: residential towers, commercial space, a waterfront park. The main terminal is converted to a market hall. The runways become trails. Portland\'s largest development since the Pearl District. Voodoo Donuts opens before the concrete is set.' },
+  'lazyriver': { title: 'The World\'s Largest Lazy River', text: 'Three thousand acres of former airport become the world\'s largest lazy river system. The main runway: two miles of continuous tubing. The Columbia River feeds it. The Willamette Great Loop connects at the south end. Portland\'s tourism economy surges. PDX becomes "The Former Airport That Is Now Entirely Water." Doug Fir designed the hydrology. He was asked this time. He said: "The grade works. We don\'t even need to bore anything."' },
+  'arts': { title: 'Portland Weird Arts District', text: 'The former PDX terminals become the largest arts complex in the Pacific Northwest. The main terminal: performance space. Concourses A, B, C: galleries, studios, maker spaces. The tarmac: outdoor festival venue for 200,000. Dante\'s opens a location in what was once the Alaska Airlines lounge. The runway lights are kept on permanently as public art. Nobody is certain who authorized this.' },
+  'powell': { title: "Powell's Books Mega-Campus", text: "Powell's Books expands to the former PDX site and creates a campus that occupies two former terminal buildings, three concourses, and a runway (converted to a spectacular outdoor reading mall). It is the largest single bookstore on Earth. The Powell's Books Columbia River Campus. Accessible by HSR from Portland. Accessible by inner tube from the Lazy River. Accessible by bike from the trail network. One million books. Still not enough." }
+};
+
+function updatePDX() {
+  const fate = document.getElementById('pdxFate').value;
+  if (!fate) return;
+  const f = pdxFates[fate];
+  document.getElementById('pdxFateOutput').innerHTML = `
+    <div class="card gold">
+      <h3>${f.title}</h3>
+      <p>${f.text}</p>
+    </div>
+  `;
+}
+
+// ==================== SEATTLE DECLINE ====================
+const seattleYears = [
+  { vibe: 100, hawks: 'HERE', mariners: 'HERE', seatac: 'HUB', color: 'var(--text)', narrative: 'Seattle is Seattle. The Seahawks are there. The Mariners are there. SeaTac is a major hub. The coffee culture is intact, though Dutch Brothers is improving rapidly. The vibe is confident.' },
+  { vibe: 90, hawks: 'HERE', mariners: 'HERE', seatac: 'HUB', color: 'var(--orange)', narrative: 'Woodburn construction begins. Airline route planning is happening quietly. Seattle hasn\'t noticed yet. Dutch Brothers opens its first actual café in Capitol Hill. It does extremely well. People attribute this to novelty.' },
+  { vibe: 75, hawks: 'NERVOUS', mariners: 'HERE', seatac: 'DECLINING', color: 'var(--orange)', narrative: 'Woodburn opens Phase 1 flights. SeaTac passenger volume measurably declining. Boeing\'s LA announcement drops. Seattle loses its largest corporate tenant. The Seahawks ownership is having quiet conversations about stadium lease terms.' },
+  { vibe: 58, hawks: 'TALKS', mariners: 'RESTLESS', seatac: 'FALLING', color: 'var(--red)', narrative: 'Seahawks relocation talks become public. Mariners attendance at a 20-year low. SeaTac loses its hub designation from United. Dutch Brothers Capitol Hill location is now the highest-rated coffee shop in Seattle. Starbucks is not commenting.' },
+  { vibe: 42, hawks: 'HILLSBORO', mariners: 'LEAVING', seatac: 'REGIONAL', color: 'var(--red)', narrative: 'The Seahawks sign the Hillsboro agreement. Nike Stadium announced. The Mariner Moose looks worried. SeaTac is now a regional airport. The Dutch Brothers on Pike Street has a longer line than the original Starbucks at Pike Place Market. This is noted by everyone and commented on by no one.' },
+  { vibe: 28, hawks: 'GONE', mariners: 'OAKLAND', seatac: 'STUB', color: 'var(--red)', narrative: 'The Seahawks are now the Portland Cascades. The Mariners play their first game at the Oakland Coliseum as the "Seattle Mariners Playing Home Games In Oakland." The Mariner Moose is retired. A Pacific Brown Pelican is introduced. Oakland is not impressed but accepts it. SeaTac is a stub airport. The mountains remain.' },
+  { vibe: 18, hawks: 'GONE', mariners: 'PACIFIC', seatac: 'MINIMAL', color: 'var(--red)', narrative: 'Seattle is a perfectly fine city with excellent mountains, a dying airport, no NFL team, a baseball team playing in Oakland under a different name, and the best Dutch Brothers per capita of any city in North America. The original Starbucks at Pike Place Market becomes a heritage museum. This is not acknowledged publicly.' },
+  { vibe: 12, hawks: 'GONE', mariners: 'PACIFIC', seatac: 'MINIMAL', color: 'var(--red)', narrative: 'British Columbia, now Jefferson-Columbia, borders Seattle to the north. Ted Cruz\'s progressive policies create a stark contrast with Washington State\'s confused political identity. Washington quietly begins considering its options. Amazon remains. The mountains are still there. The Dutch Brothers is excellent.' }
+];
+
+function updateSeattle() {
+  const year = parseInt(document.getElementById('seattleYear').value);
+  const y = seattleYears[Math.min(year, seattleYears.length-1)];
+  const labels = ['Year 0 (Before Woodburn)', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7+'];
+
+  document.getElementById('yearLabel').textContent = labels[year];
+  document.getElementById('seattleVibe').textContent = y.vibe;
+  document.getElementById('seahawksStatus').textContent = y.hawks;
+  document.getElementById('marinersStatus').textContent = y.mariners;
+  document.getElementById('seatacStatus').textContent = y.seatac;
+
+  document.getElementById('seattleVibe').style.color = y.color;
+
+  document.getElementById('seattleNarrative').innerHTML = `<p>${y.narrative}</p>`;
+}
+
+// ==================== DUTCH BROTHERS ====================
+const dbStages = [
+  { score: 12, color: 'var(--red)', text: 'Dutch Brothers currently operates 800+ drive-through locations. The coffee scores a 12/100. It is enthusiastically prepared by people who deeply love their jobs and the brand. The love is genuine. The espresso extraction is not.' },
+  { score: 35, color: 'var(--orange)', text: 'The Woodburn Airport contract provides a cash infusion that changes the procurement equation. Better equipment is purchased. The commercial espresso machines are real this time. The score improves to 35. This surprises everyone, including Dutch Brothers.' },
+  { score: 58, color: 'var(--orange)', text: 'Real baristas are hired. Trained ones. From Portland (where else). They bring their knowledge of extraction ratios, grind settings, and the general attitude that coffee is serious. The combination of Dutch Brothers energy and Portland technique produces something genuinely good. Score: 58.' },
+  { score: 74, color: 'var(--gold)', text: 'Proper café locations open alongside the drive-throughs. Tables. Atmosphere. The aesthetic is still Dutch Brothers — cowboys, energy, the brand — but now it has the infrastructure of a real café. Score: 74. Food journalists take notice. Portland is confused by its feelings.' },
+  { score: 89, color: 'var(--gold)', text: 'Dutch Brothers conquers Seattle. The Capitol Hill location has the longest line of any coffee shop in the city. Starbucks issues no comment. The Pike Place Starbucks begins to feel like a heritage site rather than a living institution. Score: 89.' },
+  { score: 96, color: 'var(--green)', text: 'The Cascalifornia contract — covering all state facilities, the Woodburn airport, and every Dante\'s location — gives Dutch Brothers the volume and resources to perfect their operation at scale. Score: 96. The coffee is genuinely excellent. This sentence would not have been writable five years ago.' },
+  { score: 100, color: 'var(--teal)', text: 'Starbucks releases a statement acknowledging Dutch Brothers as "a respected competitor with a distinctive approach." This is the corporate equivalent of a full confession. Dutch Brothers achieves 100/100. The cowboy on the cup has not changed. He looks the same as always. Somehow now he makes sense.' }
+];
+
+function updateDB() {
+  const stage = parseInt(document.getElementById('dbStage').value);
+  const s = dbStages[stage];
+  const el = document.getElementById('dbQuality');
+  el.textContent = s.score;
+  el.style.color = s.color;
+  document.getElementById('dbNarrative').innerHTML = `<p style="font-size:13px;color:var(--text-dim);">${s.text}</p>`;
+  dbCount++;
+  document.getElementById('dbCount').textContent = dbCount;
+}
+
+// ==================== LA PHASES ====================
+const laPhases = [
+  {
+    sr47: '0%', tunnel: '0%',
+    content: `<div class="card gold"><h3>Boeing Announces LA Relocation</h3><p>The official announcement arrives three weeks after the Portland site visit. The stated reason: "Los Angeles offers superior proximity to our existing McDonnell Douglas integration facilities and a more hospitable climate for executive operations." The unstated reason is the fermented oat porridge and the cyclist who maintained eye contact through the red light.</p></div><div class="faction doug">I watched the motorcade leave. I finished my Dutch Brothers. I called the LA contact. <span class="quote-attr">— Doug Fir, later</span></div>`
+  },
+  {
+    sr47: '15%', tunnel: '0%',
+    content: `<div class="card teal"><h3>SR-47 Industrial Freeway — Groundbreaking</h3><p>The Alameda Corridor rail line already exists as proof of concept. SR-47 will run parallel as a high-speed truck and cargo corridor: Port of LA/Long Beach north through Wilmington, Carson, Compton, South LA, Vernon, Commerce. Boeing's Vernon campus breaks ground simultaneously. The aerospace revival begins at both ends of the corridor at once.</p></div>`
+  },
+  {
+    sr47: '100%', tunnel: '0%',
+    content: `<div class="card green"><h3>SR-47 Opens — Port of LA to Vernon/Commerce</h3><p>The complete goods movement corridor from San Pedro to Boeing's Vernon campus is operational. Trucks move at freeway speed through the corridor for the first time. Port throughput increases 34%. Boeing's supply chain integrates immediately. Vernon, Commerce, and South LA begin their manufacturing renaissance. The freight connection that LA has needed since the 1950s is finally built.</p></div><div class="faction voodoo">SR-47 rest stop, Vernon exit. We're open. Obviously.</div>`
+  },
+  {
+    sr47: '100%', tunnel: '35%',
+    content: `<div class="card gold"><h3>South Pasadena Tunnel — Portland Boring Works Begins</h3><p>Portland Boring Works LLC (founder: Doug Fir) is contracted by CalTrans using Boeing aerospace tax revenues. The machine enters the ground at the Long Beach Freeway stub terminus at Valley Boulevard. It is 80 feet below South Pasadena. It is boring at 47 feet per day. Nobody in South Pasadena knows this is happening.</p></div><div class="faction nimby">THE SOUTH PASADENA FREEWAY EXTENSION MUST BE STOPPED. WE HAVE BEEN FIGHTING THIS FOR 50 YEARS AND WE WILL NOT STOP NOW. THE CITY COUNCIL MEETING IS TUESDAY. [The meeting is occurring 80 feet above an active boring machine.]</div><div class="faction doug">We'll need to sample the soil, but yes, we can go under them.<span class="quote-attr">— Doug Fir, initial South Pasadena site assessment</span></div>`
+  },
+  {
+    sr47: '100%', tunnel: '100%',
+    content: `<div class="card teal"><h3>Tunnel Complete — Protesters Still Protesting</h3><p>Portland Boring Works completes the South Pasadena tunnel. Zero properties demolished. Zero residents displaced. The craftsman homes of South Pasadena stand undisturbed above a completed tunnel. The South Pasadena city council receives certified letters explaining this. The letters are filed without opening. The protest continues for three more months.</p></div><div class="faction nimby">WE ARE STILL HERE. THE FREEWAY WILL NOT BE BUILT. [The tunnel has been complete for 11 weeks.]</div>`
+  },
+  {
+    sr47: '100%', tunnel: '100%',
+    content: `<div class="card gold"><h3>California Boulevard Terminus Opens — 210 Connected</h3><p>The tunnel emerges at the California Boulevard stub in Pasadena. The 210 Freeway interchange is complete. The full goods movement corridor now reads: Port of LA → SR-47 → East LA Interchange → Long Beach Freeway → Valley Blvd → South Pasadena Tunnel → California Blvd → 210 Freeway → San Gabriel Valley and beyond. The 50-year fight is over. South Pasadena's homes are intact. History is made.</p></div><div class="faction doug">The grade worked exactly as modeled. <span class="quote-attr">— Doug Fir, tunnel completion report, in its entirety</span></div>`
+  }
+];
+
+function updateLA() {
+  const phase = parseInt(document.getElementById('laPhase').value);
+  const p = laPhases[phase];
+  document.getElementById('sr47Progress').textContent = p.sr47;
+  document.getElementById('tunnelProgress').textContent = p.tunnel;
+  document.getElementById('laPhaseContent').innerHTML = p.content;
+  incrementDoug();
+}
+
+// ==================== RENO ====================
+const renoPop = [264000, 218000, 160000, 110000, 74000, 51000, 38000, 31000, 29000, 28000, 27500];
+const renoStatuses = [
+  'Reno declines to join Cascalifornia. This is Reno\'s decision. Reno has always done things its own way.',
+  'The California border is now a foreign national border. I-80 commerce requires Cascalifornia transit. The math is becoming complicated.',
+  'First casino closes. The Sands. "Due to changing market conditions." The conditions are that most customers now live in Cascalifornia.',
+  'The Truckee River headwaters are in Cascalifornia territory. Water negotiations begin. They are not going well.',
+  'Three more casinos close. UNR remains operational. The university town function continues. The rest of Reno is quieter.',
+  'A wave of artists moves to Reno specifically because the rents are extraordinary. They open studios in former casinos.',
+  'The Basque restaurant achieves international fame. Six-month reservation wait. The chef refuses all interviews.',
+  'Population stabilizes at approximately 31,000. Remaining residents: Reno loyalists, artists, UNR, and the Basque restaurant ecosystem.',
+  'Dutch Brothers spotted at Basque restaurant vicinity. Chef has not commented.',
+  'A documentary is made about Reno\'s decline. It is moving and excellent. The Basque restaurant features in episode 3.',
+  'Reno is fine, actually. Different. Quieter. Smaller. But fine. The mountains are still there. The Basque restaurant has a two-year wait.'
+];
+
+function updateReno() {
+  const year = parseInt(document.getElementById('renoSlider').value);
+  const pop = renoPop[year].toLocaleString();
+  document.getElementById('renoPopDisplay').textContent = pop;
+  document.getElementById('renoStatus').textContent = renoStatuses[year];
+  if (year > 6) incrementDoug();
+}
+
+// ==================== INIT ====================
+updateWoodburn();
+updateDB();
+updateLA();
+updateSeattle();
+</script>
+
+</body>
+</html>
